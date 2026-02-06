@@ -41,7 +41,7 @@ export default function SettingsScreen() {
           gap: 24,
         }}
       >
-        {/* Theme selector */}
+        {/* Theme selector with live preview */}
         <View style={{ gap: 12 }}>
           <Text
             style={{
@@ -52,7 +52,16 @@ export default function SettingsScreen() {
           >
             Theme
           </Text>
-          <View style={{ flexDirection: 'row', gap: 12 }}>
+          <Text
+            style={{
+              fontSize: 13,
+              fontFamily: 'Inter_400Regular',
+              color: theme.textMuted,
+            }}
+          >
+            Pick a color palette for your space. Changes apply instantly.
+          </Text>
+          <View style={{ gap: 10 }}>
             {(Object.keys(THEMES) as ThemeName[]).map((themeName) => {
               const colors = THEMES[themeName];
               const isSelected = currentTheme === themeName;
@@ -61,34 +70,70 @@ export default function SettingsScreen() {
                   key={themeName}
                   onPress={() => setTheme(themeName)}
                   style={{
-                    flex: 1,
+                    flexDirection: 'row',
                     alignItems: 'center',
-                    gap: 6,
-                    padding: 12,
-                    borderRadius: 12,
+                    gap: 14,
+                    padding: 14,
+                    borderRadius: 16,
                     borderWidth: 2,
-                    borderColor: isSelected ? colors.primary : 'transparent',
-                    backgroundColor: colors.primarySoft,
+                    borderColor: isSelected ? colors.primary : theme.accent,
+                    backgroundColor: isSelected ? colors.primarySoft : theme.surface,
                   }}
                 >
-                  <View
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
-                      backgroundColor: colors.primary,
-                    }}
-                  />
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontFamily: 'Inter_500Medium',
-                      color: colors.primary,
-                      textTransform: 'capitalize',
-                    }}
-                  >
-                    {themeName}
-                  </Text>
+                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                    <View
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 14,
+                        backgroundColor: colors.primary,
+                      }}
+                    />
+                    <View
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 14,
+                        backgroundColor: colors.accent,
+                      }}
+                    />
+                    <View
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 14,
+                        backgroundColor: colors.primarySoft,
+                        borderWidth: 1,
+                        borderColor: colors.accent,
+                      }}
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        fontFamily: 'Inter_600SemiBold',
+                        color: isSelected ? colors.primary : theme.textPrimary,
+                        textTransform: 'capitalize',
+                      }}
+                    >
+                      {themeName}
+                    </Text>
+                  </View>
+                  {isSelected && (
+                    <View
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: 12,
+                        backgroundColor: colors.primary,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text style={{ color: '#FFFFFF', fontSize: 14 }}>{'\u2713'}</Text>
+                    </View>
+                  )}
                 </Pressable>
               );
             })}
@@ -102,7 +147,7 @@ export default function SettingsScreen() {
               Us
             </Text>
             <Text style={{ fontSize: 13, fontFamily: 'Inter_400Regular', color: theme.textMuted }}>
-              A private app for the two of you. Version 1.0.0
+              A private app for the two of you. Version 2.0.0
             </Text>
           </View>
         </Card>

@@ -1,4 +1,4 @@
-import type { ThemeColors, ThemeName } from './types';
+import type { ThemeColors, ThemeName, DateIdeaCategory, DailyQuestion } from './types';
 
 // ============================================
 // Theme Definitions
@@ -120,3 +120,121 @@ export const ONBOARDING_STEPS = [
   { key: 'theme', title: 'Pick your vibe', subtitle: 'Choose a color theme for your space.' },
   { key: 'photo', title: 'Add a couple photo', subtitle: 'Your favorite picture together.' },
 ] as const;
+
+// ============================================
+// Date Ideas (Phase 2)
+// ============================================
+
+export const DATE_IDEAS: {
+  title: string;
+  description: string;
+  category: DateIdeaCategory;
+}[] = [
+  // At-home
+  { title: 'Cook a new recipe together', description: 'Pick a cuisine neither of you has tried and make it from scratch.', category: 'at-home' },
+  { title: 'Movie marathon', description: 'Pick a trilogy or franchise and binge it with snacks.', category: 'at-home' },
+  { title: 'Build a blanket fort', description: 'Pillows, fairy lights, and your favorite show inside.', category: 'at-home' },
+  { title: 'Paint night', description: 'Get canvases and paint the same scene — compare at the end.', category: 'at-home' },
+  { title: 'Board game tournament', description: 'Best of 3 across different games. Loser makes dessert.', category: 'at-home' },
+  { title: 'Bake something sweet', description: 'Cookies, brownies, or a cake you decorate together.', category: 'at-home' },
+  { title: 'Spa night at home', description: 'Face masks, candles, massage, and relaxing music.', category: 'at-home' },
+  { title: 'Stargaze from your window', description: 'Turn off all the lights and look up at the sky together.', category: 'at-home' },
+  { title: 'Write love letters', description: 'Sit together but write each other a heartfelt letter to read later.', category: 'at-home' },
+  { title: 'Photo album night', description: 'Go through old photos and relive your favorite memories.', category: 'at-home' },
+  // Outdoor
+  { title: 'Picnic in the park', description: 'Pack your favorite foods and find a beautiful spot outside.', category: 'outdoor' },
+  { title: 'Sunrise or sunset walk', description: 'Wake up early or go out in the evening for a scenic walk.', category: 'outdoor' },
+  { title: 'Bike ride together', description: 'Explore a trail or ride around your neighborhood.', category: 'outdoor' },
+  { title: 'Visit a farmers market', description: 'Walk around, sample food, and buy ingredients for dinner.', category: 'outdoor' },
+  { title: 'Beach day', description: 'Sand, sun, and each other. Simple and perfect.', category: 'outdoor' },
+  { title: 'Go hiking', description: 'Find a nearby trail and enjoy nature together.', category: 'outdoor' },
+  { title: 'Botanical garden visit', description: 'Walk through beautiful gardens and take photos together.', category: 'outdoor' },
+  { title: 'Fly a kite', description: 'Find an open field and enjoy the wind together.', category: 'outdoor' },
+  { title: 'Outdoor movie', description: 'Bring a laptop, blanket, and snacks to a park at night.', category: 'outdoor' },
+  { title: 'Walk with no destination', description: 'Just walk together and see where you end up.', category: 'outdoor' },
+  // Fancy
+  { title: 'Dress up and dine out', description: 'Put on your best outfit and go somewhere special.', category: 'fancy' },
+  { title: 'Wine or cocktail tasting', description: 'Visit a winery or try making fancy cocktails at home.', category: 'fancy' },
+  { title: 'Go see a live show', description: 'Concert, theater, comedy show, or live music.', category: 'fancy' },
+  { title: 'Rooftop dinner', description: 'Find a restaurant with a view and enjoy the skyline.', category: 'fancy' },
+  { title: 'Art gallery date', description: 'Explore an exhibition and discuss your favorite pieces.', category: 'fancy' },
+  { title: 'Couples massage', description: 'Book a real spa day and fully relax together.', category: 'fancy' },
+  { title: 'Afternoon tea', description: 'Dress up and enjoy tea, scones, and conversation.', category: 'fancy' },
+  { title: 'Candlelit dinner at home', description: 'Make a gourmet meal, set the table with candles, and play soft music.', category: 'fancy' },
+  // Adventure
+  { title: 'Road trip to somewhere new', description: 'Pick a town you\'ve never visited and just drive there.', category: 'adventure' },
+  { title: 'Try a new sport together', description: 'Rock climbing, kayaking, tennis — something neither has tried.', category: 'adventure' },
+  { title: 'Escape room', description: 'Work together to solve puzzles and escape.', category: 'adventure' },
+  { title: 'Amusement park', description: 'Rides, cotton candy, and winning a stuffed animal.', category: 'adventure' },
+  { title: 'Go camping', description: 'Pitch a tent, make a fire, and enjoy nature overnight.', category: 'adventure' },
+  { title: 'Take a dance class', description: 'Salsa, swing, or ballroom — learn something new together.', category: 'adventure' },
+  { title: 'Scavenger hunt', description: 'Create clues for each other around the city or neighborhood.', category: 'adventure' },
+  { title: 'Volunteer together', description: 'Give back side by side — animal shelter, food bank, or cleanup.', category: 'adventure' },
+];
+
+// ============================================
+// Daily Questions (Phase 2)
+// ============================================
+
+export const DAILY_QUESTIONS: DailyQuestion[] = [
+  { id: 'q1', question: 'What is your favorite memory of us?', category: 'question' },
+  { id: 'q2', question: 'What was the moment you knew you loved me?', category: 'question' },
+  { id: 'q3', question: 'What do you love most about our relationship?', category: 'question' },
+  { id: 'q4', question: 'If we could travel anywhere tomorrow, where would you want to go?', category: 'question' },
+  { id: 'q5', question: 'What is something new you want us to try together?', category: 'question' },
+  { id: 'q6', question: 'What song makes you think of me?', category: 'question' },
+  { id: 'q7', question: 'What is your dream date with me?', category: 'question' },
+  { id: 'q8', question: 'What is one thing I do that always makes you smile?', category: 'question' },
+  { id: 'q9', question: 'What do you think is our greatest strength as a couple?', category: 'question' },
+  { id: 'q10', question: 'Describe your perfect lazy Sunday with me.', category: 'question' },
+  { id: 'q11', question: 'What is the funniest thing that has happened to us?', category: 'question' },
+  { id: 'q12', question: 'If you could relive one day with me, which day would it be?', category: 'question' },
+  { id: 'q13', question: 'What is something you have never told me but want me to know?', category: 'question' },
+  { id: 'q14', question: 'What is your favorite way to show love?', category: 'question' },
+  { id: 'q15', question: 'What little thing do I do that means the world to you?', category: 'question' },
+  { id: 'q16', question: 'What is one goal you want us to achieve together this year?', category: 'question' },
+  { id: 'q17', question: 'What is your favorite thing about my personality?', category: 'question' },
+  { id: 'q18', question: 'If we wrote a book about our love story, what would the title be?', category: 'question' },
+  { id: 'q19', question: 'What is the most romantic thing I have ever done for you?', category: 'question' },
+  { id: 'q20', question: 'What does "home" mean to you?', category: 'question' },
+  // Would You Rather
+  { id: 'wyr1', question: 'Would you rather have a surprise date or plan one together?', category: 'would-you-rather' },
+  { id: 'wyr2', question: 'Would you rather go on a beach vacation or a mountain adventure?', category: 'would-you-rather' },
+  { id: 'wyr3', question: 'Would you rather have breakfast in bed or dinner by candlelight?', category: 'would-you-rather' },
+  { id: 'wyr4', question: 'Would you rather receive a love letter or a surprise gift?', category: 'would-you-rather' },
+  { id: 'wyr5', question: 'Would you rather cook together or eat out at a fancy restaurant?', category: 'would-you-rather' },
+  { id: 'wyr6', question: 'Would you rather relive our first date or plan a brand new one?', category: 'would-you-rather' },
+  { id: 'wyr7', question: 'Would you rather dance in the rain or watch the sunset together?', category: 'would-you-rather' },
+  { id: 'wyr8', question: 'Would you rather have a movie night or a game night?', category: 'would-you-rather' },
+  { id: 'wyr9', question: 'Would you rather travel the world together or build a dream home?', category: 'would-you-rather' },
+  { id: 'wyr10', question: 'Would you rather have more time or more money for our dates?', category: 'would-you-rather' },
+];
+
+// ============================================
+// Timeline Icons (Phase 2)
+// ============================================
+
+export const TIMELINE_ICONS = [
+  { emoji: '\u2764\ufe0f', label: 'Heart' },
+  { emoji: '\ud83d\udc8d', label: 'Ring' },
+  { emoji: '\u2708\ufe0f', label: 'Travel' },
+  { emoji: '\ud83c\udf89', label: 'Party' },
+  { emoji: '\ud83c\udf93', label: 'Graduation' },
+  { emoji: '\ud83c\udfe0', label: 'Home' },
+  { emoji: '\ud83c\udf39', label: 'Rose' },
+  { emoji: '\ud83d\udcf8', label: 'Photo' },
+  { emoji: '\ud83c\udfb5', label: 'Music' },
+  { emoji: '\ud83c\udf1f', label: 'Star' },
+  { emoji: '\ud83d\ude97', label: 'Car' },
+  { emoji: '\ud83c\udf82', label: 'Cake' },
+];
+
+// ============================================
+// Bucket List Category Labels (Phase 2)
+// ============================================
+
+export const BUCKET_CATEGORIES = [
+  { key: 'this-week' as const, label: 'This Week', emoji: '\ud83d\udcc5' },
+  { key: 'this-month' as const, label: 'This Month', emoji: '\ud83d\uddd3\ufe0f' },
+  { key: 'someday' as const, label: 'Someday', emoji: '\u2728' },
+];

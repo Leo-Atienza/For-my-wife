@@ -1,6 +1,16 @@
 import { View, Text, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
-import { PenLine, Camera, Clock, MapPin, Heart, BookOpen } from 'lucide-react-native';
+import {
+  PenLine,
+  Camera,
+  Clock,
+  BookOpen,
+  CalendarHeart,
+  CheckSquare,
+  Smile,
+  Music,
+  MessageCircle,
+} from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import type { ReactNode } from 'react';
 
@@ -8,7 +18,6 @@ interface ActionItem {
   icon: ReactNode;
   label: string;
   route: string;
-  emoji?: string;
 }
 
 export const QuickActions = () => {
@@ -32,19 +41,34 @@ export const QuickActions = () => {
       route: '/(tabs)/countdowns',
     },
     {
-      icon: <MapPin size={24} color={theme.primary} />,
-      label: 'Distance',
-      route: '/distance',
-    },
-    {
-      icon: <Heart size={24} color={theme.primary} />,
-      label: 'Profile',
-      route: '/profile/couple',
-    },
-    {
       icon: <BookOpen size={24} color={theme.primary} />,
       label: 'Timeline',
       route: '/timeline',
+    },
+    {
+      icon: <CalendarHeart size={24} color={theme.primary} />,
+      label: 'Date Ideas',
+      route: '/dates',
+    },
+    {
+      icon: <CheckSquare size={24} color={theme.primary} />,
+      label: 'Bucket List',
+      route: '/bucket-list',
+    },
+    {
+      icon: <Smile size={24} color={theme.primary} />,
+      label: 'Mood',
+      route: '/mood',
+    },
+    {
+      icon: <Music size={24} color={theme.primary} />,
+      label: 'Songs',
+      route: '/songs',
+    },
+    {
+      icon: <MessageCircle size={24} color={theme.primary} />,
+      label: 'Questions',
+      route: '/questions',
     },
   ];
 
@@ -87,6 +111,7 @@ export const QuickActions = () => {
               fontFamily: 'Inter_500Medium',
               color: theme.textPrimary,
             }}
+            numberOfLines={1}
           >
             {action.label}
           </Text>
