@@ -98,6 +98,57 @@ export interface LocationEntry {
 }
 
 // ============================================
+// Phase 2 — New Data Models
+// ============================================
+
+export interface DateIdea {
+  id: string;
+  title: string;
+  description: string;
+  category: DateIdeaCategory;
+  isFavorite: boolean;
+  isCustom: boolean;
+}
+
+export type DateIdeaCategory = 'at-home' | 'outdoor' | 'fancy' | 'adventure';
+
+export interface JournalLetter {
+  id: string;
+  author: PartnerRole;
+  content: string;
+  weekKey: string;
+  revealDate: string;
+  createdAt: string;
+}
+
+export interface DailyQuestion {
+  id: string;
+  question: string;
+  category: 'question' | 'would-you-rather';
+}
+
+export interface DailyQuestionEntry {
+  id: string;
+  questionId: string;
+  question: string;
+  category: 'question' | 'would-you-rather';
+  dateKey: string;
+  partner1Answer?: string;
+  partner2Answer?: string;
+  createdAt: string;
+}
+
+export interface SongDedicationEntry {
+  id: string;
+  dedicatedBy: PartnerRole;
+  title: string;
+  artist: string;
+  url?: string;
+  message?: string;
+  createdAt: string;
+}
+
+// ============================================
 // Supporting Types
 // ============================================
 
