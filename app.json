@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Us",
+    "slug": "us-couple-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "us-couple-app",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF1F2"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.us.coupleapp"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFF1F2"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.us.coupleapp"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ]
+  }
+}
