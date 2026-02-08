@@ -1,9 +1,12 @@
-import { View, Text } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MapPin } from 'lucide-react-native';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProfileStore } from '@/stores/useProfileStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { useTheme } from '@/hooks/useTheme';
+import { useLocationTracking } from '@/hooks/useLocationTracking';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -13,10 +16,14 @@ import { calculateDistanceKm, formatDistance } from '@/lib/distance';
 export default function DistanceScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
+  const myRole = useAuthStore((state) => state.myRole);
   const partner1 = useProfileStore((state) => state.partner1);
   const partner2 = useProfileStore((state) => state.partner2);
   const locations = useLocationStore((state) => state.locations);
   const setLocation = useLocationStore((state) => state.setLocation);
+
+  // Enable GPS tracking while on this screen
+  useLocationTracking();
 
   const [city1, setCity1] = useState(locations.partner1?.cityName ?? '');
   const [lat1, setLat1] = useState(locations.partner1?.latitude.toString() ?? '');
@@ -46,10 +53,47 @@ export default function DistanceScreen() {
     ? calculateDistanceKm(loc1.latitude, loc1.longitude, loc2.latitude, loc2.longitude)
     : null;
 
+  const myLoc = myRole === 'partner1' ? loc1 : loc2;
+  const isGpsActive = !!myLoc;
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
       <PageHeader title="Distance" showBack />
-      <View style={{ paddingHorizontal: 24, gap: 20, paddingBottom: insets.bottom + 20 }}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 24,
+          gap: 20,
+          paddingBottom: insets.bottom + 20,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* GPS Status */}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+            backgroundColor: isGpsActive ? theme.primarySoft : theme.surface,
+            borderRadius: 12,
+            padding: 12,
+            borderWidth: 1,
+            borderColor: theme.accent,
+          }}
+        >
+          <MapPin size={18} color={isGpsActive ? theme.primary : theme.textMuted} />
+          <Text
+            style={{
+              fontSize: 13,
+              fontFamily: 'Inter_500Medium',
+              color: isGpsActive ? theme.primary : theme.textMuted,
+            }}
+          >
+            {isGpsActive
+              ? `GPS active \u2022 ${myLoc.cityName ?? 'Tracking...'}`
+              : 'GPS tracking will start automatically'}
+          </Text>
+        </View>
+
         {/* Distance display */}
         {distanceKm !== null && loc1 && loc2 && (
           <Card>
@@ -77,7 +121,11 @@ export default function DistanceScreen() {
           </Card>
         )}
 
-        {/* Manual location inputs */}
+        {/* Manual location inputs (fallback) */}
+        <Text style={{ fontSize: 14, fontFamily: 'Inter_600SemiBold', color: theme.textMuted, marginTop: 8 }}>
+          Manual Override
+        </Text>
+
         <Text style={{ fontSize: 16, fontFamily: 'Inter_600SemiBold', color: theme.textPrimary }}>
           {partner1?.name ?? 'Your'} Location
         </Text>
@@ -105,7 +153,7 @@ export default function DistanceScreen() {
         </View>
 
         <Button title="Update Distance" onPress={handleSave} />
-      </View>
+      </ScrollView>
     </View>
   );
 }

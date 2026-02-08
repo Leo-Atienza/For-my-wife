@@ -19,7 +19,16 @@ export const Button = ({
   const theme = useTheme();
 
   const getBackgroundColor = () => {
-    if (disabled) return '#D1D5DB';
+    if (disabled) {
+      switch (variant) {
+        case 'primary':
+          return theme.accent; // Use theme accent (e.g. soft pink) instead of gray
+        case 'secondary':
+          return theme.primarySoft;
+        case 'ghost':
+          return 'transparent';
+      }
+    }
     switch (variant) {
       case 'primary':
         return theme.primary;
@@ -31,7 +40,16 @@ export const Button = ({
   };
 
   const getTextColor = () => {
-    if (disabled) return '#9CA3AF';
+    if (disabled) {
+      switch (variant) {
+        case 'primary':
+          return '#FFFFFF'; // White text on accent bg for visibility
+        case 'secondary':
+          return theme.accent;
+        case 'ghost':
+          return theme.accent;
+      }
+    }
     switch (variant) {
       case 'primary':
         return '#FFFFFF';
@@ -42,13 +60,23 @@ export const Button = ({
     }
   };
 
+  const getBorderStyle = () => {
+    if (disabled && variant === 'ghost') {
+      return { borderWidth: 1, borderColor: theme.accent };
+    }
+    if (variant === 'secondary') {
+      return { borderWidth: 1, borderColor: theme.accent };
+    }
+    return {};
+  };
+
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled || loading}
       style={({ pressed }) => ({
         backgroundColor: getBackgroundColor(),
-        opacity: pressed ? 0.9 : 1,
+        opacity: pressed ? 0.9 : disabled ? 0.6 : 1,
         borderRadius: 9999,
         paddingHorizontal: 24,
         paddingVertical: 14,
@@ -56,6 +84,7 @@ export const Button = ({
         justifyContent: 'center',
         flexDirection: 'row',
         minHeight: 48,
+        ...getBorderStyle(),
       })}
       accessibilityRole="button"
       accessibilityLabel={title}

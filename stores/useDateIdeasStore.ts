@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
 import { generateId } from '@/lib/utils';
+import { pushToSupabase, deleteFromSupabase } from '@/lib/sync';
 import { DATE_IDEAS } from '@/lib/constants';
 import type { DateIdea, DateIdeaCategory } from '@/lib/types';
 
@@ -13,6 +14,10 @@ interface DateIdeasState {
   toggleFavorite: (id: string) => void;
   isFavorite: (id: string) => boolean;
   getAllIdeas: () => DateIdea[];
+  loadFromRemote: (records: DateIdea[]) => void;
+  syncRemoteInsert: (record: DateIdea) => void;
+  syncRemoteUpdate: (record: DateIdea) => void;
+  syncRemoteDelete: (id: string) => void;
   reset: () => void;
 }
 
@@ -29,26 +34,28 @@ export const useDateIdeasStore = create<DateIdeasState>()(
       customIdeas: [],
       favoriteIds: [],
 
-      addCustomIdea: (title, description, category) =>
+      addCustomIdea: (title, description, category) => {
+        const idea: DateIdea = {
+          id: generateId(),
+          title,
+          description,
+          category,
+          isFavorite: false,
+          isCustom: true,
+        };
         set((state) => ({
-          customIdeas: [
-            ...state.customIdeas,
-            {
-              id: generateId(),
-              title,
-              description,
-              category,
-              isFavorite: false,
-              isCustom: true,
-            },
-          ],
-        })),
+          customIdeas: [...state.customIdeas, idea],
+        }));
+        pushToSupabase('date_ideas', idea);
+      },
 
-      removeCustomIdea: (id) =>
+      removeCustomIdea: (id) => {
         set((state) => ({
           customIdeas: state.customIdeas.filter((i) => i.id !== id),
           favoriteIds: state.favoriteIds.filter((fId) => fId !== id),
-        })),
+        }));
+        deleteFromSupabase('date_ideas', id);
+      },
 
       toggleFavorite: (id) =>
         set((state) => ({
@@ -67,6 +74,27 @@ export const useDateIdeasStore = create<DateIdeasState>()(
           isFavorite: favs.includes(idea.id),
         }));
       },
+
+      loadFromRemote: (records) => set({ customIdeas: records }),
+
+      syncRemoteInsert: (record) =>
+        set((state) => {
+          if (state.customIdeas.some((i) => i.id === record.id)) return state;
+          return { customIdeas: [...state.customIdeas, record] };
+        }),
+
+      syncRemoteUpdate: (record) =>
+        set((state) => ({
+          customIdeas: state.customIdeas.map((i) =>
+            i.id === record.id ? { ...i, ...record } : i
+          ),
+        })),
+
+      syncRemoteDelete: (id) =>
+        set((state) => ({
+          customIdeas: state.customIdeas.filter((i) => i.id !== id),
+          favoriteIds: state.favoriteIds.filter((fId) => fId !== id),
+        })),
 
       reset: () => set({ customIdeas: [], favoriteIds: [] }),
     }),

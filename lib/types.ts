@@ -205,6 +205,68 @@ export interface ThemeColors {
 }
 
 // ============================================
+// Phase 3 — Auth & Sync Types
+// ============================================
+
+export interface Space {
+  id: string;
+  inviteCode: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface SpaceMember {
+  id: string;
+  spaceId: string;
+  userId: string;
+  role: PartnerRole;
+  joinedAt: string;
+  pushToken?: string;
+}
+
+export interface ThinkingOfYouTap {
+  id: string;
+  fromPartner: PartnerRole;
+  createdAt: string;
+}
+
+export interface SleepWakeEntry {
+  id: string;
+  partner: PartnerRole;
+  status: 'sleeping' | 'awake';
+  createdAt: string;
+}
+
+export interface WeeklyRecap {
+  id: string;
+  weekKey: string;
+  memoriesCount: number;
+  notesCount: number;
+  bucketCompletedCount: number;
+  moodSummary: string;
+  highlightText: string;
+  createdAt: string;
+}
+
+export type PartnerNoteCategory =
+  | 'things-i-love'
+  | 'noticed-today'
+  | 'why-amazing'
+  | 'gratitude'
+  | 'memories-of-us';
+
+export interface PartnerNote {
+  id: string;
+  author: PartnerRole;
+  aboutPartner: PartnerRole;
+  content: string;
+  category: PartnerNoteCategory;
+  isDiscovered: boolean;
+  discoveredAt?: string;
+  createdAt: string;
+}
+
+// ============================================
 // Onboarding Types
 // ============================================
 

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
 import { generateId } from '@/lib/utils';
+import { pushToSupabase } from '@/lib/sync';
 import { DAILY_QUESTIONS } from '@/lib/constants';
 import type { DailyQuestionEntry, PartnerRole } from '@/lib/types';
 
@@ -10,6 +11,10 @@ interface QuestionsState {
   getTodayEntry: () => DailyQuestionEntry | undefined;
   createTodayEntry: () => DailyQuestionEntry;
   answerQuestion: (entryId: string, partner: PartnerRole, answer: string) => void;
+  loadFromRemote: (records: DailyQuestionEntry[]) => void;
+  syncRemoteInsert: (record: DailyQuestionEntry) => void;
+  syncRemoteUpdate: (record: DailyQuestionEntry) => void;
+  syncRemoteDelete: (id: string) => void;
   reset: () => void;
 }
 
@@ -54,11 +59,12 @@ export const useQuestionsStore = create<QuestionsState>()(
         set((state) => ({
           entries: [newEntry, ...state.entries],
         }));
+        pushToSupabase('daily_question_entries', newEntry);
 
         return newEntry;
       },
 
-      answerQuestion: (entryId, partner, answer) =>
+      answerQuestion: (entryId, partner, answer) => {
         set((state) => ({
           entries: state.entries.map((e) =>
             e.id === entryId
@@ -70,6 +76,29 @@ export const useQuestionsStore = create<QuestionsState>()(
                 }
               : e
           ),
+        }));
+        const updated = get().entries.find((e) => e.id === entryId);
+        if (updated) pushToSupabase('daily_question_entries', updated);
+      },
+
+      loadFromRemote: (records) => set({ entries: records }),
+
+      syncRemoteInsert: (record) =>
+        set((state) => {
+          if (state.entries.some((e) => e.id === record.id)) return state;
+          return { entries: [record, ...state.entries] };
+        }),
+
+      syncRemoteUpdate: (record) =>
+        set((state) => ({
+          entries: state.entries.map((e) =>
+            e.id === record.id ? { ...e, ...record } : e
+          ),
+        })),
+
+      syncRemoteDelete: (id) =>
+        set((state) => ({
+          entries: state.entries.filter((e) => e.id !== id),
         })),
 
       reset: () => set({ entries: [] }),

@@ -12,6 +12,8 @@ interface InputProps {
   maxLength?: number;
   autoFocus?: boolean;
   keyboardType?: 'default' | 'email-address' | 'numeric';
+  secureTextEntry?: boolean;
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
 }
 
 export const Input = ({
@@ -24,6 +26,8 @@ export const Input = ({
   maxLength,
   autoFocus = false,
   keyboardType = 'default',
+  secureTextEntry = false,
+  autoCapitalize,
 }: InputProps) => {
   const theme = useTheme();
   const [isFocused, setIsFocused] = useState(false);
@@ -51,6 +55,8 @@ export const Input = ({
         maxLength={maxLength}
         autoFocus={autoFocus}
         keyboardType={keyboardType}
+        secureTextEntry={secureTextEntry}
+        autoCapitalize={autoCapitalize}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         style={{

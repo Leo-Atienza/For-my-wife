@@ -15,6 +15,8 @@ import {
   MessageCircle,
   Music,
   Palette,
+  NotebookPen,
+  Fingerprint,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -154,6 +156,18 @@ export default function MoreScreen() {
           label: 'Song Dedications',
           subtitle: 'Build your shared playlist',
           route: '/songs',
+        },
+        {
+          icon: <NotebookPen size={22} color={theme.primary} />,
+          label: 'Partner Notes',
+          subtitle: 'Notes about your partner',
+          route: '/partner-notes',
+        },
+        {
+          icon: <Fingerprint size={22} color={theme.primary} />,
+          label: 'Virtual Touch',
+          subtitle: 'Touch screens together',
+          route: '/touch',
         },
         {
           icon: <MapPin size={22} color={theme.primary} />,

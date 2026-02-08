@@ -9,6 +9,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { uploadPhoto } from '@/lib/photo-storage';
 import { Pressable, Text } from 'react-native';
 
 export default function NewMemoryScreen() {
@@ -21,6 +22,7 @@ export default function NewMemoryScreen() {
   const [caption, setCaption] = useState('');
   const [date, setDate] = useState('');
   const [location, setLocation] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -34,11 +36,21 @@ export default function NewMemoryScreen() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!imageUri || !caption.trim()) return;
-    const memoryDate = date.trim() || new Date().toISOString().split('T')[0];
-    addMemory(imageUri, caption.trim(), memoryDate, location.trim() || undefined);
-    router.back();
+    setIsUploading(true);
+
+    try {
+      // Upload photo to cloud storage, fall back to local URI
+      const cloudUrl = await uploadPhoto(imageUri, 'memories');
+      const finalUri = cloudUrl ?? imageUri;
+
+      const memoryDate = date.trim() || new Date().toISOString().split('T')[0];
+      addMemory(finalUri, caption.trim(), memoryDate, location.trim() || undefined);
+      router.back();
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -118,9 +130,10 @@ export default function NewMemoryScreen() {
 
         <View style={{ marginTop: 'auto', paddingTop: 16 }}>
           <Button
-            title="Save Memory"
+            title={isUploading ? 'Uploading...' : 'Save Memory'}
             onPress={handleSave}
-            disabled={!imageUri || !caption.trim()}
+            disabled={!imageUri || !caption.trim() || isUploading}
+            loading={isUploading}
           />
         </View>
       </ScrollView>

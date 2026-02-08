@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
 import { generateId } from '@/lib/utils';
+import { pushToSupabase, deleteFromSupabase } from '@/lib/sync';
 import type { Milestone } from '@/lib/types';
 
 interface TimelineState {
@@ -10,6 +11,10 @@ interface TimelineState {
   removeMilestone: (id: string) => void;
   updateMilestone: (id: string, updates: Partial<Milestone>) => void;
   getMilestoneById: (id: string) => Milestone | undefined;
+  loadFromRemote: (records: Milestone[]) => void;
+  syncRemoteInsert: (record: Milestone) => void;
+  syncRemoteUpdate: (record: Milestone) => void;
+  syncRemoteDelete: (id: string) => void;
   reset: () => void;
 }
 
@@ -18,34 +23,71 @@ export const useTimelineStore = create<TimelineState>()(
     (set, get) => ({
       milestones: [],
 
-      addMilestone: (title, date, description, icon, imageUri) =>
+      addMilestone: (title, date, description, icon, imageUri) => {
+        const milestone: Milestone = {
+          id: generateId(),
+          title,
+          date,
+          description,
+          icon,
+          imageUri,
+        };
         set((state) => ({
           milestones: [
             ...state.milestones,
-            {
-              id: generateId(),
-              title,
-              date,
-              description,
-              icon,
-              imageUri,
-            },
+            milestone,
           ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
-        })),
+        }));
+        pushToSupabase('milestones', milestone);
+      },
 
-      removeMilestone: (id) =>
+      removeMilestone: (id) => {
         set((state) => ({
           milestones: state.milestones.filter((m) => m.id !== id),
-        })),
+        }));
+        deleteFromSupabase('milestones', id);
+      },
 
-      updateMilestone: (id, updates) =>
+      updateMilestone: (id, updates) => {
         set((state) => ({
           milestones: state.milestones
             .map((m) => (m.id === id ? { ...m, ...updates } : m))
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
-        })),
+        }));
+        const updated = get().milestones.find((m) => m.id === id);
+        if (updated) pushToSupabase('milestones', updated);
+      },
 
       getMilestoneById: (id) => get().milestones.find((m) => m.id === id),
+
+      loadFromRemote: (records) =>
+        set({
+          milestones: records.sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          ),
+        }),
+
+      syncRemoteInsert: (record) =>
+        set((state) => {
+          if (state.milestones.some((m) => m.id === record.id)) return state;
+          return {
+            milestones: [...state.milestones, record].sort(
+              (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+            ),
+          };
+        }),
+
+      syncRemoteUpdate: (record) =>
+        set((state) => ({
+          milestones: state.milestones
+            .map((m) => (m.id === record.id ? { ...m, ...record } : m))
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+        })),
+
+      syncRemoteDelete: (id) =>
+        set((state) => ({
+          milestones: state.milestones.filter((m) => m.id !== id),
+        })),
 
       reset: () => set({ milestones: [] }),
     }),

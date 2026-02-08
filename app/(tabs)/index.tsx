@@ -1,44 +1,99 @@
-import { View, Text, ScrollView, Image } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { View, Text, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCoupleStore } from '@/stores/useCoupleStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useNicknameStore } from '@/stores/useNicknameStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { useTheme } from '@/hooks/useTheme';
 import { DurationCounter } from '@/components/home/DurationCounter';
 import { QuickActions } from '@/components/home/QuickActions';
 import { DailyQuote } from '@/components/home/DailyQuote';
+import { ThinkingOfYouButton } from '@/components/home/ThinkingOfYouButton';
+import { ThinkingOfYouReceiver } from '@/components/home/ThinkingOfYouReceiver';
+import { SleepWakeToggle } from '@/components/home/SleepWakeToggle';
+import { PartnerSleepStatus } from '@/components/home/PartnerSleepStatus';
+import { WeeklyRecapCard } from '@/components/home/WeeklyRecapCard';
+import { SyncStatusIndicator } from '@/components/home/SyncStatusIndicator';
 import { getGreeting } from '@/lib/utils';
 
 export default function HomeScreen() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
+  const session = useAuthStore((state) => state.session);
+  const spaceId = useAuthStore((state) => state.spaceId);
   const isOnboarded = useCoupleStore((state) => state.isOnboarded);
   const profile = useCoupleStore((state) => state.profile);
   const partner1 = useProfileStore((state) => state.partner1);
   const partner2 = useProfileStore((state) => state.partner2);
   const getActiveNickname = useNicknameStore((state) => state.getActiveNickname);
 
-  useEffect(() => {
-    if (!isOnboarded) {
-      router.replace('/setup');
-    }
-  }, [isOnboarded, router]);
+  // Auth redirects are handled by _layout.tsx useProtectedRoute
+  // Show loading state while waiting for data
+  if (!session || !spaceId || !isOnboarded) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: theme.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <ActivityIndicator size="small" color={theme.primary} />
+      </View>
+    );
+  }
 
-  if (!isOnboarded || !profile || !partner1) {
-    return null;
+  // Handle missing profile data gracefully (empty state)
+  if (!profile || !partner1) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: theme.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingHorizontal: 32,
+          gap: 16,
+        }}
+      >
+        <Text style={{ fontSize: 48 }}>{'\u2764\ufe0f'}</Text>
+        <Text
+          style={{
+            fontSize: 20,
+            fontFamily: 'PlayfairDisplay_700Bold',
+            color: theme.textPrimary,
+            textAlign: 'center',
+          }}
+        >
+          Setting things up...
+        </Text>
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: 'Inter_400Regular',
+            color: theme.textMuted,
+            textAlign: 'center',
+          }}
+        >
+          Loading your shared space. This may take a moment.
+        </Text>
+        <ActivityIndicator size="small" color={theme.primary} />
+      </View>
+    );
   }
 
   const nickname = getActiveNickname('partner2');
   const partnerDisplayName = nickname ?? partner2?.name ?? 'Your love';
+  const myName = partner1.name ?? 'You';
   const greeting = getGreeting();
 
   return (
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+    <ThinkingOfYouReceiver />
     <ScrollView
-      style={{ flex: 1, backgroundColor: theme.background }}
+      style={{ flex: 1 }}
       contentContainerStyle={{
         paddingTop: insets.top + 16,
         paddingBottom: insets.bottom + 80,
@@ -47,6 +102,9 @@ export default function HomeScreen() {
       }}
       showsVerticalScrollIndicator={false}
     >
+      {/* Sync status */}
+      <SyncStatusIndicator />
+
       {/* Header with couple photo and names */}
       <View style={{ alignItems: 'center', gap: 12 }}>
         {profile.couplePhoto ? (
@@ -84,7 +142,7 @@ export default function HomeScreen() {
             color: theme.textMuted,
           }}
         >
-          {greeting}, {partner1.name}
+          {greeting}, {myName}
         </Text>
 
         <Text
@@ -95,12 +153,21 @@ export default function HomeScreen() {
             textAlign: 'center',
           }}
         >
-          {partner1.name} & {partnerDisplayName}
+          {myName} & {partnerDisplayName}
         </Text>
       </View>
 
+      {/* Thinking of You + Partner Status */}
+      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
+        <ThinkingOfYouButton />
+      </View>
+
+      <PartnerSleepStatus />
+
       {/* Duration counter */}
-      <DurationCounter anniversaryDate={profile.anniversaryDate} />
+      {profile.anniversaryDate ? (
+        <DurationCounter anniversaryDate={profile.anniversaryDate} />
+      ) : null}
 
       {/* Quick actions */}
       <View style={{ gap: 12 }}>
@@ -116,8 +183,15 @@ export default function HomeScreen() {
         <QuickActions />
       </View>
 
+      {/* Sleep/Wake toggle */}
+      <SleepWakeToggle />
+
+      {/* Weekly Recap */}
+      <WeeklyRecapCard />
+
       {/* Daily quote */}
       <DailyQuote />
     </ScrollView>
+    </View>
   );
 }

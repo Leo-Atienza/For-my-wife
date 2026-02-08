@@ -10,6 +10,7 @@ import {
   Smile,
   Music,
   MessageCircle,
+  NotebookPen,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import type { ReactNode } from 'react';
@@ -69,6 +70,11 @@ export const QuickActions = () => {
       icon: <MessageCircle size={24} color={theme.primary} />,
       label: 'Questions',
       route: '/questions',
+    },
+    {
+      icon: <NotebookPen size={24} color={theme.primary} />,
+      label: 'Partner Notes',
+      route: '/partner-notes',
     },
   ];
 

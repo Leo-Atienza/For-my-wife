@@ -2,36 +2,79 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
 import { generateId } from '@/lib/utils';
+import { pushToSupabase } from '@/lib/sync';
 import type { LocationEntry, PartnerRole } from '@/lib/types';
 
 interface LocationState {
   locations: Record<PartnerRole, LocationEntry | null>;
   setLocation: (partner: PartnerRole, lat: number, lng: number, cityName?: string) => void;
+  loadFromRemote: (records: LocationEntry[]) => void;
+  syncRemoteInsert: (record: LocationEntry) => void;
+  syncRemoteUpdate: (record: LocationEntry) => void;
+  syncRemoteDelete: (id: string) => void;
   reset: () => void;
 }
 
 export const useLocationStore = create<LocationState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       locations: {
         partner1: null,
         partner2: null,
       },
 
-      setLocation: (partner, latitude, longitude, cityName) =>
+      setLocation: (partner, latitude, longitude, cityName) => {
+        const entry: LocationEntry = {
+          id: generateId(),
+          partner,
+          latitude,
+          longitude,
+          cityName,
+          updatedAt: new Date().toISOString(),
+        };
         set((state) => ({
           locations: {
             ...state.locations,
-            [partner]: {
-              id: generateId(),
-              partner,
-              latitude,
-              longitude,
-              cityName,
-              updatedAt: new Date().toISOString(),
-            },
+            [partner]: entry,
+          },
+        }));
+        pushToSupabase('location_entries', entry);
+      },
+
+      loadFromRemote: (records) => {
+        const locations: Record<PartnerRole, LocationEntry | null> = {
+          partner1: null,
+          partner2: null,
+        };
+        for (const record of records) {
+          locations[record.partner] = record;
+        }
+        set({ locations });
+      },
+
+      syncRemoteInsert: (record) =>
+        set((state) => ({
+          locations: {
+            ...state.locations,
+            [record.partner]: record,
           },
         })),
+
+      syncRemoteUpdate: (record) =>
+        set((state) => ({
+          locations: {
+            ...state.locations,
+            [record.partner]: record,
+          },
+        })),
+
+      syncRemoteDelete: (id) =>
+        set((state) => {
+          const newLocations = { ...state.locations };
+          if (newLocations.partner1?.id === id) newLocations.partner1 = null;
+          if (newLocations.partner2?.id === id) newLocations.partner2 = null;
+          return { locations: newLocations };
+        }),
 
       reset: () => set({ locations: { partner1: null, partner2: null } }),
     }),
