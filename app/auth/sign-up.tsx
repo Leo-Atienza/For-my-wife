@@ -202,11 +202,30 @@ export default function SignUpScreen() {
           )}
 
           <View style={{ marginTop: 8 }}>
-            <Button
-              title="Create Account"
+            <Pressable
               onPress={handleSignUp}
-              loading={isLoading}
-            />
+              disabled={isLoading}
+              style={{
+                backgroundColor: '#E11D48',
+                borderRadius: 9999,
+                paddingHorizontal: 24,
+                paddingVertical: 16,
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 52,
+              }}
+            >
+              <Text
+                style={{
+                  color: '#FFFFFF',
+                  fontSize: 17,
+                  fontFamily: 'Inter_600SemiBold',
+                  fontWeight: '600',
+                }}
+              >
+                {isLoading ? 'Creating Account...' : 'Create Account'}
+              </Text>
+            </Pressable>
           </View>
         </View>
 
