@@ -6,7 +6,6 @@ import {
   Platform,
   ScrollView,
   Pressable,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -31,10 +30,23 @@ export default function SignUpScreen() {
   const [confirmationSent, setConfirmationSent] = useState(false);
 
   const passwordsMatch = password === confirmPassword;
-  const canSubmit = email.trim().length > 0 && password.length >= 6 && passwordsMatch;
+  const [validationError, setValidationError] = useState('');
 
   const handleSignUp = async () => {
-    if (!canSubmit) return;
+    // Validate and show clear error instead of silently disabling
+    if (!email.trim()) {
+      setValidationError('Please enter your email address.');
+      return;
+    }
+    if (password.length < 6) {
+      setValidationError(`Password must be at least 6 characters (currently ${password.length}).`);
+      return;
+    }
+    if (!passwordsMatch) {
+      setValidationError('Passwords do not match.');
+      return;
+    }
+    setValidationError('');
     try {
       const result = await signUp(email.trim(), password);
       if (result === 'session') {
@@ -141,7 +153,7 @@ export default function SignUpScreen() {
         <View style={{ gap: 12 }}>
           <Input
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(v) => { setEmail(v); setValidationError(''); }}
             placeholder="Email"
             label="Email"
             keyboardType="email-address"
@@ -149,7 +161,7 @@ export default function SignUpScreen() {
           />
           <Input
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(v) => { setPassword(v); setValidationError(''); }}
             placeholder="At least 6 characters"
             label="Password"
             secureTextEntry
@@ -157,7 +169,7 @@ export default function SignUpScreen() {
           />
           <Input
             value={confirmPassword}
-            onChangeText={setConfirmPassword}
+            onChangeText={(v) => { setConfirmPassword(v); setValidationError(''); }}
             placeholder="Confirm your password"
             label="Confirm Password"
             secureTextEntry
@@ -176,7 +188,7 @@ export default function SignUpScreen() {
             </Text>
           )}
 
-          {error && (
+          {(error || validationError) && (
             <Text
               style={{
                 fontSize: 13,
@@ -185,35 +197,16 @@ export default function SignUpScreen() {
                 textAlign: 'center',
               }}
             >
-              {error}
+              {error || validationError}
             </Text>
           )}
 
-          <View style={{ marginTop: 8, gap: 8 }}>
+          <View style={{ marginTop: 8 }}>
             <Button
               title="Create Account"
               onPress={handleSignUp}
-              disabled={!canSubmit}
               loading={isLoading}
             />
-            {!canSubmit && (email.length > 0 || password.length > 0 || confirmPassword.length > 0) && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontFamily: 'Inter_400Regular',
-                  color: theme.textMuted,
-                  textAlign: 'center',
-                }}
-              >
-                {!email.trim()
-                  ? 'Enter your email to continue'
-                  : password.length < 6
-                    ? `Password must be at least 6 characters (${password.length}/6)`
-                    : !passwordsMatch
-                      ? 'Passwords must match'
-                      : ''}
-              </Text>
-            )}
           </View>
         </View>
 
