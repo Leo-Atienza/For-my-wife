@@ -83,51 +83,63 @@ export const useAuthStore = create<AuthState>()(
 
       signUp: async (email, password) => {
         set({ isLoading: true, error: null });
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
+        try {
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+          });
 
-        if (error) {
-          set({ isLoading: false, error: error.message });
+          if (error) {
+            set({ isLoading: false, error: error.message });
+            return false;
+          }
+
+          if (data.session) {
+            set({
+              session: data.session,
+              user: data.user,
+              isLoading: false,
+            });
+            return 'session';
+          }
+
+          // No session means email confirmation is required
+          set({ isLoading: false });
+          return 'confirmation';
+        } catch (e) {
+          const message = e instanceof Error ? e.message : 'Something went wrong. Please try again.';
+          set({ isLoading: false, error: message });
           return false;
         }
+      },
 
-        if (data.session) {
+      signIn: async (email, password) => {
+        set({ isLoading: true, error: null });
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (error) {
+            set({ isLoading: false, error: error.message });
+            return false;
+          }
+
           set({
             session: data.session,
             user: data.user,
             isLoading: false,
           });
-          return 'session';
-        }
 
-        // No session means email confirmation is required
-        set({ isLoading: false });
-        return 'confirmation';
-      },
-
-      signIn: async (email, password) => {
-        set({ isLoading: true, error: null });
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          set({ isLoading: false, error: error.message });
+          // Load space info after sign in
+          await get().loadSpaceInfo();
+          return true;
+        } catch (e) {
+          const message = e instanceof Error ? e.message : 'Something went wrong. Please try again.';
+          set({ isLoading: false, error: message });
           return false;
         }
-
-        set({
-          session: data.session,
-          user: data.user,
-          isLoading: false,
-        });
-
-        // Load space info after sign in
-        await get().loadSpaceInfo();
-        return true;
       },
 
       signOut: async () => {

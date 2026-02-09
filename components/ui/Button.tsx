@@ -22,7 +22,7 @@ export const Button = ({
     if (disabled) {
       switch (variant) {
         case 'primary':
-          return theme.accent;
+          return '#D6D3D1'; // Stone-300 — clearly grayed out
         case 'secondary':
           return theme.primarySoft;
         case 'ghost':
@@ -43,7 +43,7 @@ export const Button = ({
     if (disabled) {
       switch (variant) {
         case 'primary':
-          return '#FFFFFF';
+          return 'rgba(255, 255, 255, 0.6)';
         case 'secondary':
           return theme.textMuted;
         case 'ghost':

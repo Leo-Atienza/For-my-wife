@@ -6,6 +6,7 @@ import {
   Platform,
   ScrollView,
   Pressable,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -22,6 +23,7 @@ export default function SignUpScreen() {
   const signUp = useAuthStore((state) => state.signUp);
   const isLoading = useAuthStore((state) => state.isLoading);
   const error = useAuthStore((state) => state.error);
+  const setError = useAuthStore((state) => state.setError);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,13 +35,17 @@ export default function SignUpScreen() {
 
   const handleSignUp = async () => {
     if (!canSubmit) return;
-    const result = await signUp(email.trim(), password);
-    if (result === 'session') {
-      // Session created immediately — navigate to create space
-      router.replace('/auth/create-space');
-    } else if (result === 'confirmation') {
-      // Email confirmation required
-      setConfirmationSent(true);
+    try {
+      const result = await signUp(email.trim(), password);
+      if (result === 'session') {
+        router.replace('/auth/create-space');
+      } else if (result === 'confirmation') {
+        setConfirmationSent(true);
+      }
+      // result === false means error was already set in the store
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'An unexpected error occurred.';
+      setError(message);
     }
   };
 
@@ -183,13 +189,31 @@ export default function SignUpScreen() {
             </Text>
           )}
 
-          <View style={{ marginTop: 8 }}>
+          <View style={{ marginTop: 8, gap: 8 }}>
             <Button
               title="Create Account"
               onPress={handleSignUp}
               disabled={!canSubmit}
               loading={isLoading}
             />
+            {!canSubmit && (email.length > 0 || password.length > 0 || confirmPassword.length > 0) && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontFamily: 'Inter_400Regular',
+                  color: theme.textMuted,
+                  textAlign: 'center',
+                }}
+              >
+                {!email.trim()
+                  ? 'Enter your email to continue'
+                  : password.length < 6
+                    ? `Password must be at least 6 characters (${password.length}/6)`
+                    : !passwordsMatch
+                      ? 'Passwords must match'
+                      : ''}
+              </Text>
+            )}
           </View>
         </View>
 

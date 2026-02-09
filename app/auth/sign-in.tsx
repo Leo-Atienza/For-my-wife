@@ -22,14 +22,19 @@ export default function SignInScreen() {
   const signIn = useAuthStore((state) => state.signIn);
   const isLoading = useAuthStore((state) => state.isLoading);
   const error = useAuthStore((state) => state.error);
+  const setError = useAuthStore((state) => state.setError);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSignIn = async () => {
     if (!email.trim() || !password.trim()) return;
-    // useProtectedRoute in _layout.tsx handles navigation after session changes
-    await signIn(email.trim(), password);
+    try {
+      await signIn(email.trim(), password);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'An unexpected error occurred.';
+      setError(message);
+    }
   };
 
   return (
