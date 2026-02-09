@@ -22,7 +22,7 @@ export const Button = ({
     if (disabled) {
       switch (variant) {
         case 'primary':
-          return theme.primary; // Keep primary color, opacity handles the "disabled" look
+          return theme.accent;
         case 'secondary':
           return theme.primarySoft;
         case 'ghost':
@@ -43,11 +43,11 @@ export const Button = ({
     if (disabled) {
       switch (variant) {
         case 'primary':
-          return '#FFFFFF'; // White text on accent bg for visibility
+          return theme.textMuted;
         case 'secondary':
-          return theme.accent;
+          return theme.textMuted;
         case 'ghost':
-          return theme.accent;
+          return theme.textMuted;
       }
     }
     switch (variant) {
@@ -76,7 +76,7 @@ export const Button = ({
       disabled={disabled || loading}
       style={({ pressed }) => ({
         backgroundColor: getBackgroundColor(),
-        opacity: pressed ? 0.9 : disabled ? 0.75 : 1,
+        opacity: pressed ? 0.9 : 1,
         borderRadius: 9999,
         paddingHorizontal: 24,
         paddingVertical: 14,
