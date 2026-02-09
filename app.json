@@ -23,6 +23,7 @@
         "backgroundColor": "#FFF1F2"
       },
       "edgeToEdgeEnabled": true,
+      "softwareKeyboardLayoutMode": "resize",
       "package": "com.us.coupleapp"
     },
     "plugins": [

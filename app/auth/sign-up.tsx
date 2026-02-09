@@ -26,23 +26,77 @@ export default function SignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmationSent, setConfirmationSent] = useState(false);
 
   const passwordsMatch = password === confirmPassword;
   const canSubmit = email.trim().length > 0 && password.length >= 6 && passwordsMatch;
 
   const handleSignUp = async () => {
     if (!canSubmit) return;
-    const success = await signUp(email.trim(), password);
-    if (success) {
+    const result = await signUp(email.trim(), password);
+    if (result === 'session') {
+      // Session created immediately — navigate to create space
       router.replace('/auth/create-space');
+    } else if (result === 'confirmation') {
+      // Email confirmation required
+      setConfirmationSent(true);
     }
   };
+
+  if (confirmationSent) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: theme.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingHorizontal: 32,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+          gap: 12,
+        }}
+      >
+        <Text style={{ fontSize: 48 }}>{'\u2709\ufe0f'}</Text>
+        <Text
+          style={{
+            fontSize: 24,
+            fontFamily: 'PlayfairDisplay_700Bold',
+            color: theme.textPrimary,
+            textAlign: 'center',
+          }}
+        >
+          Check Your Email
+        </Text>
+        <Text
+          style={{
+            fontSize: 15,
+            fontFamily: 'Inter_400Regular',
+            color: theme.textMuted,
+            textAlign: 'center',
+            lineHeight: 22,
+          }}
+        >
+          We sent a confirmation link to{' '}
+          <Text style={{ fontFamily: 'Inter_600SemiBold', color: theme.textPrimary }}>
+            {email.trim()}
+          </Text>
+          . Tap the link to activate your account, then come back and sign in.
+        </Text>
+        <View style={{ marginTop: 16, width: '100%' }}>
+          <Button
+            title="Go to Sign In"
+            onPress={() => router.replace('/auth/sign-in')}
+          />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: theme.background }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
         contentContainerStyle={{

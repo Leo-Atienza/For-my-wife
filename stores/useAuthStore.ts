@@ -36,7 +36,7 @@ interface AuthState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 
-  signUp: (email: string, password: string) => Promise<boolean>;
+  signUp: (email: string, password: string) => Promise<'session' | 'confirmation' | false>;
   signIn: (email: string, password: string) => Promise<boolean>;
   signOut: () => Promise<void>;
 
@@ -99,10 +99,12 @@ export const useAuthStore = create<AuthState>()(
             user: data.user,
             isLoading: false,
           });
-        } else {
-          set({ isLoading: false });
+          return 'session';
         }
-        return true;
+
+        // No session means email confirmation is required
+        set({ isLoading: false });
+        return 'confirmation';
       },
 
       signIn: async (email, password) => {
