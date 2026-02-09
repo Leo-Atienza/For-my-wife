@@ -37,16 +37,15 @@ export default function SignInScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: theme.background }}
-      behavior="padding"
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
           paddingTop: insets.top + 60,
-          paddingBottom: insets.bottom + 40,
+          paddingBottom: insets.bottom + 60,
           paddingHorizontal: 24,
-          justifyContent: 'center',
         }}
         keyboardShouldPersistTaps="handled"
       >
@@ -106,9 +105,9 @@ export default function SignInScreen() {
             </Text>
           )}
 
-          <View style={{ marginTop: 8 }}>
+          <View style={{ marginTop: 16 }}>
             <Button
-              title={email.trim() && password.trim() ? 'Continue' : 'Sign In'}
+              title="Sign In"
               onPress={handleSignIn}
               disabled={!email.trim() || !password.trim()}
               loading={isLoading}
