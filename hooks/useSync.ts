@@ -25,6 +25,25 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RemoteRecord = Record<string, any> & { id: string };
 
+/**
+ * Map snake_case remote thinking_of_you record to camelCase local ThinkingTap.
+ */
+const mapThinkingRecord = (record: RemoteRecord) => ({
+  id: record.id,
+  fromPartner: record.from_partner,
+  createdAt: record.created_at,
+});
+
+/**
+ * Map snake_case remote sleep_wake_status record to camelCase local SleepWakeEntry.
+ */
+const mapSleepWakeRecord = (record: RemoteRecord) => ({
+  id: record.id,
+  partner: record.partner,
+  status: record.status,
+  createdAt: record.created_at,
+});
+
 export const useSync = () => {
   const session = useAuthStore((state) => state.session);
   const spaceId = useAuthStore((state) => state.spaceId);
@@ -143,18 +162,18 @@ export const useSync = () => {
     });
     if (partnerNotesChannel) channels.push(partnerNotesChannel);
 
-    // Thinking of You
+    // Thinking of You — map snake_case fields from remote
     const thinkingChannel = subscribeToTable<RemoteRecord>('thinking_of_you', {
-      onInsert: (record) => useThinkingStore.getState().syncRemoteInsert(record as never),
-      onUpdate: (record) => useThinkingStore.getState().syncRemoteUpdate(record as never),
+      onInsert: (record) => useThinkingStore.getState().syncRemoteInsert(mapThinkingRecord(record)),
+      onUpdate: (record) => useThinkingStore.getState().syncRemoteUpdate(mapThinkingRecord(record)),
       onDelete: (old) => useThinkingStore.getState().syncRemoteDelete(old.id),
     });
     if (thinkingChannel) channels.push(thinkingChannel);
 
-    // Sleep/Wake Status
+    // Sleep/Wake Status — map snake_case fields from remote
     const sleepWakeChannel = subscribeToTable<RemoteRecord>('sleep_wake_status', {
-      onInsert: (record) => useSleepWakeStore.getState().syncRemoteInsert(record as never),
-      onUpdate: (record) => useSleepWakeStore.getState().syncRemoteUpdate(record as never),
+      onInsert: (record) => useSleepWakeStore.getState().syncRemoteInsert(mapSleepWakeRecord(record)),
+      onUpdate: (record) => useSleepWakeStore.getState().syncRemoteUpdate(mapSleepWakeRecord(record)),
       onDelete: (old) => useSleepWakeStore.getState().syncRemoteDelete(old.id),
     });
     if (sleepWakeChannel) channels.push(sleepWakeChannel);

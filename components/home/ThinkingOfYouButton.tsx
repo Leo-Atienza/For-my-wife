@@ -13,9 +13,17 @@ export const ThinkingOfYouButton = () => {
 
   const [justSent, setJustSent] = useState(false);
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const partnerRole = myRole ?? 'partner1';
   const todayCount = getTodayCount(partnerRole);
+
+  // Cleanup timeout on unmount to prevent memory leak
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   const handlePress = () => {
     if (justSent) return;
@@ -36,7 +44,7 @@ export const ThinkingOfYouButton = () => {
       }),
     ]).start();
 
-    setTimeout(() => setJustSent(false), 2000);
+    timeoutRef.current = setTimeout(() => setJustSent(false), 2000);
   };
 
   return (

@@ -20,8 +20,9 @@ interface MoodState {
 }
 
 const getTodayKey = (): string => {
+  // Use UTC to ensure consistent date keys across timezones for both partners
   const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
 };
 
 export const useMoodStore = create<MoodState>()(

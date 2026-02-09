@@ -24,8 +24,10 @@ export const useLocationStore = create<LocationState>()(
       },
 
       setLocation: (partner, latitude, longitude, cityName) => {
+        // Reuse existing ID for this partner to avoid creating duplicate entries
+        const existingId = get().locations[partner]?.id;
         const entry: LocationEntry = {
-          id: generateId(),
+          id: existingId ?? generateId(),
           partner,
           latitude,
           longitude,

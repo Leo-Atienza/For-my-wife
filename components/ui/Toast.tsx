@@ -74,7 +74,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const showToast = useCallback((text: string, type: ToastType = 'info') => {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    setToasts((prev) => [...prev.slice(-2), { id, text, type }]);
+    // Log all toasts to console so errors aren't lost even if display is limited
+    if (type === 'error') {
+      console.warn(`[Toast Error] ${text}`);
+    }
+    setToasts((prev) => [...prev.slice(-4), { id, text, type }]);
   }, []);
 
   const dismissToast = useCallback((id: string) => {

@@ -32,6 +32,18 @@ const savePendingOps = async (ops: PendingOperation[]): Promise<void> => {
 
 const addPendingOp = async (op: Omit<PendingOperation, 'id' | 'createdAt'>): Promise<void> => {
   let ops = await loadPendingOps();
+
+  // Deduplicate: if an op for the same table + record already exists, replace it
+  if (op.operation === 'upsert' && op.record?.id) {
+    ops = ops.filter(
+      (existing) => !(existing.table === op.table && existing.record?.id === op.record?.id)
+    );
+  } else if (op.operation === 'delete' && op.recordId) {
+    ops = ops.filter(
+      (existing) => !(existing.table === op.table && existing.recordId === op.recordId)
+    );
+  }
+
   ops.push({
     ...op,
     id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,

@@ -37,6 +37,9 @@ export default function PartnerNotesScreen() {
     return (
       <Pressable
         onPress={() => setActiveTab(key)}
+        accessibilityRole="tab"
+        accessibilityState={{ selected: isActive }}
+        accessibilityLabel={label}
         style={{
           flex: 1,
           paddingVertical: 12,

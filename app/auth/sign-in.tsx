@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,12 @@ import {
   Platform,
   ScrollView,
   Pressable,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTheme } from '@/hooks/useTheme';
-import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
 export default function SignInScreen() {
@@ -23,17 +23,33 @@ export default function SignInScreen() {
   const isLoading = useAuthStore((state) => state.isLoading);
   const error = useAuthStore((state) => state.error);
   const setError = useAuthStore((state) => state.setError);
+  const setLoading = useAuthStore((state) => state.setLoading);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Reset loading/error state on mount in case it got stuck from a previous screen
+  useEffect(() => {
+    setLoading(false);
+    setError(null);
+  }, [setLoading, setError]);
+
   const handleSignIn = async () => {
-    if (!email.trim() || !password.trim()) return;
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('Missing Fields', 'Please enter both email and password.');
+      return;
+    }
     try {
-      await signIn(email.trim(), password);
+      const result = await signIn(email.trim(), password);
+      if (!result) {
+        const currentError = useAuthStore.getState().error;
+        Alert.alert('Sign In Failed', currentError || 'Unknown error. Please try again.');
+      }
+      // If result is true, the protected route in _layout.tsx will handle navigation
     } catch (e) {
       const message = e instanceof Error ? e.message : 'An unexpected error occurred.';
       setError(message);
+      Alert.alert('Sign In Error', message);
     }
   };
 
@@ -80,7 +96,7 @@ export default function SignInScreen() {
         <View style={{ gap: 12 }}>
           <Input
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(v) => { setEmail(v); setError(null); }}
             placeholder="Email"
             label="Email"
             keyboardType="email-address"
@@ -88,7 +104,7 @@ export default function SignInScreen() {
           />
           <Input
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(v) => { setPassword(v); setError(null); }}
             placeholder="Password"
             label="Password"
             secureTextEntry
@@ -109,12 +125,31 @@ export default function SignInScreen() {
           )}
 
           <View style={{ marginTop: 8 }}>
-            <Button
-              title="Sign In"
+            <Pressable
               onPress={handleSignIn}
-              disabled={!email.trim() || !password.trim()}
-              loading={isLoading}
-            />
+              disabled={isLoading}
+              style={({ pressed }) => ({
+                backgroundColor: '#E11D48',
+                borderRadius: 9999,
+                paddingHorizontal: 24,
+                paddingVertical: 16,
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 52,
+                opacity: isLoading ? 0.5 : pressed ? 0.8 : 1,
+              })}
+            >
+              <Text
+                style={{
+                  color: '#FFFFFF',
+                  fontSize: 17,
+                  fontFamily: 'Inter_600SemiBold',
+                  fontWeight: '600',
+                }}
+              >
+                {isLoading ? 'Signing In...' : 'Sign In'}
+              </Text>
+            </Pressable>
           </View>
         </View>
 

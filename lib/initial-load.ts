@@ -78,22 +78,59 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       pullFromSupabase<{ id: string; partner: PartnerRole; status: 'sleeping' | 'awake'; created_at: string }>('sleep_wake_status'),
     ]);
 
-    // Populate all stores
-    useNotesStore.getState().loadFromRemote(notes);
-    useMemoriesStore.getState().loadFromRemote(memories);
-    useCountdownsStore.getState().loadFromRemote(countdowns);
-    useTimelineStore.getState().loadFromRemote(milestones);
-    useBucketStore.getState().loadFromRemote(bucketItems);
-    useMoodStore.getState().loadFromRemote(moodEntries);
+    // Merge remote data with local data (preserving offline-created records)
+    // For each store, we merge by ID — remote wins for conflicts, local-only records are kept
+    const mergeById = <T extends { id: string }>(local: T[], remote: T[]): T[] => {
+      const remoteMap = new Map(remote.map((r) => [r.id, r]));
+      const merged = [...remote];
+      for (const localItem of local) {
+        if (!remoteMap.has(localItem.id)) {
+          merged.push(localItem); // Keep local-only records (created offline)
+        }
+      }
+      return merged;
+    };
+
+    // Populate all stores with merged data
+    useNotesStore.getState().loadFromRemote(
+      mergeById(useNotesStore.getState().notes, notes)
+    );
+    useMemoriesStore.getState().loadFromRemote(
+      mergeById(useMemoriesStore.getState().memories, memories)
+    );
+    useCountdownsStore.getState().loadFromRemote(
+      mergeById(useCountdownsStore.getState().countdowns, countdowns)
+    );
+    useTimelineStore.getState().loadFromRemote(
+      mergeById(useTimelineStore.getState().milestones, milestones)
+    );
+    useBucketStore.getState().loadFromRemote(
+      mergeById(useBucketStore.getState().items, bucketItems)
+    );
+    useMoodStore.getState().loadFromRemote(
+      mergeById(useMoodStore.getState().entries, moodEntries)
+    );
     useLocationStore.getState().loadFromRemote(locations);
-    useNicknameStore.getState().loadFromRemote(nicknames);
+    useNicknameStore.getState().loadFromRemote(
+      mergeById(useNicknameStore.getState().nicknames, nicknames)
+    );
     useCoupleStore.getState().loadFromRemote(coupleProfiles);
     useProfileStore.getState().loadFromRemote(individualProfiles);
-    useDateIdeasStore.getState().loadFromRemote(dateIdeas);
-    useJournalStore.getState().loadFromRemote(journalLetters);
-    useQuestionsStore.getState().loadFromRemote(questionEntries);
-    useSongStore.getState().loadFromRemote(songs);
-    usePartnerNotesStore.getState().loadFromRemote(partnerNotes);
+    useDateIdeasStore.getState().loadFromRemote(
+      mergeById(useDateIdeasStore.getState().customIdeas, dateIdeas)
+    );
+    useJournalStore.getState().loadFromRemote(
+      mergeById(useJournalStore.getState().letters, journalLetters)
+    );
+    useQuestionsStore.getState().loadFromRemote(
+      mergeById(useQuestionsStore.getState().entries, questionEntries)
+    );
+    useSongStore.getState().loadFromRemote(
+      mergeById(useSongStore.getState().songs, songs)
+    );
+    usePartnerNotesStore.getState().loadFromRemote(
+      mergeById(usePartnerNotesStore.getState().notes, partnerNotes as { id: string }[])
+    );
 
     // Map remote field names to local for thinking taps
     const mappedTaps = thinkingTaps.map((t) => ({

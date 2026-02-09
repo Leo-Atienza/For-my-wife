@@ -14,6 +14,9 @@ import { useDateIdeasStore } from '@/stores/useDateIdeasStore';
 import { useJournalStore } from '@/stores/useJournalStore';
 import { useQuestionsStore } from '@/stores/useQuestionsStore';
 import { useSongStore } from '@/stores/useSongStore';
+import { usePartnerNotesStore } from '@/stores/usePartnerNotesStore';
+import { useThinkingStore } from '@/stores/useThinkingStore';
+import { useSleepWakeStore } from '@/stores/useSleepWakeStore';
 
 const MIGRATION_KEY = 'migration-complete';
 
@@ -118,6 +121,24 @@ export const migrateLocalDataToCloud = async (): Promise<void> => {
     const songs = useSongStore.getState().songs;
     for (const song of songs) {
       await pushToSupabase('song_dedications', song);
+    }
+
+    // Partner notes
+    const partnerNotes = usePartnerNotesStore.getState().notes;
+    for (const note of partnerNotes) {
+      await pushToSupabase('partner_notes', note);
+    }
+
+    // Thinking of you taps
+    const thinkingTaps = useThinkingStore.getState().taps;
+    for (const tap of thinkingTaps) {
+      await pushToSupabase('thinking_of_you', tap);
+    }
+
+    // Sleep/wake entries
+    const sleepWakeEntries = useSleepWakeStore.getState().entries;
+    for (const entry of sleepWakeEntries) {
+      await pushToSupabase('sleep_wake_status', entry);
     }
 
     // Mark migration as complete
