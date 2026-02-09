@@ -52,15 +52,23 @@ export const useLocationTracking = () => {
         return;
       }
 
-      // Initial update
-      if (mounted) {
-        updateLocation();
-      }
+      // Guard against setting up interval after unmount
+      if (!mounted) return;
 
-      // Periodic updates
-      intervalRef.current = setInterval(() => {
+      // Initial update
+      updateLocation();
+
+      // Periodic updates — only set if still mounted
+      const id = setInterval(() => {
         if (mounted) updateLocation();
       }, UPDATE_INTERVAL_MS);
+
+      // Store interval id only if still mounted, otherwise clear immediately
+      if (mounted) {
+        intervalRef.current = id;
+      } else {
+        clearInterval(id);
+      }
     };
 
     startTracking();

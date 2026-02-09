@@ -45,9 +45,19 @@ function useProtectedRoute() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Wait a tick for hydration of persisted stores
-    const timer = setTimeout(() => setIsReady(true), 100);
-    return () => clearTimeout(timer);
+    // Wait for Zustand persisted stores to fully rehydrate before routing
+    const unsubs = [
+      useAuthStore.persist.onFinishHydration(() => checkReady()),
+      useCoupleStore.persist.onFinishHydration(() => checkReady()),
+    ];
+    function checkReady() {
+      if (useAuthStore.persist.hasHydrated() && useCoupleStore.persist.hasHydrated()) {
+        setIsReady(true);
+      }
+    }
+    // Check immediately in case stores already hydrated
+    checkReady();
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   useEffect(() => {
@@ -142,9 +152,14 @@ function AppContent() {
   useEffect(() => {
     if (session && spaceId && !initialLoadDone.current) {
       initialLoadDone.current = true;
-      loadAllDataFromSupabase().then(() => {
-        migrateLocalDataToCloud();
-      });
+      loadAllDataFromSupabase()
+        .then(() => {
+          migrateLocalDataToCloud();
+        })
+        .catch((err) => {
+          console.error('Initial load failed, skipping migration to prevent data loss:', err);
+          initialLoadDone.current = false;
+        });
     }
     if (!session) {
       initialLoadDone.current = false;

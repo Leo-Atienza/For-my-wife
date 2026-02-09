@@ -19,6 +19,7 @@ interface PendingOperation {
 }
 
 const PENDING_OPS_KEY = 'sync-pending-operations';
+const MAX_PENDING_OPS = 200;
 
 const loadPendingOps = async (): Promise<PendingOperation[]> => {
   const raw = await AsyncStorage.getItem(PENDING_OPS_KEY);
@@ -30,12 +31,16 @@ const savePendingOps = async (ops: PendingOperation[]): Promise<void> => {
 };
 
 const addPendingOp = async (op: Omit<PendingOperation, 'id' | 'createdAt'>): Promise<void> => {
-  const ops = await loadPendingOps();
+  let ops = await loadPendingOps();
   ops.push({
     ...op,
     id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
     createdAt: new Date().toISOString(),
   });
+  // Cap queue size to prevent unbounded memory growth — drop oldest entries
+  if (ops.length > MAX_PENDING_OPS) {
+    ops = ops.slice(ops.length - MAX_PENDING_OPS);
+  }
   await savePendingOps(ops);
 };
 

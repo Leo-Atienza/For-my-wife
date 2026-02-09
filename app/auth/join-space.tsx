@@ -27,10 +27,8 @@ export default function JoinSpaceScreen() {
 
   const handleJoin = async () => {
     if (code.length !== 6) return;
-    const success = await joinSpace(code);
-    if (success) {
-      router.replace('/');
-    }
+    // useProtectedRoute in _layout.tsx handles navigation after spaceId is set
+    await joinSpace(code);
   };
 
   return (

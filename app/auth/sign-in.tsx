@@ -28,10 +28,8 @@ export default function SignInScreen() {
 
   const handleSignIn = async () => {
     if (!email.trim() || !password.trim()) return;
-    const success = await signIn(email.trim(), password);
-    if (success) {
-      router.replace('/');
-    }
+    // useProtectedRoute in _layout.tsx handles navigation after session changes
+    await signIn(email.trim(), password);
   };
 
   return (

@@ -1,11 +1,13 @@
 import { Tabs } from 'expo-router';
 import { Heart, PenLine, Camera, Clock, Menu } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 
 export default function TabLayout() {
   const theme = useTheme();
 
   return (
+    <ScreenErrorBoundary>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -71,5 +73,6 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    </ScreenErrorBoundary>
   );
 }

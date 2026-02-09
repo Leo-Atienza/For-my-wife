@@ -43,7 +43,7 @@ export const Button = ({
     if (disabled) {
       switch (variant) {
         case 'primary':
-          return theme.textMuted;
+          return '#FFFFFF';
         case 'secondary':
           return theme.textMuted;
         case 'ghost':

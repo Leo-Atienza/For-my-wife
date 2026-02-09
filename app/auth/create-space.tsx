@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -22,11 +22,7 @@ export default function CreateSpaceScreen() {
   const [generatedCode, setGeneratedCode] = useState<string | null>(null);
   const [mode, setMode] = useState<'choose' | 'create' | 'join'>('choose');
 
-  useEffect(() => {
-    if (spaceId) {
-      router.replace('/');
-    }
-  }, [spaceId, router]);
+  // Navigation is handled by useProtectedRoute in _layout.tsx when spaceId changes
 
   const handleCreateSpace = async () => {
     const code = await createSpace();

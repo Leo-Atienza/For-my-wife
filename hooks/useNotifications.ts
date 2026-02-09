@@ -16,6 +16,10 @@ export const useNotifications = () => {
   useEffect(() => {
     if (!session || !spaceId) return;
 
+    // Clean up any existing listeners before creating new ones
+    notificationListener.current?.remove();
+    responseListener.current?.remove();
+
     // Register and save push token
     registerForPushNotifications().then((token) => {
       if (token) {
@@ -43,6 +47,8 @@ export const useNotifications = () => {
     return () => {
       notificationListener.current?.remove();
       responseListener.current?.remove();
+      notificationListener.current = null;
+      responseListener.current = null;
     };
   }, [session, spaceId, router]);
 };

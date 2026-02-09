@@ -207,6 +207,13 @@ export const useAuthStore = create<AuthState>()(
         const { user } = get();
         if (!user) return false;
 
+        // Validate invite code format before querying
+        const trimmed = inviteCode.trim().toUpperCase();
+        if (!/^[A-Z2-9]{6}$/.test(trimmed)) {
+          set({ error: 'Invalid invite code format. Code should be 6 characters.' });
+          return false;
+        }
+
         set({ isLoading: true, error: null });
 
         // Find space by invite code
@@ -267,11 +274,22 @@ export const useAuthStore = create<AuthState>()(
           .single();
 
         if (member) {
-          const spaceData = member.spaces as unknown as { invite_code: string } | null;
+          // Safely extract invite_code from the joined spaces relation
+          let inviteCodeValue: string | null = null;
+          const spaceData = member.spaces;
+          if (
+            spaceData &&
+            typeof spaceData === 'object' &&
+            !Array.isArray(spaceData) &&
+            'invite_code' in spaceData &&
+            typeof (spaceData as Record<string, unknown>).invite_code === 'string'
+          ) {
+            inviteCodeValue = (spaceData as Record<string, unknown>).invite_code as string;
+          }
           set({
             spaceId: member.space_id,
             myRole: member.role as PartnerRole,
-            inviteCode: spaceData?.invite_code ?? null,
+            inviteCode: inviteCodeValue,
           });
         }
       },

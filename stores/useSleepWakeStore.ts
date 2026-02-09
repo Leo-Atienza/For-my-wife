@@ -32,8 +32,13 @@ export const useSleepWakeStore = create<SleepWakeState>()(
       entries: [],
 
       getLatestStatus: (partner) => {
-        const entry = get().entries.find((e) => e.partner === partner);
-        return entry?.status ?? null;
+        const partnerEntries = get().entries.filter((e) => e.partner === partner);
+        if (partnerEntries.length === 0) return null;
+        // Sort by createdAt descending to guarantee latest entry
+        const sorted = [...partnerEntries].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        return sorted[0].status;
       },
 
       setStatus: (partner, status) => {
