@@ -133,6 +133,9 @@ function AppContent() {
       } else {
         setIsAuthChecking(false);
       }
+    }).catch(() => {
+      // If getSession fails (e.g. network issue), still proceed to auth screens
+      setIsAuthChecking(false);
     });
 
     // Listen for changes
