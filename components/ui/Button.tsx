@@ -22,7 +22,7 @@ export const Button = ({
     if (disabled) {
       switch (variant) {
         case 'primary':
-          return theme.accent; // Use theme accent (e.g. soft pink) instead of gray
+          return theme.primary; // Keep primary color, opacity handles the "disabled" look
         case 'secondary':
           return theme.primarySoft;
         case 'ghost':
