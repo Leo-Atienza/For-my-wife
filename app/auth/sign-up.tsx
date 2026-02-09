@@ -47,18 +47,18 @@ export default function SignUpScreen() {
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          paddingTop: insets.top + 60,
-          paddingBottom: insets.bottom + 60,
+          paddingTop: insets.top + 20,
+          paddingBottom: insets.bottom + 40,
           paddingHorizontal: 24,
         }}
         keyboardShouldPersistTaps="handled"
       >
         {/* Header */}
-        <View style={{ alignItems: 'center', gap: 8, marginBottom: 40 }}>
-          <Text style={{ fontSize: 48 }}>{'\u2764\ufe0f'}</Text>
+        <View style={{ alignItems: 'center', gap: 6, marginBottom: 24 }}>
+          <Text style={{ fontSize: 36 }}>{'\u2764\ufe0f'}</Text>
           <Text
             style={{
-              fontSize: 32,
+              fontSize: 28,
               fontFamily: 'PlayfairDisplay_700Bold',
               color: theme.textPrimary,
             }}
@@ -67,7 +67,7 @@ export default function SignUpScreen() {
           </Text>
           <Text
             style={{
-              fontSize: 15,
+              fontSize: 14,
               fontFamily: 'Inter_400Regular',
               color: theme.textMuted,
               textAlign: 'center',
@@ -78,7 +78,7 @@ export default function SignUpScreen() {
         </View>
 
         {/* Form */}
-        <View style={{ gap: 16 }}>
+        <View style={{ gap: 12 }}>
           <Input
             value={email}
             onChangeText={setEmail}
@@ -129,26 +129,7 @@ export default function SignUpScreen() {
             </Text>
           )}
 
-          {!canSubmit && email.trim().length > 0 && (
-            <Text
-              style={{
-                fontSize: 12,
-                fontFamily: 'Inter_400Regular',
-                color: theme.textMuted,
-                textAlign: 'center',
-              }}
-            >
-              {password.length < 6
-                ? 'Password must be at least 6 characters'
-                : !passwordsMatch && confirmPassword.length > 0
-                ? ''
-                : confirmPassword.length === 0
-                ? 'Please confirm your password'
-                : ''}
-            </Text>
-          )}
-
-          <View style={{ marginTop: 16 }}>
+          <View style={{ marginTop: 8 }}>
             <Button
               title="Create Account"
               onPress={handleSignUp}
@@ -159,7 +140,7 @@ export default function SignUpScreen() {
         </View>
 
         {/* Switch to sign in */}
-        <View style={{ alignItems: 'center', marginTop: 24 }}>
+        <View style={{ alignItems: 'center', marginTop: 20 }}>
           <Pressable onPress={() => router.replace('/auth/sign-in')}>
             <Text
               style={{
