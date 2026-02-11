@@ -44,7 +44,6 @@ export default function SignUpScreen() {
   }, [setStoreLoading, setStoreError]);
 
   const handleSignUp = async () => {
-    // Validate and show clear error instead of silently disabling
     if (!email.trim()) {
       setValidationError('Please enter your email address.');
       return;
@@ -135,48 +134,52 @@ export default function SignUpScreen() {
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          paddingTop: insets.top + 20,
+          paddingTop: insets.top + 16,
           paddingBottom: insets.bottom + 40,
-          paddingHorizontal: 24,
+          paddingHorizontal: 28,
         }}
         keyboardShouldPersistTaps="handled"
       >
         {/* Back button */}
         <TouchableOpacity
           onPress={() => router.replace('/auth/sign-in')}
+          activeOpacity={0.6}
           style={{
             alignSelf: 'flex-start',
-            paddingVertical: 8,
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingVertical: 10,
             paddingRight: 16,
-            marginBottom: 8,
+            marginBottom: 4,
           }}
         >
           <Text
             style={{
-              fontSize: 16,
+              fontSize: 15,
               fontFamily: 'Inter_500Medium',
               color: theme.primary,
             }}
           >
-            {'\u2190'} Back to Sign In
+            {'\u2190'}  Sign In
           </Text>
         </TouchableOpacity>
 
         {/* Header */}
-        <View style={{ alignItems: 'center', gap: 6, marginBottom: 24 }}>
-          <Text style={{ fontSize: 36 }}>{'\u2764\ufe0f'}</Text>
+        <View style={{ alignItems: 'center', gap: 8, marginBottom: 32 }}>
+          <Text style={{ fontSize: 48 }}>{'\u2764\ufe0f'}</Text>
           <Text
             style={{
-              fontSize: 28,
+              fontSize: 32,
               fontFamily: 'PlayfairDisplay_700Bold',
               color: theme.textPrimary,
+              marginTop: 4,
             }}
           >
             Create Account
           </Text>
           <Text
             style={{
-              fontSize: 14,
+              fontSize: 15,
               fontFamily: 'Inter_400Regular',
               color: theme.textMuted,
               textAlign: 'center',
@@ -187,7 +190,7 @@ export default function SignUpScreen() {
         </View>
 
         {/* Form */}
-        <View style={{ gap: 12 }}>
+        <View style={{ gap: 16 }}>
           <Input
             value={email}
             onChangeText={(v) => { setEmail(v); setValidationError(''); setStoreError(null); }}
@@ -238,7 +241,7 @@ export default function SignUpScreen() {
             </Text>
           ) : null}
 
-          <View style={{ marginTop: 8 }}>
+          <View style={{ marginTop: 4 }}>
             <Button
               title={isLoading ? 'Creating Account...' : 'Create Account'}
               onPress={handleSignUp}
@@ -249,11 +252,14 @@ export default function SignUpScreen() {
         </View>
 
         {/* Switch to sign in */}
-        <View style={{ alignItems: 'center', marginTop: 20 }}>
-          <Pressable onPress={() => router.replace('/auth/sign-in')}>
+        <View style={{ alignItems: 'center', marginTop: 24 }}>
+          <Pressable
+            onPress={() => router.replace('/auth/sign-in')}
+            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+          >
             <Text
               style={{
-                fontSize: 14,
+                fontSize: 15,
                 fontFamily: 'Inter_400Regular',
                 color: theme.textMuted,
               }}

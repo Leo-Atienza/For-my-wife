@@ -1,4 +1,4 @@
-import { Pressable, Text, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, Text, ActivityIndicator, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 
 interface ButtonProps {
@@ -17,71 +17,74 @@ export const Button = ({
   loading = false,
 }: ButtonProps) => {
   const theme = useTheme();
+  const isDisabled = disabled || loading;
 
-  const getBackgroundColor = () => {
-    switch (variant) {
-      case 'primary':
-        return theme.primary;
-      case 'secondary':
-        return theme.primarySoft;
-      case 'ghost':
-        return 'transparent';
-    }
-  };
+  // --- colors ---
+  let bg = theme.primary;
+  let fg = '#FFFFFF';
 
-  const getTextColor = () => {
-    switch (variant) {
-      case 'primary':
-        return '#FFFFFF';
-      case 'secondary':
-        return disabled ? theme.textMuted : theme.primary;
-      case 'ghost':
-        return disabled ? theme.textMuted : theme.primary;
-    }
-  };
+  if (variant === 'primary') {
+    bg = isDisabled ? '#F9A8B8' : theme.primary;
+    fg = '#FFFFFF';
+  } else if (variant === 'secondary') {
+    bg = '#FFFFFF';
+    fg = isDisabled ? theme.textMuted : theme.primary;
+  } else {
+    bg = 'transparent';
+    fg = isDisabled ? theme.textMuted : theme.primary;
+  }
 
-  const getBorderStyle = () => {
-    if (disabled && variant === 'ghost') {
-      return { borderWidth: 1, borderColor: theme.accent };
-    }
-    if (variant === 'secondary') {
-      return { borderWidth: 1, borderColor: theme.accent };
-    }
-    return {};
-  };
+  // --- shadow (primary only) ---
+  const shadow =
+    variant === 'primary' && !isDisabled
+      ? Platform.select({
+          ios: {
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 3 },
+            shadowOpacity: 0.15,
+            shadowRadius: 6,
+          },
+          android: {
+            elevation: 4,
+          },
+        })
+      : {};
 
   return (
-    <Pressable
+    <TouchableOpacity
       onPress={onPress}
-      disabled={disabled || loading}
-      style={({ pressed }) => ({
-        backgroundColor: getBackgroundColor(),
-        opacity: disabled || loading ? 0.7 : pressed ? 0.85 : 1,
-        borderRadius: 9999,
+      disabled={isDisabled}
+      activeOpacity={0.8}
+      style={{
+        backgroundColor: bg,
+        borderRadius: 14,
         paddingHorizontal: 24,
-        paddingVertical: 14,
+        paddingVertical: 16,
+        minHeight: 54,
         alignItems: 'center',
         justifyContent: 'center',
-        flexDirection: 'row',
-        minHeight: 48,
-        ...getBorderStyle(),
-      })}
+        ...(variant === 'secondary'
+          ? { borderWidth: 1.5, borderColor: isDisabled ? theme.accent : theme.primary }
+          : {}),
+        ...shadow,
+      }}
       accessibilityRole="button"
       accessibilityLabel={title}
     >
       {loading ? (
-        <ActivityIndicator color={getTextColor()} size="small" />
+        <ActivityIndicator color={fg} size="small" />
       ) : (
         <Text
           style={{
-            color: getTextColor(),
-            fontSize: 16,
+            color: fg,
+            fontSize: 17,
             fontFamily: 'Inter_600SemiBold',
+            textAlign: 'center',
           }}
         >
           {title}
         </Text>
       )}
-    </Pressable>
+    </TouchableOpacity>
   );
 };

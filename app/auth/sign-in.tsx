@@ -70,27 +70,29 @@ export default function SignInScreen() {
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          paddingTop: insets.top + 60,
+          justifyContent: 'center',
+          paddingTop: insets.top + 40,
           paddingBottom: insets.bottom + 40,
-          paddingHorizontal: 24,
+          paddingHorizontal: 28,
         }}
         keyboardShouldPersistTaps="handled"
       >
         {/* Header */}
-        <View style={{ alignItems: 'center', gap: 6, marginBottom: 24 }}>
-          <Text style={{ fontSize: 36 }}>{'\u2764\ufe0f'}</Text>
+        <View style={{ alignItems: 'center', gap: 8, marginBottom: 36 }}>
+          <Text style={{ fontSize: 48 }}>{'\u2764\ufe0f'}</Text>
           <Text
             style={{
-              fontSize: 28,
+              fontSize: 32,
               fontFamily: 'PlayfairDisplay_700Bold',
               color: theme.textPrimary,
+              marginTop: 4,
             }}
           >
             Welcome Back
           </Text>
           <Text
             style={{
-              fontSize: 14,
+              fontSize: 15,
               fontFamily: 'Inter_400Regular',
               color: theme.textMuted,
               textAlign: 'center',
@@ -101,7 +103,7 @@ export default function SignInScreen() {
         </View>
 
         {/* Form */}
-        <View style={{ gap: 12 }}>
+        <View style={{ gap: 16 }}>
           <Input
             value={email}
             onChangeText={(v) => { setEmail(v); clearError(); }}
@@ -132,7 +134,7 @@ export default function SignInScreen() {
             </Text>
           )}
 
-          <View style={{ marginTop: 8 }}>
+          <View style={{ marginTop: 4 }}>
             <Button
               title={isLoading ? 'Signing In...' : 'Sign In'}
               onPress={handleSignIn}
@@ -143,8 +145,11 @@ export default function SignInScreen() {
         </View>
 
         {/* Forgot password */}
-        <View style={{ alignItems: 'center', marginTop: 16 }}>
-          <Pressable onPress={() => router.push('/auth/forgot-password')}>
+        <View style={{ alignItems: 'center', marginTop: 20 }}>
+          <Pressable
+            onPress={() => router.push('/auth/forgot-password')}
+            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+          >
             <Text
               style={{
                 fontSize: 14,
@@ -158,11 +163,14 @@ export default function SignInScreen() {
         </View>
 
         {/* Switch to sign up */}
-        <View style={{ alignItems: 'center', marginTop: 12 }}>
-          <Pressable onPress={() => router.replace('/auth/sign-up')}>
+        <View style={{ alignItems: 'center', marginTop: 16 }}>
+          <Pressable
+            onPress={() => router.replace('/auth/sign-up')}
+            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+          >
             <Text
               style={{
-                fontSize: 14,
+                fontSize: 15,
                 fontFamily: 'Inter_400Regular',
                 color: theme.textMuted,
               }}
