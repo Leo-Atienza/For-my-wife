@@ -6,6 +6,7 @@ import {
   Platform,
   ScrollView,
   Pressable,
+  Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -47,6 +48,7 @@ export default function SignUpScreen() {
       return;
     }
     setValidationError('');
+    Keyboard.dismiss();
     try {
       const result = await signUp(email.trim(), password);
       if (result === 'session') {
@@ -63,17 +65,18 @@ export default function SignUpScreen() {
 
   if (confirmationSent) {
     return (
-      <View
-        style={{
-          flex: 1,
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
           backgroundColor: theme.background,
           justifyContent: 'center',
           alignItems: 'center',
           paddingHorizontal: 32,
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom,
+          paddingTop: insets.top + 40,
+          paddingBottom: insets.bottom + 40,
           gap: 12,
         }}
+        keyboardShouldPersistTaps="handled"
       >
         <Text style={{ fontSize: 48 }}>{'\u2709\ufe0f'}</Text>
         <Text
@@ -107,7 +110,7 @@ export default function SignUpScreen() {
             onPress={() => router.replace('/auth/sign-in')}
           />
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -202,30 +205,12 @@ export default function SignUpScreen() {
           )}
 
           <View style={{ marginTop: 8 }}>
-            <Pressable
+            <Button
+              title={isLoading ? 'Creating Account...' : 'Create Account'}
               onPress={handleSignUp}
               disabled={isLoading}
-              style={{
-                backgroundColor: '#E11D48',
-                borderRadius: 9999,
-                paddingHorizontal: 24,
-                paddingVertical: 16,
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: 52,
-              }}
-            >
-              <Text
-                style={{
-                  color: '#FFFFFF',
-                  fontSize: 17,
-                  fontFamily: 'Inter_600SemiBold',
-                  fontWeight: '600',
-                }}
-              >
-                {isLoading ? 'Creating Account...' : 'Create Account'}
-              </Text>
-            </Pressable>
+              loading={isLoading}
+            />
           </View>
         </View>
 

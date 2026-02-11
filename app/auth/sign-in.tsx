@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTheme } from '@/hooks/useTheme';
 import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 export default function SignInScreen() {
   const router = useRouter();
@@ -121,31 +122,12 @@ export default function SignInScreen() {
           )}
 
           <View style={{ marginTop: 8 }}>
-            <Pressable
+            <Button
+              title={isLoading ? 'Signing In...' : 'Sign In'}
               onPress={handleSignIn}
               disabled={isLoading}
-              style={({ pressed }) => ({
-                backgroundColor: '#E11D48',
-                borderRadius: 9999,
-                paddingHorizontal: 24,
-                paddingVertical: 16,
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: 52,
-                opacity: isLoading ? 0.5 : pressed ? 0.8 : 1,
-              })}
-            >
-              <Text
-                style={{
-                  color: '#FFFFFF',
-                  fontSize: 17,
-                  fontFamily: 'Inter_600SemiBold',
-                  fontWeight: '600',
-                }}
-              >
-                {isLoading ? 'Signing In...' : 'Sign In'}
-              </Text>
-            </Pressable>
+              loading={isLoading}
+            />
           </View>
         </View>
 
