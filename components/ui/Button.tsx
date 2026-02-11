@@ -19,16 +19,6 @@ export const Button = ({
   const theme = useTheme();
 
   const getBackgroundColor = () => {
-    if (disabled) {
-      switch (variant) {
-        case 'primary':
-          return '#D6D3D1'; // Stone-300 — clearly grayed out
-        case 'secondary':
-          return theme.primarySoft;
-        case 'ghost':
-          return 'transparent';
-      }
-    }
     switch (variant) {
       case 'primary':
         return theme.primary;
@@ -40,23 +30,13 @@ export const Button = ({
   };
 
   const getTextColor = () => {
-    if (disabled) {
-      switch (variant) {
-        case 'primary':
-          return 'rgba(255, 255, 255, 0.6)';
-        case 'secondary':
-          return theme.textMuted;
-        case 'ghost':
-          return theme.textMuted;
-      }
-    }
     switch (variant) {
       case 'primary':
         return '#FFFFFF';
       case 'secondary':
-        return theme.primary;
+        return disabled ? theme.textMuted : theme.primary;
       case 'ghost':
-        return theme.primary;
+        return disabled ? theme.textMuted : theme.primary;
     }
   };
 
@@ -76,7 +56,7 @@ export const Button = ({
       disabled={disabled || loading}
       style={({ pressed }) => ({
         backgroundColor: getBackgroundColor(),
-        opacity: pressed ? 0.9 : 1,
+        opacity: disabled || loading ? 0.5 : pressed ? 0.9 : 1,
         borderRadius: 9999,
         paddingHorizontal: 24,
         paddingVertical: 14,

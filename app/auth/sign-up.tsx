@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -21,17 +21,26 @@ export default function SignUpScreen() {
   const theme = useTheme();
 
   const signUp = useAuthStore((state) => state.signUp);
-  const isLoading = useAuthStore((state) => state.isLoading);
-  const error = useAuthStore((state) => state.error);
-  const setError = useAuthStore((state) => state.setError);
+  const storeError = useAuthStore((state) => state.error);
+  const setStoreError = useAuthStore((state) => state.setError);
+  const setStoreLoading = useAuthStore((state) => state.setLoading);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmationSent, setConfirmationSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const passwordsMatch = password === confirmPassword;
   const [validationError, setValidationError] = useState('');
+
+  const error = storeError || validationError;
+
+  // Reset store loading on mount in case it got stuck
+  useEffect(() => {
+    setStoreLoading(false);
+    setStoreError(null);
+  }, [setStoreLoading, setStoreError]);
 
   const handleSignUp = async () => {
     // Validate and show clear error instead of silently disabling
@@ -49,6 +58,7 @@ export default function SignUpScreen() {
     }
     setValidationError('');
     Keyboard.dismiss();
+    setIsLoading(true);
     try {
       const result = await signUp(email.trim(), password);
       if (result === 'session') {
@@ -56,10 +66,12 @@ export default function SignUpScreen() {
       } else if (result === 'confirmation') {
         setConfirmationSent(true);
       }
-      // result === false means error was already set in the store
     } catch (e) {
       const message = e instanceof Error ? e.message : 'An unexpected error occurred.';
-      setError(message);
+      setStoreError(message);
+    } finally {
+      setIsLoading(false);
+      setStoreLoading(false);
     }
   };
 
@@ -156,7 +168,7 @@ export default function SignUpScreen() {
         <View style={{ gap: 12 }}>
           <Input
             value={email}
-            onChangeText={(v) => { setEmail(v); setValidationError(''); }}
+            onChangeText={(v) => { setEmail(v); setValidationError(''); setStoreError(null); }}
             placeholder="Email"
             label="Email"
             keyboardType="email-address"
@@ -164,7 +176,7 @@ export default function SignUpScreen() {
           />
           <Input
             value={password}
-            onChangeText={(v) => { setPassword(v); setValidationError(''); }}
+            onChangeText={(v) => { setPassword(v); setValidationError(''); setStoreError(null); }}
             placeholder="At least 6 characters"
             label="Password"
             secureTextEntry
@@ -172,7 +184,7 @@ export default function SignUpScreen() {
           />
           <Input
             value={confirmPassword}
-            onChangeText={(v) => { setConfirmPassword(v); setValidationError(''); }}
+            onChangeText={(v) => { setConfirmPassword(v); setValidationError(''); setStoreError(null); }}
             placeholder="Confirm your password"
             label="Confirm Password"
             secureTextEntry
@@ -191,7 +203,7 @@ export default function SignUpScreen() {
             </Text>
           )}
 
-          {(error || validationError) && (
+          {error ? (
             <Text
               style={{
                 fontSize: 13,
@@ -200,9 +212,9 @@ export default function SignUpScreen() {
                 textAlign: 'center',
               }}
             >
-              {error || validationError}
+              {error}
             </Text>
-          )}
+          ) : null}
 
           <View style={{ marginTop: 8 }}>
             <Button

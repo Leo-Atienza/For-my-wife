@@ -21,33 +21,44 @@ export default function SignInScreen() {
   const theme = useTheme();
 
   const signIn = useAuthStore((state) => state.signIn);
-  const isLoading = useAuthStore((state) => state.isLoading);
-  const error = useAuthStore((state) => state.error);
-  const setError = useAuthStore((state) => state.setError);
-  const setLoading = useAuthStore((state) => state.setLoading);
+  const storeError = useAuthStore((state) => state.error);
+  const setStoreError = useAuthStore((state) => state.setError);
+  const setStoreLoading = useAuthStore((state) => state.setLoading);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  // Reset loading/error state on mount in case it got stuck from a previous screen
+  const error = localError || storeError;
+
+  // Reset store loading/error on mount in case it got stuck from a previous screen
   useEffect(() => {
-    setLoading(false);
-    setError(null);
-  }, [setLoading, setError]);
+    setStoreLoading(false);
+    setStoreError(null);
+  }, [setStoreLoading, setStoreError]);
+
+  const clearError = () => {
+    setLocalError(null);
+    setStoreError(null);
+  };
 
   const handleSignIn = async () => {
     Keyboard.dismiss();
     if (!email.trim() || !password.trim()) {
-      setError('Please enter both email and password.');
+      setLocalError('Please enter both email and password.');
       return;
     }
+    setIsLoading(true);
+    clearError();
     try {
       await signIn(email.trim(), password);
-      // If successful, the protected route in _layout.tsx will handle navigation
-      // If failed, signIn sets the error in the store
     } catch (e) {
       const message = e instanceof Error ? e.message : 'An unexpected error occurred.';
-      setError(message);
+      setLocalError(message);
+    } finally {
+      setIsLoading(false);
+      setStoreLoading(false);
     }
   };
 
@@ -93,7 +104,7 @@ export default function SignInScreen() {
         <View style={{ gap: 12 }}>
           <Input
             value={email}
-            onChangeText={(v) => { setEmail(v); setError(null); }}
+            onChangeText={(v) => { setEmail(v); clearError(); }}
             placeholder="Email"
             label="Email"
             keyboardType="email-address"
@@ -101,7 +112,7 @@ export default function SignInScreen() {
           />
           <Input
             value={password}
-            onChangeText={(v) => { setPassword(v); setError(null); }}
+            onChangeText={(v) => { setPassword(v); clearError(); }}
             placeholder="Password"
             label="Password"
             secureTextEntry
