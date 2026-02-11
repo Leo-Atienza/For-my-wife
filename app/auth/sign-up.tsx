@@ -7,6 +7,7 @@ import {
   ScrollView,
   Pressable,
   Keyboard,
+  TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -140,6 +141,27 @@ export default function SignUpScreen() {
         }}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Back button */}
+        <TouchableOpacity
+          onPress={() => router.replace('/auth/sign-in')}
+          style={{
+            alignSelf: 'flex-start',
+            paddingVertical: 8,
+            paddingRight: 16,
+            marginBottom: 8,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: 'Inter_500Medium',
+              color: theme.primary,
+            }}
+          >
+            {'\u2190'} Back to Sign In
+          </Text>
+        </TouchableOpacity>
+
         {/* Header */}
         <View style={{ alignItems: 'center', gap: 6, marginBottom: 24 }}>
           <Text style={{ fontSize: 36 }}>{'\u2764\ufe0f'}</Text>

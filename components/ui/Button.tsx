@@ -56,7 +56,7 @@ export const Button = ({
       disabled={disabled || loading}
       style={({ pressed }) => ({
         backgroundColor: getBackgroundColor(),
-        opacity: disabled || loading ? 0.5 : pressed ? 0.9 : 1,
+        opacity: disabled || loading ? 0.7 : pressed ? 0.85 : 1,
         borderRadius: 9999,
         paddingHorizontal: 24,
         paddingVertical: 14,
