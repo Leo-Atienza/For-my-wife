@@ -24,6 +24,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useCoupleStore } from '@/stores/useCoupleStore';
 import { useSync } from '@/hooks/useSync';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useLocationTracking } from '@/hooks/useLocationTracking';
 import { loadAllDataFromSupabase } from '@/lib/initial-load';
 import { migrateLocalDataToCloud } from '@/lib/migration';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -108,9 +109,10 @@ function AppContent() {
   const initialLoadDone = useRef(false);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
-  // Initialize sync and notifications when authenticated
+  // Initialize sync, notifications, and location tracking when authenticated
   useSync();
   useNotifications();
+  useLocationTracking();
 
   // Connect sync error events to toast system
   const { showToast } = useToast();

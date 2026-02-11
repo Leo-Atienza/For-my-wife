@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
-import { generateId } from '@/lib/utils';
+import { generateId, isNewerRecord } from '@/lib/utils';
 import { pushToSupabase, deleteFromSupabase } from '@/lib/sync';
 import type { MoodEntry, PartnerRole } from '@/lib/types';
 
@@ -36,8 +36,9 @@ export const useMoodStore = create<MoodState>()(
           const existing = state.entries.find(
             (e) => e.partner === partner && e.date === todayKey
           );
+          const now = new Date().toISOString();
           if (existing) {
-            const updated = { ...existing, mood, note };
+            const updated = { ...existing, mood, note, updatedAt: now };
             pushToSupabase('mood_entries', updated);
             return {
               entries: state.entries.map((e) =>
@@ -51,6 +52,7 @@ export const useMoodStore = create<MoodState>()(
             mood,
             note,
             date: todayKey,
+            updatedAt: now,
           };
           pushToSupabase('mood_entries', newEntry);
           return {
@@ -91,9 +93,10 @@ export const useMoodStore = create<MoodState>()(
 
       syncRemoteUpdate: (record) =>
         set((state) => ({
-          entries: state.entries.map((e) =>
-            e.id === record.id ? { ...e, ...record } : e
-          ),
+          entries: state.entries.map((e) => {
+            if (e.id !== record.id) return e;
+            return isNewerRecord(e, record) ? { ...e, ...record } : e;
+          }),
         })),
 
       syncRemoteDelete: (id) =>

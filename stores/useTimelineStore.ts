@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
-import { generateId } from '@/lib/utils';
+import { generateId, isNewerRecord } from '@/lib/utils';
 import { pushToSupabase, deleteFromSupabase } from '@/lib/sync';
 import type { Milestone } from '@/lib/types';
 
@@ -24,6 +24,7 @@ export const useTimelineStore = create<TimelineState>()(
       milestones: [],
 
       addMilestone: (title, date, description, icon, imageUri) => {
+        const now = new Date().toISOString();
         const milestone: Milestone = {
           id: generateId(),
           title,
@@ -31,6 +32,8 @@ export const useTimelineStore = create<TimelineState>()(
           description,
           icon,
           imageUri,
+          createdAt: now,
+          updatedAt: now,
         };
         set((state) => ({
           milestones: [
@@ -49,9 +52,10 @@ export const useTimelineStore = create<TimelineState>()(
       },
 
       updateMilestone: (id, updates) => {
+        const now = new Date().toISOString();
         set((state) => ({
           milestones: state.milestones
-            .map((m) => (m.id === id ? { ...m, ...updates } : m))
+            .map((m) => (m.id === id ? { ...m, ...updates, updatedAt: now } : m))
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
         }));
         const updated = get().milestones.find((m) => m.id === id);
@@ -80,7 +84,10 @@ export const useTimelineStore = create<TimelineState>()(
       syncRemoteUpdate: (record) =>
         set((state) => ({
           milestones: state.milestones
-            .map((m) => (m.id === record.id ? { ...m, ...record } : m))
+            .map((m) => {
+              if (m.id !== record.id) return m;
+              return isNewerRecord(m, record) ? { ...m, ...record } : m;
+            })
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
         })),
 

@@ -6,7 +6,6 @@ import {
   Platform,
   ScrollView,
   Pressable,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -36,20 +35,16 @@ export default function SignInScreen() {
 
   const handleSignIn = async () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Missing Fields', 'Please enter both email and password.');
+      setError('Please enter both email and password.');
       return;
     }
     try {
-      const result = await signIn(email.trim(), password);
-      if (!result) {
-        const currentError = useAuthStore.getState().error;
-        Alert.alert('Sign In Failed', currentError || 'Unknown error. Please try again.');
-      }
-      // If result is true, the protected route in _layout.tsx will handle navigation
+      await signIn(email.trim(), password);
+      // If successful, the protected route in _layout.tsx will handle navigation
+      // If failed, signIn sets the error in the store
     } catch (e) {
       const message = e instanceof Error ? e.message : 'An unexpected error occurred.';
       setError(message);
-      Alert.alert('Sign In Error', message);
     }
   };
 

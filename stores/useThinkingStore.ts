@@ -44,7 +44,7 @@ export const useThinkingStore = create<ThinkingState>()(
           from_partner: tap.fromPartner,
           created_at: tap.createdAt,
         });
-        sendPushToPartner('Thinking of You', '\u2764\ufe0f Your partner is thinking about you right now');
+        sendPushToPartner('Thinking of You', '\u2764\ufe0f Your partner is thinking about you right now', '/');
       },
 
       getTodayCount: (partner) => {

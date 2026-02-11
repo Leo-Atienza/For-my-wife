@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
-import { generateId } from '@/lib/utils';
+import { generateId, isNewerRecord } from '@/lib/utils';
 import { pushToSupabase, deleteFromSupabase } from '@/lib/sync';
 import type { BucketItem, BucketCategory } from '@/lib/types';
 
@@ -24,11 +24,14 @@ export const useBucketStore = create<BucketState>()(
       items: [],
 
       addItem: (title, category) => {
+        const now = new Date().toISOString();
         const item: BucketItem = {
           id: generateId(),
           title,
           category,
           isCompleted: false,
+          createdAt: now,
+          updatedAt: now,
         };
         set((state) => ({
           items: [...state.items, item],
@@ -44,15 +47,15 @@ export const useBucketStore = create<BucketState>()(
       },
 
       toggleComplete: (id) => {
+        const now = new Date().toISOString();
         set((state) => ({
           items: state.items.map((i) =>
             i.id === id
               ? {
                   ...i,
                   isCompleted: !i.isCompleted,
-                  completedDate: !i.isCompleted
-                    ? new Date().toISOString()
-                    : undefined,
+                  completedDate: !i.isCompleted ? now : undefined,
+                  updatedAt: now,
                 }
               : i
           ),
@@ -62,9 +65,10 @@ export const useBucketStore = create<BucketState>()(
       },
 
       updateItem: (id, updates) => {
+        const now = new Date().toISOString();
         set((state) => ({
           items: state.items.map((i) =>
-            i.id === id ? { ...i, ...updates } : i
+            i.id === id ? { ...i, ...updates, updatedAt: now } : i
           ),
         }));
         const updated = get().items.find((i) => i.id === id);
@@ -81,9 +85,10 @@ export const useBucketStore = create<BucketState>()(
 
       syncRemoteUpdate: (record) =>
         set((state) => ({
-          items: state.items.map((i) =>
-            i.id === record.id ? { ...i, ...record } : i
-          ),
+          items: state.items.map((i) => {
+            if (i.id !== record.id) return i;
+            return isNewerRecord(i, record) ? { ...i, ...record } : i;
+          }),
         })),
 
       syncRemoteDelete: (id) =>

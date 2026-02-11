@@ -1,17 +1,28 @@
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MapPin } from 'lucide-react-native';
+import { MapPin, Settings } from 'lucide-react-native';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTheme } from '@/hooks/useTheme';
-import { useLocationTracking } from '@/hooks/useLocationTracking';
+import { openLocationSettings, type LocationPermissionStatus } from '@/hooks/useLocationTracking';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { calculateDistanceKm, formatDistance } from '@/lib/distance';
+
+function formatTimeAgo(isoString: string): string {
+  const diff = Date.now() - new Date(isoString).getTime();
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
 
 export default function DistanceScreen() {
   const insets = useSafeAreaInsets();
@@ -21,9 +32,6 @@ export default function DistanceScreen() {
   const partner2 = useProfileStore((state) => state.partner2);
   const locations = useLocationStore((state) => state.locations);
   const setLocation = useLocationStore((state) => state.setLocation);
-
-  // Enable GPS tracking while on this screen
-  useLocationTracking();
 
   const [city1, setCity1] = useState(locations.partner1?.cityName ?? '');
   const [lat1, setLat1] = useState(locations.partner1?.latitude.toString() ?? '');
@@ -56,6 +64,13 @@ export default function DistanceScreen() {
   const myLoc = myRole === 'partner1' ? loc1 : loc2;
   const isGpsActive = !!myLoc;
 
+  // Determine the most recent location update timestamp
+  const lastUpdated = (() => {
+    const timestamps = [loc1?.updatedAt, loc2?.updatedAt].filter(Boolean) as string[];
+    if (timestamps.length === 0) return null;
+    return timestamps.sort().pop()!;
+  })();
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
       <PageHeader title="Distance" showBack />
@@ -81,17 +96,50 @@ export default function DistanceScreen() {
           }}
         >
           <MapPin size={18} color={isGpsActive ? theme.primary : theme.textMuted} />
-          <Text
-            style={{
-              fontSize: 13,
-              fontFamily: 'Inter_500Medium',
-              color: isGpsActive ? theme.primary : theme.textMuted,
-            }}
-          >
-            {isGpsActive
-              ? `GPS active \u2022 ${myLoc.cityName ?? 'Tracking...'}`
-              : 'GPS tracking will start automatically'}
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 13,
+                fontFamily: 'Inter_500Medium',
+                color: isGpsActive ? theme.primary : theme.textMuted,
+              }}
+            >
+              {isGpsActive
+                ? `GPS active \u2022 ${myLoc.cityName ?? 'Tracking...'}`
+                : 'GPS permission needed for live tracking'}
+            </Text>
+            {lastUpdated && (
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontFamily: 'Inter_400Regular',
+                  color: theme.textMuted,
+                  marginTop: 2,
+                }}
+              >
+                Updated {formatTimeAgo(lastUpdated)}
+              </Text>
+            )}
+          </View>
+          {!isGpsActive && (
+            <Pressable
+              onPress={openLocationSettings}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+                backgroundColor: theme.primary,
+                paddingHorizontal: 10,
+                paddingVertical: 6,
+                borderRadius: 8,
+              }}
+            >
+              <Settings size={14} color="#fff" />
+              <Text style={{ fontSize: 12, fontFamily: 'Inter_600SemiBold', color: '#fff' }}>
+                Enable GPS
+              </Text>
+            </Pressable>
+          )}
         </View>
 
         {/* Distance display */}

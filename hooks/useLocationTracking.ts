@@ -1,10 +1,12 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import * as Location from 'expo-location';
-import { AppState } from 'react-native';
+import { AppState, Linking } from 'react-native';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useLocationStore } from '@/stores/useLocationStore';
 
 const UPDATE_INTERVAL_MS = 30_000; // 30 seconds
+
+export type LocationPermissionStatus = 'checking' | 'granted' | 'denied' | 'not-needed';
 
 export const useLocationTracking = () => {
   const myRole = useAuthStore((s) => s.myRole);
@@ -12,6 +14,7 @@ export const useLocationTracking = () => {
   const spaceId = useAuthStore((s) => s.spaceId);
   const setLocation = useLocationStore((s) => s.setLocation);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [permissionStatus, setPermissionStatus] = useState<LocationPermissionStatus>('checking');
 
   const updateLocation = useCallback(async () => {
     if (!myRole) return;
@@ -41,19 +44,23 @@ export const useLocationTracking = () => {
   }, [myRole, setLocation]);
 
   useEffect(() => {
-    if (!session || !spaceId || !myRole) return;
+    if (!session || !spaceId || !myRole) {
+      setPermissionStatus('not-needed');
+      return;
+    }
 
     let mounted = true;
 
     const startTracking = async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
+      if (!mounted) return;
+
       if (status !== 'granted') {
-        console.log('Location permission not granted');
+        setPermissionStatus('denied');
         return;
       }
 
-      // Guard against setting up interval after unmount
-      if (!mounted) return;
+      setPermissionStatus('granted');
 
       // Initial update
       updateLocation();
@@ -89,4 +96,13 @@ export const useLocationTracking = () => {
       appStateListener.remove();
     };
   }, [session, spaceId, myRole, updateLocation]);
+
+  return { permissionStatus };
+};
+
+/**
+ * Open the device settings so the user can grant location permission.
+ */
+export const openLocationSettings = (): void => {
+  Linking.openSettings();
 };

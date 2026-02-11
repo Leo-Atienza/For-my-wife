@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
-import { generateId } from '@/lib/utils';
+import { generateId, isNewerRecord } from '@/lib/utils';
 import { pushToSupabase, deleteFromSupabase } from '@/lib/sync';
 import type { CountdownEvent } from '@/lib/types';
 
@@ -23,12 +23,15 @@ export const useCountdownsStore = create<CountdownsState>()(
       countdowns: [],
 
       addCountdown: (title, targetDate, emoji, isRecurring = false) => {
+        const now = new Date().toISOString();
         const countdown: CountdownEvent = {
           id: generateId(),
           title,
           targetDate,
           emoji,
           isRecurring,
+          createdAt: now,
+          updatedAt: now,
         };
         set((state) => ({
           countdowns: [...state.countdowns, countdown],
@@ -44,9 +47,10 @@ export const useCountdownsStore = create<CountdownsState>()(
       },
 
       updateCountdown: (id, updates) => {
+        const now = new Date().toISOString();
         set((state) => ({
           countdowns: state.countdowns.map((c) =>
-            c.id === id ? { ...c, ...updates } : c
+            c.id === id ? { ...c, ...updates, updatedAt: now } : c
           ),
         }));
         const updated = get().countdowns.find((c) => c.id === id);
@@ -63,9 +67,10 @@ export const useCountdownsStore = create<CountdownsState>()(
 
       syncRemoteUpdate: (record) =>
         set((state) => ({
-          countdowns: state.countdowns.map((c) =>
-            c.id === record.id ? { ...c, ...record } : c
-          ),
+          countdowns: state.countdowns.map((c) => {
+            if (c.id !== record.id) return c;
+            return isNewerRecord(c, record) ? { ...c, ...record } : c;
+          }),
         })),
 
       syncRemoteDelete: (id) =>

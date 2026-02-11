@@ -19,6 +19,7 @@ import { usePartnerNotesStore } from '@/stores/usePartnerNotesStore';
 import { useThinkingStore } from '@/stores/useThinkingStore';
 import { useSleepWakeStore } from '@/stores/useSleepWakeStore';
 import { subscribeToTable, flushPendingOperations } from '@/lib/sync';
+import { flushPendingUploads } from '@/lib/photo-storage';
 import { supabase } from '@/lib/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
@@ -54,6 +55,12 @@ export const useSync = () => {
 
     // Flush any pending offline operations
     flushPendingOperations();
+
+    // Flush pending photo uploads — update memory URIs on success
+    const updateMemoryUri = (memoryId: string, newUri: string) => {
+      useMemoriesStore.getState().updateMemory(memoryId, { imageUri: newUri });
+    };
+    flushPendingUploads(updateMemoryUri);
 
     // Set up Realtime subscriptions for all synced tables
     const channels: RealtimeChannel[] = [];
@@ -200,6 +207,7 @@ export const useSync = () => {
     const appStateListener = AppState.addEventListener('change', (state) => {
       if (state === 'active') {
         flushPendingOperations();
+        flushPendingUploads(updateMemoryUri);
       }
     });
 

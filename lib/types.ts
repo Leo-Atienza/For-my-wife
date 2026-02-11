@@ -42,6 +42,7 @@ export interface LoveNote {
   content: string;
   mood?: string;
   createdAt: string;
+  updatedAt?: string;
   isRead: boolean;
 }
 
@@ -53,6 +54,7 @@ export interface Memory {
   location?: string;
   tags?: string[];
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface Milestone {
@@ -62,6 +64,8 @@ export interface Milestone {
   description?: string;
   imageUri?: string;
   icon?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CountdownEvent {
@@ -70,6 +74,8 @@ export interface CountdownEvent {
   targetDate: string;
   emoji?: string;
   isRecurring: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface BucketItem {
@@ -78,6 +84,8 @@ export interface BucketItem {
   category: BucketCategory;
   isCompleted: boolean;
   completedDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface MoodEntry {
@@ -86,6 +94,7 @@ export interface MoodEntry {
   mood: string;
   note?: string;
   date: string;
+  updatedAt?: string;
 }
 
 export interface LocationEntry {
@@ -264,6 +273,7 @@ export interface PartnerNote {
   isDiscovered: boolean;
   discoveredAt?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 // ============================================

@@ -1,9 +1,39 @@
 import { File } from 'expo-file-system';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { supabase } from './supabase';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { generateId } from './utils';
 
 const BUCKET = 'couple-photos';
+const PENDING_UPLOADS_KEY = 'photo-pending-uploads';
+const MAX_IMAGE_DIMENSION = 1200;
+
+interface PendingUpload {
+  localUri: string;
+  memoryId: string;
+  subfolder: string;
+  createdAt: string;
+}
+
+/**
+ * Compress and resize an image before upload.
+ * Ensures images are at most MAX_IMAGE_DIMENSION on their longest side.
+ */
+const compressImage = async (uri: string): Promise<string> => {
+  try {
+    const result = await manipulateAsync(
+      uri,
+      [{ resize: { width: MAX_IMAGE_DIMENSION } }],
+      { compress: 0.7, format: SaveFormat.JPEG }
+    );
+    return result.uri;
+  } catch {
+    // If manipulation fails, return original
+    return uri;
+  }
+};
 
 /**
  * Upload a local photo to Supabase Storage.
@@ -17,8 +47,11 @@ export const uploadPhoto = async (
   if (!spaceId) return null;
 
   try {
-    // Create a File instance from the local URI
-    const file = new File(localUri);
+    // Compress before upload
+    const compressedUri = await compressImage(localUri);
+
+    // Create a File instance from the compressed URI
+    const file = new File(compressedUri);
 
     // Read file as ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
@@ -47,6 +80,58 @@ export const uploadPhoto = async (
     console.error('Photo upload failed:', err);
     return null;
   }
+};
+
+/**
+ * Queue a failed photo upload for later retry.
+ */
+export const queuePendingUpload = async (
+  localUri: string,
+  memoryId: string,
+  subfolder = 'memories'
+): Promise<void> => {
+  const pending = await loadPendingUploads();
+  // Deduplicate by memoryId
+  const filtered = pending.filter((p) => p.memoryId !== memoryId);
+  filtered.push({
+    localUri,
+    memoryId,
+    subfolder,
+    createdAt: new Date().toISOString(),
+  });
+  await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(filtered));
+};
+
+const loadPendingUploads = async (): Promise<PendingUpload[]> => {
+  const raw = await AsyncStorage.getItem(PENDING_UPLOADS_KEY);
+  return raw ? JSON.parse(raw) : [];
+};
+
+/**
+ * Retry all pending photo uploads. Called when connectivity returns.
+ * Updates memory records with the cloud URL on success.
+ */
+export const flushPendingUploads = async (
+  updateMemoryUri: (memoryId: string, newUri: string) => void
+): Promise<void> => {
+  const pending = await loadPendingUploads();
+  if (pending.length === 0) return;
+
+  const state = await NetInfo.fetch();
+  if (!state.isConnected) return;
+
+  const remaining: PendingUpload[] = [];
+
+  for (const upload of pending) {
+    const cloudUrl = await uploadPhoto(upload.localUri, upload.subfolder);
+    if (cloudUrl) {
+      updateMemoryUri(upload.memoryId, cloudUrl);
+    } else {
+      remaining.push(upload);
+    }
+  }
+
+  await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(remaining));
 };
 
 /**

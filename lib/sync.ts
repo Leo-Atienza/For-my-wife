@@ -143,6 +143,35 @@ export const pullFromSupabase = async <T>(
 // Flush Pending Operations
 // ============================================
 
+const MAX_RETRIES = 3;
+const BASE_DELAY_MS = 1000;
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const executeOpWithRetry = async (op: PendingOperation): Promise<boolean> => {
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      await delay(BASE_DELAY_MS * Math.pow(2, attempt - 1));
+    }
+
+    if (op.operation === 'upsert' && op.record) {
+      const { error } = await supabase.from(op.table).upsert(op.record);
+      if (!error) return true;
+    } else if (op.operation === 'delete' && op.recordId) {
+      const spaceId = getSpaceId();
+      if (spaceId) {
+        const { error } = await supabase
+          .from(op.table)
+          .delete()
+          .eq('id', op.recordId)
+          .eq('space_id', spaceId);
+        if (!error) return true;
+      }
+    }
+  }
+  return false;
+};
+
 export const flushPendingOperations = async (): Promise<void> => {
   const ops = await loadPendingOps();
   if (ops.length === 0) return;
@@ -153,23 +182,9 @@ export const flushPendingOperations = async (): Promise<void> => {
   const remaining: PendingOperation[] = [];
 
   for (const op of ops) {
-    if (op.operation === 'upsert' && op.record) {
-      const { error } = await supabase.from(op.table).upsert(op.record);
-      if (error) {
-        remaining.push(op);
-      }
-    } else if (op.operation === 'delete' && op.recordId) {
-      const spaceId = getSpaceId();
-      if (spaceId) {
-        const { error } = await supabase
-          .from(op.table)
-          .delete()
-          .eq('id', op.recordId)
-          .eq('space_id', spaceId);
-        if (error) {
-          remaining.push(op);
-        }
-      }
+    const succeeded = await executeOpWithRetry(op);
+    if (!succeeded) {
+      remaining.push(op);
     }
   }
 

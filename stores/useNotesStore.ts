@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
-import { generateId } from '@/lib/utils';
+import { generateId, isNewerRecord } from '@/lib/utils';
 import { pushToSupabase, deleteFromSupabase } from '@/lib/sync';
 import { sendPushToPartner } from '@/lib/notifications';
 import type { LoveNote, PartnerRole } from '@/lib/types';
@@ -26,19 +26,21 @@ export const useNotesStore = create<NotesState>()(
       notes: [],
 
       addNote: (author, content, mood) => {
+        const now = new Date().toISOString();
         const note: LoveNote = {
           id: generateId(),
           author,
           content,
           mood,
-          createdAt: new Date().toISOString(),
+          createdAt: now,
+          updatedAt: now,
           isRead: false,
         };
         set((state) => ({
           notes: [note, ...state.notes],
         }));
         pushToSupabase('love_notes', note);
-        sendPushToPartner('New Love Note', 'Your partner left you a love note 💌');
+        sendPushToPartner('New Love Note', 'Your partner left you a love note \u{1F48C}', '/notes');
       },
 
       removeNote: (id) => {
@@ -49,9 +51,10 @@ export const useNotesStore = create<NotesState>()(
       },
 
       updateNote: (id, updates) => {
+        const now = new Date().toISOString();
         set((state) => ({
           notes: state.notes.map((n) =>
-            n.id === id ? { ...n, ...updates } : n
+            n.id === id ? { ...n, ...updates, updatedAt: now } : n
           ),
         }));
         const updated = get().notes.find((n) => n.id === id);
@@ -59,9 +62,10 @@ export const useNotesStore = create<NotesState>()(
       },
 
       markAsRead: (id) => {
+        const now = new Date().toISOString();
         set((state) => ({
           notes: state.notes.map((n) =>
-            n.id === id ? { ...n, isRead: true } : n
+            n.id === id ? { ...n, isRead: true, updatedAt: now } : n
           ),
         }));
         const updated = get().notes.find((n) => n.id === id);
@@ -80,9 +84,10 @@ export const useNotesStore = create<NotesState>()(
 
       syncRemoteUpdate: (record) =>
         set((state) => ({
-          notes: state.notes.map((n) =>
-            n.id === record.id ? { ...n, ...record } : n
-          ),
+          notes: state.notes.map((n) => {
+            if (n.id !== record.id) return n;
+            return isNewerRecord(n, record) ? { ...n, ...record } : n;
+          }),
         })),
 
       syncRemoteDelete: (id) =>

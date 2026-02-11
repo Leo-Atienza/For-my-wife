@@ -86,22 +86,32 @@ export const getPartnerPushToken = async (): Promise<string | null> => {
 
 export const sendPushToPartner = async (
   title: string,
-  body: string
+  body: string,
+  route?: string
 ): Promise<void> => {
   const partnerToken = await getPartnerPushToken();
   if (!partnerToken) return;
 
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include Expo Access Token if configured (required for production)
+    const accessToken = process.env.EXPO_PUBLIC_ACCESS_TOKEN;
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
     await fetch('https://exp.host/--/api/v2/push/send', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         to: partnerToken,
         title,
         body,
         sound: 'default',
+        data: route ? { route } : undefined,
       }),
     });
   } catch (err) {

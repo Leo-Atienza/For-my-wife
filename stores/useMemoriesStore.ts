@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
-import { generateId } from '@/lib/utils';
+import { generateId, isNewerRecord } from '@/lib/utils';
 import { pushToSupabase, deleteFromSupabase } from '@/lib/sync';
 import { sendPushToPartner } from '@/lib/notifications';
+import { deletePhoto, isRemoteUrl } from '@/lib/photo-storage';
 import type { Memory } from '@/lib/types';
 
 interface MemoriesState {
@@ -25,22 +26,28 @@ export const useMemoriesStore = create<MemoriesState>()(
       memories: [],
 
       addMemory: (imageUri, caption, date, location) => {
+        const now = new Date().toISOString();
         const memory: Memory = {
           id: generateId(),
           imageUri,
           caption,
           date,
           location,
-          createdAt: new Date().toISOString(),
+          createdAt: now,
+          updatedAt: now,
         };
         set((state) => ({
           memories: [memory, ...state.memories],
         }));
         pushToSupabase('memories', memory);
-        sendPushToPartner('New Memory', 'Your partner added a new memory 📸');
+        sendPushToPartner('New Memory', 'Your partner added a new memory 📸', '/memories');
       },
 
       removeMemory: (id) => {
+        const memory = get().memories.find((m) => m.id === id);
+        if (memory && isRemoteUrl(memory.imageUri)) {
+          deletePhoto(memory.imageUri);
+        }
         set((state) => ({
           memories: state.memories.filter((m) => m.id !== id),
         }));
@@ -48,9 +55,10 @@ export const useMemoriesStore = create<MemoriesState>()(
       },
 
       updateMemory: (id, updates) => {
+        const now = new Date().toISOString();
         set((state) => ({
           memories: state.memories.map((m) =>
-            m.id === id ? { ...m, ...updates } : m
+            m.id === id ? { ...m, ...updates, updatedAt: now } : m
           ),
         }));
         const updated = get().memories.find((m) => m.id === id);
@@ -69,9 +77,10 @@ export const useMemoriesStore = create<MemoriesState>()(
 
       syncRemoteUpdate: (record) =>
         set((state) => ({
-          memories: state.memories.map((m) =>
-            m.id === record.id ? { ...m, ...record } : m
-          ),
+          memories: state.memories.map((m) => {
+            if (m.id !== record.id) return m;
+            return isNewerRecord(m, record) ? { ...m, ...record } : m;
+          }),
         })),
 
       syncRemoteDelete: (id) =>

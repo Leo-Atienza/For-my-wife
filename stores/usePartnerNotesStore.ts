@@ -68,7 +68,7 @@ export const usePartnerNotesStore = create<PartnerNotesState>()(
         };
         set((state) => ({ notes: [note, ...state.notes] }));
         pushToSupabase('partner_notes', mapLocalToRemote(note));
-        sendPushToPartner('Partner Note', 'Your partner wrote something about you 💝');
+        sendPushToPartner('Partner Note', 'Your partner wrote something about you 💝', '/partner-notes');
       },
 
       updateNote: (id, updates) => {

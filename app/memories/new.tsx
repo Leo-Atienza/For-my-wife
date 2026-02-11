@@ -9,7 +9,8 @@ import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { uploadPhoto } from '@/lib/photo-storage';
+import { uploadPhoto, queuePendingUpload } from '@/lib/photo-storage';
+import { generateId } from '@/lib/utils';
 import { Pressable, Text } from 'react-native';
 
 export default function NewMemoryScreen() {
@@ -41,12 +42,18 @@ export default function NewMemoryScreen() {
     setIsUploading(true);
 
     try {
-      // Upload photo to cloud storage, fall back to local URI
       const cloudUrl = await uploadPhoto(imageUri, 'memories');
       const finalUri = cloudUrl ?? imageUri;
-
       const memoryDate = date.trim() || new Date().toISOString().split('T')[0];
+      const memoryId = generateId();
+
       addMemory(finalUri, caption.trim(), memoryDate, location.trim() || undefined);
+
+      // If upload failed, queue for retry so partner eventually gets the cloud URL
+      if (!cloudUrl) {
+        queuePendingUpload(imageUri, memoryId, 'memories');
+      }
+
       router.back();
     } finally {
       setIsUploading(false);

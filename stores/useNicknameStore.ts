@@ -42,7 +42,7 @@ export const useNicknameStore = create<NicknameState>()(
             givenAt: new Date().toISOString(),
           };
           pushToSupabase('nicknames', newNickname);
-          sendPushToPartner('New Nickname', 'Your partner gave you a new nickname 💕');
+          sendPushToPartner('New Nickname', 'Your partner gave you a new nickname 💕', '/profile/nicknames');
           return { nicknames: [...deactivated, newNickname] };
         });
       },
