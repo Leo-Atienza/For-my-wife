@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, Linking } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -152,6 +152,42 @@ function AppContent() {
 
     return () => subscription.unsubscribe();
   }, [setSession, loadSpaceInfo]);
+
+  // Handle deep links from Supabase email confirmation / password reset
+  useEffect(() => {
+    const handleDeepLink = async (url: string) => {
+      // Supabase sends tokens in the URL fragment: ...#access_token=...&refresh_token=...
+      const hashIndex = url.indexOf('#');
+      if (hashIndex === -1) return;
+
+      const fragment = url.substring(hashIndex + 1);
+      const params = new URLSearchParams(fragment);
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+
+      if (accessToken && refreshToken) {
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        if (!error && data.session) {
+          setSession(data.session);
+        }
+      }
+    };
+
+    // Handle the URL that launched the app (cold start)
+    Linking.getInitialURL().then((url) => {
+      if (url) handleDeepLink(url);
+    });
+
+    // Handle URLs while the app is already open (warm start)
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      handleDeepLink(url);
+    });
+
+    return () => subscription.remove();
+  }, [setSession]);
 
   // Pull existing data from Supabase after auth + space are ready
   useEffect(() => {

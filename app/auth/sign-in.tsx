@@ -6,6 +6,7 @@ import {
   Platform,
   ScrollView,
   Pressable,
+  Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -34,6 +35,7 @@ export default function SignInScreen() {
   }, [setLoading, setError]);
 
   const handleSignIn = async () => {
+    Keyboard.dismiss();
     if (!email.trim() || !password.trim()) {
       setError('Please enter both email and password.');
       return;
@@ -51,15 +53,14 @@ export default function SignInScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: theme.background }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          paddingTop: insets.top + 20,
+          paddingTop: insets.top + 60,
           paddingBottom: insets.bottom + 40,
           paddingHorizontal: 24,
-          justifyContent: 'center',
         }}
         keyboardShouldPersistTaps="handled"
       >
@@ -148,8 +149,23 @@ export default function SignInScreen() {
           </View>
         </View>
 
+        {/* Forgot password */}
+        <View style={{ alignItems: 'center', marginTop: 16 }}>
+          <Pressable onPress={() => router.push('/auth/forgot-password')}>
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: 'Inter_500Medium',
+                color: theme.primary,
+              }}
+            >
+              Forgot Password?
+            </Text>
+          </Pressable>
+        </View>
+
         {/* Switch to sign up */}
-        <View style={{ alignItems: 'center', marginTop: 20 }}>
+        <View style={{ alignItems: 'center', marginTop: 12 }}>
           <Pressable onPress={() => router.replace('/auth/sign-up')}>
             <Text
               style={{
