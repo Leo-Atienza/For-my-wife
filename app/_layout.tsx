@@ -68,22 +68,18 @@ function useProtectedRoute() {
     const inSetupGroup = segments[0] === 'setup';
 
     if (!session) {
-      // Not signed in — go to sign-in (unless already in auth)
       if (!inAuthGroup) {
         router.replace('/auth/sign-in');
       }
     } else if (!spaceId) {
-      // Signed in but no space — go to create-space
       if (!inAuthGroup) {
         router.replace('/auth/create-space');
       }
     } else if (!isOnboarded) {
-      // Has space but not onboarded — go to setup
       if (!inSetupGroup) {
         router.replace('/setup');
       }
     } else {
-      // Fully set up — redirect away from auth/setup
       if (inAuthGroup || inSetupGroup) {
         router.replace('/');
       }
@@ -140,9 +136,15 @@ function AppContent() {
       setIsAuthChecking(false);
     });
 
-    // Listen for changes
+    // Listen for changes — but skip SIGNED_IN events when the store's signIn()
+    // is actively running, since it loads space info before setting session to
+    // prevent the route guard from seeing session-without-spaceId and redirecting.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, s) => {
+        if (_event === 'SIGNED_IN' && useAuthStore.getState().isLoading) {
+          // signIn() is loading space info before setting session — don't interfere
+          return;
+        }
         setSession(s);
         if (s) {
           loadSpaceInfo();

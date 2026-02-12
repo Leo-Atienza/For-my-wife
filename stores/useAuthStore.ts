@@ -131,40 +131,43 @@ export const useAuthStore = create<AuthState>()(
 
           // Load space info BEFORE setting session to prevent race condition
           // where protected route sees session but no spaceId and redirects to create-space
-          const { data: member } = await supabase
-            .from('space_members')
-            .select('space_id, role, spaces(invite_code)')
-            .eq('user_id', data.user.id)
-            .single();
+          let spaceId: string | null = null;
+          let myRole: PartnerRole | null = null;
+          let inviteCodeValue: string | null = null;
 
-          if (member) {
-            let inviteCodeValue: string | null = null;
-            const spaceData = member.spaces;
-            if (
-              spaceData &&
-              typeof spaceData === 'object' &&
-              !Array.isArray(spaceData) &&
-              'invite_code' in spaceData &&
-              typeof (spaceData as Record<string, unknown>).invite_code === 'string'
-            ) {
-              inviteCodeValue = (spaceData as Record<string, unknown>).invite_code as string;
+          try {
+            const { data: member } = await supabase
+              .from('space_members')
+              .select('space_id, role, spaces(invite_code)')
+              .eq('user_id', data.user.id)
+              .single();
+
+            if (member) {
+              spaceId = member.space_id;
+              myRole = member.role as PartnerRole;
+              const spaceData = member.spaces;
+              if (
+                spaceData &&
+                typeof spaceData === 'object' &&
+                !Array.isArray(spaceData) &&
+                'invite_code' in spaceData &&
+                typeof (spaceData as Record<string, unknown>).invite_code === 'string'
+              ) {
+                inviteCodeValue = (spaceData as Record<string, unknown>).invite_code as string;
+              }
             }
-            set({
-              session: data.session,
-              user: data.user,
-              spaceId: member.space_id,
-              myRole: member.role as PartnerRole,
-              inviteCode: inviteCodeValue,
-              isLoading: false,
-            });
-          } else {
-            // No space yet — set session without spaceId
-            set({
-              session: data.session,
-              user: data.user,
-              isLoading: false,
-            });
+          } catch {
+            // Space info query failed — still proceed with session
           }
+
+          set({
+            session: data.session,
+            user: data.user,
+            spaceId,
+            myRole,
+            inviteCode: inviteCodeValue,
+            isLoading: false,
+          });
 
           return true;
         } catch (e) {

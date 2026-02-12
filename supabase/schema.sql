@@ -251,19 +251,23 @@ ALTER TABLE partner_notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE thinking_of_you ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sleep_wake_status ENABLE ROW LEVEL SECURITY;
 
--- Spaces: users can read spaces they belong to, and insert new ones
+-- Spaces: users can read spaces they created or belong to, and insert new ones
 CREATE POLICY "Users can read their spaces"
   ON spaces FOR SELECT
-  USING (id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()));
+  USING (
+    created_by = auth.uid()
+    OR id IN (SELECT user_space_ids())
+  );
 
 CREATE POLICY "Users can create spaces"
   ON spaces FOR INSERT
   WITH CHECK (created_by = auth.uid());
 
 -- Space members: users can read/insert members for their spaces
+-- Uses user_space_ids() (SECURITY DEFINER) to avoid infinite recursion
 CREATE POLICY "Users can read space members"
   ON space_members FOR SELECT
-  USING (space_id IN (SELECT space_id FROM space_members sm WHERE sm.user_id = auth.uid()));
+  USING (space_id IN (SELECT user_space_ids()));
 
 CREATE POLICY "Users can join spaces"
   ON space_members FOR INSERT

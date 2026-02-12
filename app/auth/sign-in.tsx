@@ -52,13 +52,22 @@ export default function SignInScreen() {
     setIsLoading(true);
     clearError();
     try {
-      await signIn(email.trim(), password);
+      const result = await signIn(email.trim(), password);
+      const state = useAuthStore.getState();
+      if (result && state.session) {
+        if (!state.spaceId) {
+          // Signed in but no space — go to create-space
+          router.replace('/auth/create-space');
+        }
+        // If spaceId exists, the route guard in _layout will handle navigation
+      } else if (!result && state.error) {
+        setLocalError(state.error);
+      }
     } catch (e) {
       const message = e instanceof Error ? e.message : 'An unexpected error occurred.';
       setLocalError(message);
     } finally {
       setIsLoading(false);
-      setStoreLoading(false);
     }
   };
 
