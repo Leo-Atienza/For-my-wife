@@ -14,6 +14,7 @@ import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/hooks/useTheme';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -102,10 +103,10 @@ export default function ForgotPasswordScreen() {
       style={{ flex: 1, backgroundColor: theme.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <PageHeader title="Reset Password" showBack />
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          paddingTop: insets.top + 60,
           paddingBottom: insets.bottom + 40,
           paddingHorizontal: 24,
         }}

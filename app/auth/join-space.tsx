@@ -22,6 +22,7 @@ export default function JoinSpaceScreen() {
   const joinSpace = useAuthStore((state) => state.joinSpace);
   const isLoading = useAuthStore((state) => state.isLoading);
   const error = useAuthStore((state) => state.error);
+  const setError = useAuthStore((state) => state.setError);
 
   const [code, setCode] = useState('');
 
@@ -75,7 +76,7 @@ export default function JoinSpaceScreen() {
         </View>
 
         {/* Code input */}
-        <InviteCodeInput value={code} onChangeText={setCode} />
+        <InviteCodeInput value={code} onChangeText={(v) => { setCode(v); if (error) setError(null); }} />
 
         {error && (
           <Text
