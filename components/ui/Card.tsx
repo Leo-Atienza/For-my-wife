@@ -1,4 +1,4 @@
-import { Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import type { ReactNode } from 'react';
 
@@ -6,9 +6,10 @@ interface CardProps {
   children: ReactNode;
   onPress?: () => void;
   style?: object;
+  loading?: boolean;
 }
 
-export const Card = ({ children, onPress, style }: CardProps) => {
+export const Card = ({ children, onPress, style, loading = false }: CardProps) => {
   const theme = useTheme();
 
   const cardStyle = {
@@ -25,19 +26,31 @@ export const Card = ({ children, onPress, style }: CardProps) => {
     ...style,
   };
 
+  const content = loading ? (
+    <>
+      <View style={{ opacity: 0.3 }}>{children}</View>
+      <ActivityIndicator
+        size="small"
+        color={theme.primary}
+        style={{ position: 'absolute', alignSelf: 'center' }}
+      />
+    </>
+  ) : children;
+
   if (onPress) {
     return (
       <Pressable
         onPress={onPress}
+        disabled={loading}
         style={({ pressed }) => ({
           ...cardStyle,
           transform: [{ scale: pressed ? 0.98 : 1 }],
         })}
       >
-        {children}
+        {content}
       </Pressable>
     );
   }
 
-  return <View style={cardStyle}>{children}</View>;
+  return <View style={cardStyle}>{content}</View>;
 };

@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useTheme } from '@/hooks/useTheme';
+import { SEMANTIC_COLORS } from '@/lib/constants';
 
 const PENDING_OPS_KEY = 'sync-pending-operations';
 
@@ -33,7 +34,7 @@ export function SyncStatusIndicator() {
     : `Syncing ${pendingCount} change${pendingCount > 1 ? 's' : ''}...`;
 
   const statusColor = !isConnected ? theme.textMuted : theme.primary;
-  const bgColor = !isConnected ? '#FEF3C7' : theme.primarySoft;
+  const bgColor = !isConnected ? SEMANTIC_COLORS.warningBg : theme.primarySoft;
 
   return (
     <View
@@ -52,7 +53,7 @@ export function SyncStatusIndicator() {
           width: 8,
           height: 8,
           borderRadius: 4,
-          backgroundColor: !isConnected ? '#F59E0B' : theme.primary,
+          backgroundColor: !isConnected ? SEMANTIC_COLORS.warning : theme.primary,
         }}
       />
       <Text

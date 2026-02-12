@@ -38,7 +38,7 @@ export const PageHeader = ({
             hitSlop={12}
             accessibilityRole="button"
             accessibilityLabel="Go back"
-            style={{ padding: 4 }}
+            style={{ padding: 10 }}
           >
             <ChevronLeft size={24} color={theme.textPrimary} />
           </Pressable>

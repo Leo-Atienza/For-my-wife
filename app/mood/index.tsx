@@ -101,7 +101,7 @@ export default function MoodScreen() {
           <Card>
             <View style={{ alignItems: 'center', gap: 4 }}>
               <Text style={{ fontSize: 12, fontFamily: 'Inter_500Medium', color: theme.textMuted }}>
-                TODAY'S MOOD
+                How are you feeling
               </Text>
               <Text style={{ fontSize: 40 }}>{todayEntry.mood}</Text>
               <Text style={{ fontSize: 14, fontFamily: 'Inter_500Medium', color: theme.textPrimary }}>
@@ -215,14 +215,14 @@ export default function MoodScreen() {
                     key={entry.id}
                     style={{
                       alignItems: 'center',
-                      width: 40,
+                      width: 48,
                       gap: 2,
                     }}
                   >
-                    <Text style={{ fontSize: 20 }}>{entry.mood}</Text>
+                    <Text style={{ fontSize: 24 }}>{entry.mood}</Text>
                     <Text
                       style={{
-                        fontSize: 9,
+                        fontSize: 10,
                         fontFamily: 'Inter_400Regular',
                         color: theme.textMuted,
                       }}
@@ -251,14 +251,14 @@ export default function MoodScreen() {
                     key={entry.id}
                     style={{
                       alignItems: 'center',
-                      width: 40,
+                      width: 48,
                       gap: 2,
                     }}
                   >
-                    <Text style={{ fontSize: 20 }}>{entry.mood}</Text>
+                    <Text style={{ fontSize: 24 }}>{entry.mood}</Text>
                     <Text
                       style={{
-                        fontSize: 9,
+                        fontSize: 10,
                         fontFamily: 'Inter_400Regular',
                         color: theme.textMuted,
                       }}

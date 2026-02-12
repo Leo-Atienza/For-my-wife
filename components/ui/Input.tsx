@@ -14,6 +14,7 @@ interface InputProps {
   keyboardType?: 'default' | 'email-address' | 'numeric';
   secureTextEntry?: boolean;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  error?: string;
 }
 
 export const Input = ({
@@ -28,6 +29,7 @@ export const Input = ({
   keyboardType = 'default',
   secureTextEntry = false,
   autoCapitalize,
+  error,
 }: InputProps) => {
   const theme = useTheme();
   const [isFocused, setIsFocused] = useState(false);
@@ -62,7 +64,7 @@ export const Input = ({
         style={{
           backgroundColor: theme.primarySoft,
           borderWidth: 1,
-          borderColor: isFocused ? theme.primary : theme.accent,
+          borderColor: error ? theme.danger : isFocused ? theme.primary : theme.accent,
           borderRadius: 12,
           paddingHorizontal: 16,
           paddingVertical: 12,
@@ -74,6 +76,18 @@ export const Input = ({
         }}
         accessibilityLabel={label ?? placeholder}
       />
+      {error && (
+        <Text
+          style={{
+            fontSize: 12,
+            fontFamily: 'Inter_400Regular',
+            color: theme.danger,
+            marginTop: 2,
+          }}
+        >
+          {error}
+        </Text>
+      )}
     </View>
   );
 };

@@ -170,8 +170,8 @@ export default function DistanceScreen() {
         )}
 
         {/* Manual location inputs (fallback) */}
-        <Text style={{ fontSize: 14, fontFamily: 'Inter_600SemiBold', color: theme.textMuted, marginTop: 8 }}>
-          Manual Override
+        <Text style={{ fontSize: 16, fontFamily: 'DancingScript_400Regular', color: theme.primary, marginTop: 8 }}>
+          Where are you both?
         </Text>
 
         <Text style={{ fontSize: 16, fontFamily: 'Inter_600SemiBold', color: theme.textPrimary }}>

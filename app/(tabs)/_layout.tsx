@@ -21,7 +21,7 @@ export default function TabLayout() {
           height: 60,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 12,
           fontFamily: 'Inter_500Medium',
           marginBottom: 4,
         },

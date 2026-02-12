@@ -1,4 +1,5 @@
-import { View, FlatList, Text, Pressable } from 'react-native';
+import { View, FlatList, Text, Pressable, RefreshControl } from 'react-native';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { Plus } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -61,6 +62,11 @@ export default function NotesScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const notes = useNotesStore((state) => state.notes);
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 500);
+  }, []);
 
   if (notes.length === 0) {
     return (
@@ -108,6 +114,14 @@ export default function NotesScreen() {
             onPress={() => router.push(`/notes/${item.id}`)}
           />
         )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={theme.primary}
+            colors={[theme.primary]}
+          />
+        }
         contentContainerStyle={{
           paddingHorizontal: 24,
           paddingVertical: 16,

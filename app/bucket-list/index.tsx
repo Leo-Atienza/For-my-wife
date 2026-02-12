@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Pressable } from 'react-native';
+import { View, Text, FlatList, Pressable, Alert } from 'react-native';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus, Check, Trash2 } from 'lucide-react-native';
@@ -116,7 +116,16 @@ export default function BucketListScreen() {
         )}
 
         <Pressable
-          onPress={() => removeItem(item.id)}
+          onPress={() =>
+            Alert.alert(
+              'Remove this dream?',
+              `"${item.title}" will be removed from your bucket list.`,
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Remove', style: 'destructive', onPress: () => removeItem(item.id) },
+              ]
+            )
+          }
           hitSlop={8}
           accessibilityLabel="Delete item"
           style={{ padding: 4 }}

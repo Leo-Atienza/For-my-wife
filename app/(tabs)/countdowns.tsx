@@ -1,4 +1,5 @@
-import { View, FlatList, Text, Pressable } from 'react-native';
+import { View, FlatList, Text, Pressable, RefreshControl } from 'react-native';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { Plus } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -102,6 +103,11 @@ export default function CountdownsScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const countdowns = useCountdownsStore((state) => state.countdowns);
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 500);
+  }, []);
 
   if (countdowns.length === 0) {
     return (
@@ -144,6 +150,14 @@ export default function CountdownsScreen() {
         data={countdowns}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <CountdownCard countdown={item} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={theme.primary}
+            colors={[theme.primary]}
+          />
+        }
         contentContainerStyle={{
           paddingHorizontal: 24,
           paddingVertical: 16,

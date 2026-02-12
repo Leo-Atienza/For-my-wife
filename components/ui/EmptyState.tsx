@@ -1,4 +1,5 @@
-import { View, Text } from 'react-native';
+import { View, Text, Animated } from 'react-native';
+import { useEffect, useRef } from 'react';
 import { useTheme } from '@/hooks/useTheme';
 import { Button } from './Button';
 
@@ -18,6 +19,16 @@ export const EmptyState = ({
   onAction,
 }: EmptyStateProps) => {
   const theme = useTheme();
+  const bobAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(bobAnim, { toValue: -8, duration: 1500, useNativeDriver: true }),
+        Animated.timing(bobAnim, { toValue: 0, duration: 1500, useNativeDriver: true }),
+      ])
+    ).start();
+  }, [bobAnim]);
 
   return (
     <View
@@ -29,7 +40,7 @@ export const EmptyState = ({
         gap: 16,
       }}
     >
-      <Text style={{ fontSize: 48 }}>{emoji}</Text>
+      <Animated.Text style={{ fontSize: 48, transform: [{ translateY: bobAnim }] }}>{emoji}</Animated.Text>
       <Text
         style={{
           fontSize: 20,

@@ -52,6 +52,15 @@ export const THEMES: Record<ThemeName, ThemeColors> = {
 };
 
 // ============================================
+// Semantic Colors (theme-independent)
+// ============================================
+
+export const SEMANTIC_COLORS = {
+  warning: '#F59E0B',
+  warningBg: '#FEF3C7',
+};
+
+// ============================================
 // Love Quotes (for daily dashboard quote)
 // ============================================
 

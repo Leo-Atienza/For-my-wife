@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, Animated, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AlertTriangle, CheckCircle, Info, X } from 'lucide-react-native';
 
 type ToastType = 'error' | 'success' | 'info';
 
@@ -50,19 +51,19 @@ function ToastItem({ toast, onDismiss }: { toast: ToastMessage; onDismiss: (id: 
     toast.type === 'success' ? '#166534' :
     '#075985';
 
-  const icon =
-    toast.type === 'error' ? '\u26a0\ufe0f' :
-    toast.type === 'success' ? '\u2705' :
-    '\u2139\ufe0f';
+  const IconComponent =
+    toast.type === 'error' ? AlertTriangle :
+    toast.type === 'success' ? CheckCircle :
+    Info;
 
   return (
     <Animated.View style={[styles.toast, { backgroundColor: bgColor, opacity, transform: [{ translateY }] }]}>
-      <Text style={{ fontSize: 16, marginRight: 8 }}>{icon}</Text>
+      <IconComponent size={18} color={textColor} style={{ marginRight: 8 }} />
       <Text style={[styles.toastText, { color: textColor }]} numberOfLines={2}>
         {toast.text}
       </Text>
-      <Pressable onPress={() => onDismiss(toast.id)} hitSlop={8}>
-        <Text style={{ fontSize: 16, color: textColor }}>{'\u2715'}</Text>
+      <Pressable onPress={() => onDismiss(toast.id)} hitSlop={12}>
+        <X size={16} color={textColor} />
       </Pressable>
     </Animated.View>
   );
