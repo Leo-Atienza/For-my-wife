@@ -2,37 +2,11 @@ import { View, Text } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useRelationshipDuration } from '@/hooks/useRelationshipDuration';
 import { Card } from '@/components/ui/Card';
+import { FlipNumber } from '@/components/countdowns/FlipNumber';
 
 interface DurationCounterProps {
   anniversaryDate: string;
 }
-
-const TimeUnit = ({ value, label }: { value: number; label: string }) => {
-  const theme = useTheme();
-  return (
-    <View style={{ alignItems: 'center' }}>
-      <Text
-        style={{
-          fontSize: 30,
-          fontFamily: 'PlayfairDisplay_700Bold',
-          color: theme.primary,
-        }}
-      >
-        {value.toLocaleString()}
-      </Text>
-      <Text
-        style={{
-          fontSize: 12,
-          fontFamily: 'Inter_400Regular',
-          color: theme.textMuted,
-          marginTop: 2,
-        }}
-      >
-        {label}
-      </Text>
-    </View>
-  );
-};
 
 const Separator = () => {
   const theme = useTheme();
@@ -97,13 +71,13 @@ export const DurationCounter = ({ anniversaryDate }: DurationCounterProps) => {
           gap: 12,
         }}
       >
-        <TimeUnit value={duration.days} label="days" />
+        <FlipNumber value={duration.days} fontSize={30} label="days" />
         <Separator />
-        <TimeUnit value={duration.hours} label="hrs" />
+        <FlipNumber value={duration.hours} fontSize={30} label="hrs" />
         <Separator />
-        <TimeUnit value={duration.minutes} label="min" />
+        <FlipNumber value={duration.minutes} fontSize={30} label="min" />
         <Separator />
-        <TimeUnit value={duration.seconds} label="sec" />
+        <FlipNumber value={duration.seconds} fontSize={30} label="sec" />
       </View>
     </Card>
   );

@@ -1,5 +1,5 @@
 import { View, Text, FlatList, Pressable, Alert } from 'react-native';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus, Check, Trash2 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
@@ -7,6 +7,7 @@ import { useBucketStore } from '@/stores/useBucketStore';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Card } from '@/components/ui/Card';
+import { ConfettiBurst } from '@/components/bucket/ConfettiBurst';
 import { AddBucketItemModal } from '@/components/bucket/AddBucketItemModal';
 import { BUCKET_CATEGORIES } from '@/lib/constants';
 import { formatDate } from '@/lib/dates';
@@ -111,9 +112,7 @@ export default function BucketListScreen() {
           </View>
         </View>
 
-        {isJustDone && (
-          <Text style={{ fontSize: 24 }}>{'\ud83c\udf89'}</Text>
-        )}
+        <ConfettiBurst active={isJustDone} />
 
         <Pressable
           onPress={() =>

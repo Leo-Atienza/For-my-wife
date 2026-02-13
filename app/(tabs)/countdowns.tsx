@@ -9,6 +9,7 @@ import { useCountdown } from '@/hooks/useCountdown';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { FlipNumber } from '@/components/countdowns/FlipNumber';
 import type { CountdownEvent } from '@/lib/types';
 
 const CountdownCard = ({ countdown }: { countdown: CountdownEvent }) => {
@@ -61,40 +62,14 @@ const CountdownCard = ({ countdown }: { countdown: CountdownEvent }) => {
               padding: 12,
             }}
           >
-            <CountdownUnit value={values.days} label="days" />
-            <CountdownUnit value={values.hours} label="hrs" />
-            <CountdownUnit value={values.minutes} label="min" />
-            <CountdownUnit value={values.seconds} label="sec" />
+            <FlipNumber value={values.days} label="days" />
+            <FlipNumber value={values.hours} label="hrs" />
+            <FlipNumber value={values.minutes} label="min" />
+            <FlipNumber value={values.seconds} label="sec" />
           </View>
         )}
       </View>
     </Card>
-  );
-};
-
-const CountdownUnit = ({ value, label }: { value: number; label: string }) => {
-  const theme = useTheme();
-  return (
-    <View style={{ alignItems: 'center' }}>
-      <Text
-        style={{
-          fontSize: 22,
-          fontFamily: 'PlayfairDisplay_700Bold',
-          color: theme.primary,
-        }}
-      >
-        {value}
-      </Text>
-      <Text
-        style={{
-          fontSize: 11,
-          fontFamily: 'Inter_400Regular',
-          color: theme.textMuted,
-        }}
-      >
-        {label}
-      </Text>
-    </View>
   );
 };
 

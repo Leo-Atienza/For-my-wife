@@ -6,6 +6,7 @@ import { useNicknameStore } from '@/stores/useNicknameStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useTheme } from '@/hooks/useTheme';
 import { DurationCounter } from '@/components/home/DurationCounter';
+import { FloatingHearts } from '@/components/home/FloatingHearts';
 import { QuickActions } from '@/components/home/QuickActions';
 import { DailyQuote } from '@/components/home/DailyQuote';
 import { ThinkingOfYouButton } from '@/components/home/ThinkingOfYouButton';
@@ -165,9 +166,12 @@ export default function HomeScreen() {
       {/* Partner sleep status — subtle inline */}
       <PartnerSleepStatus />
 
-      {/* Duration counter */}
+      {/* Duration counter with floating hearts */}
       {profile.anniversaryDate ? (
-        <DurationCounter anniversaryDate={profile.anniversaryDate} />
+        <View style={{ position: 'relative' }}>
+          <FloatingHearts />
+          <DurationCounter anniversaryDate={profile.anniversaryDate} />
+        </View>
       ) : null}
 
       {/* Quick actions */}
