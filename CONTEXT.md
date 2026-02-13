@@ -1,20 +1,53 @@
-# Session Context — UI Polish, Invite Partner Feature & NativeWind Fix
+# Session Context — Animations, NativeWind Bug Sweep & Polish
 
 > Hand-off document for the next Claude agent. Read this FIRST, then CLAUDE.md, then APP_PLAN.md.
 
 ## Current Branch & Git State
 
 - **Branch**: `main`
-- **Status**: Uncommitted changes — 2 modified files + 2 new files (see below).
+- **Status**: Clean working tree, 3 commits ahead of origin (not yet pushed).
+- **Last 3 commits**:
+  - `624e560` — Add celebration animation when countdown reaches zero
+  - `3cfba02` — Add delightful animations across four features
+  - `2812c4f` — Fix NativeWind Pressable layout bug across 5 components
 
-### Uncommitted Changes
+---
 
-| File | Status | What Changed |
-|------|--------|-------------|
-| `app/(tabs)/more.tsx` | Modified | Full rewrite — MenuItem component, NativeWind fix, bigger elements, invite partner item |
-| `app/settings/index.tsx` | Modified | Added invite partner shortcut card, sign out button, NativeWind fix |
-| `app/invite-partner.tsx` | **New** | Partner invite/connection screen with Supabase integration |
-| `app/setup/_layout.tsx` | **New** | Minimal Stack layout to fix "setup" route warning |
+## What Was Done (This Session)
+
+### 1. NativeWind Pressable Bug — Full Codebase Sweep
+
+Audited **every `.tsx` file** in the project for the NativeWind + Pressable callback layout bug. Fixed all 5 remaining files that had layout properties inside `({ pressed }) => ({...})` callback styles:
+
+| File | What Was Broken |
+|------|----------------|
+| `components/home/SleepWakeToggle.tsx` | `flexDirection: 'row'` in callback — toggle stacking vertically |
+| `app/dates/index.tsx` | "Surprise Me" button row layout broken |
+| `components/home/QuickActions.tsx` | `alignItems` + `gap` in callback — icons misaligned |
+| `components/ui/Card.tsx` | `cardStyle` spread in callback — pressable cards losing styles |
+| `components/partner-notes/PartnerNoteCard.tsx` | All card styling in callback — notes cards losing layout |
+
+**Verified**: No other files in the codebase have this bug. All remaining Pressables either use static `style={{...}}` (safe) or already follow the View wrapper pattern.
+
+### 2. Four Delightful Animations Added
+
+| Animation | Component | Where Used |
+|-----------|-----------|------------|
+| **Envelope opening** | `components/notes/EnvelopeAnimation.tsx` | `app/notes/[id].tsx` — plays when opening an unread note. Flap lifts, note slides out, envelope fades. |
+| **Confetti burst** | `components/bucket/ConfettiBurst.tsx` | `app/bucket-list/index.tsx` — 12 colored particles explode outward when checking off an item. |
+| **Flip number** | `components/countdowns/FlipNumber.tsx` | `app/(tabs)/countdowns.tsx` + `components/home/DurationCounter.tsx` — numbers slide and fade when changing. Enclosed in a bordered card-style container. |
+| **Floating hearts** | `components/home/FloatingHearts.tsx` | `app/(tabs)/index.tsx` — 5 hearts float gently upward around the "Together for X days" counter on the home dashboard. |
+
+### 3. Countdown Celebration Animation
+
+When a countdown reaches zero (`isExpired`), the static "It's here!" text was replaced with a `CelebrationBadge` component inside `app/(tabs)/countdowns.tsx` that:
+- Shows a bouncing party emoji (scale 0 → 1.2 → 1)
+- Fires a confetti burst (reuses `ConfettiBurst` component)
+
+### 4. Also Committed (From Previous Session)
+
+- `app/invite-partner.tsx` — Partner invite/connection screen
+- `app/setup/_layout.tsx` — Fixes "setup" route warning
 
 ---
 
@@ -30,12 +63,12 @@
 - Fixed `onAuthStateChange` race condition (skip SIGNED_IN during `signIn()` loading)
 - Post-login navigation to `/auth/create-space` when no spaceId
 
-### Bug Fixes (Previous Session)
-- **Invalid date crash**: Added `isNaN(date.getTime())` guards to `formatDate()`, `formatDateShort()`, `formatRelativeTime()` in `lib/dates.ts` — returns `'Not set'` instead of throwing `RangeError`
-- **camelCase→snake_case sync failure**: Centralized `camelToSnake()` / `snakeToCamel()` in `lib/sync.ts` with alias maps for non-standard fields (`imageUri` ↔ `image_url`, `couplePhoto` ↔ `couple_photo_url`, `photoUrl` ↔ `photo_url`). All push/pull/subscribe operations auto-convert.
-- **"setup" route warning**: Added `app/setup/_layout.tsx` (minimal Stack + ErrorBoundary)
+### Bug Fixes
+- **Invalid date crash**: `isNaN(date.getTime())` guards in `lib/dates.ts`
+- **camelCase→snake_case sync failure**: Centralized conversion in `lib/sync.ts` with alias maps
+- **"setup" route warning**: Added `app/setup/_layout.tsx`
 
-### UI Polish (Previous Session)
+### UI Polish
 - Toast.tsx — Lucide icons instead of emoji
 - Input.tsx — `error?: string` prop with red border
 - EmptyState.tsx — Gentle bobbing animation
@@ -47,51 +80,16 @@
 - Require cycle fix via `lib/store-reset.ts`
 - QuickActions redesign — horizontal scrollable row of 56px circular icon buttons
 
----
-
-## What Was Done (This Session)
-
-### 1. More Screen Complete Rewrite
-- **Problem**: Menu items were stacking vertically instead of horizontal rows on device
-- **Root cause**: NativeWind's `@tailwind base` (in `global.css`) overrides `flexDirection: 'row'` when applied inside Pressable's callback style function `style={({ pressed }) => ({...})}`
-- **Fix**: Extracted all layout into a plain `View` inside Pressable; Pressable only handles opacity/background on press
-- **New `MenuItem` component** in `more.tsx` follows the safe pattern:
-  ```tsx
-  <Pressable style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-    <View style={{ flexDirection: 'row', alignItems: 'center', ... }}>
-      {/* content here */}
-    </View>
-  </Pressable>
-  ```
-- **Bigger elements**: icon container 44×44px, icon size 22, label 16px, subtitle 13px
-- **MenuCard component**: groups items with rounded card, shared border, dividers
-- **3 sections**: "Fun Activities", "Stay Connected", "You & Me"
-- Added ChevronRight indicator on every item
-- Added "Invite Partner" menu item under "You & Me" section
-
-### 2. Invite Partner Feature (`app/invite-partner.tsx`)
-- **NEW SCREEN** — allows partners to connect their devices
-- Queries `space_members` count from Supabase to show connection status
-- **Connected state**: green checkmark, partner name, "2 of 2 partners joined"
-- **Waiting state**: amber indicator, "Waiting for your partner", "1 of 2 joined"
-- Invite code display with dashed border styling
-- Copy to clipboard (Expo Clipboard) and Share (React Native Share API) buttons
-- "How it works" 4-step guide
-- Refresh status button with ActivityIndicator
-- Handles edge case: partner2 (who joined via code) doesn't have the invite code
-- All buttons use the View wrapper pattern to avoid NativeWind bug
-
-### 3. Settings Screen Enhancements (`app/settings/index.tsx`)
-- **Invite Partner shortcut card** at top with UserPlus icon, ring emoji, and ChevronRight
-- **Account section** with Sign Out button (Alert confirmation before signing out)
-- Sign Out calls `useAuthStore.signOut()` which resets all stores
-- Both new interactive elements use View wrapper pattern for NativeWind compatibility
+### More Screen & Invite Partner
+- Full rewrite of `more.tsx` with MenuItem component and MenuCard groups
+- Invite partner screen with Supabase integration, clipboard, share
+- Settings screen enhancements (invite shortcut, sign out)
 
 ---
 
 ## Critical Pattern: NativeWind + Pressable Layout Bug
 
-**ALWAYS follow this pattern when using Pressable with row layouts:**
+**ALWAYS follow this pattern when using Pressable with callback styles:**
 
 ```tsx
 // CORRECT — layout on plain View, press state on Pressable
@@ -99,19 +97,20 @@
   onPress={handlePress}
   style={({ pressed }) => ({
     opacity: pressed ? 0.7 : 1,
-    backgroundColor: pressed ? theme.primarySoft : 'transparent',
+    transform: [{ scale: pressed ? 0.98 : 1 }],
   })}
 >
-  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+  <View style={{ flexDirection: 'row', alignItems: 'center', ... }}>
     {/* content */}
   </View>
 </Pressable>
 
-// WRONG — NativeWind will override flexDirection
+// WRONG — NativeWind @tailwind base will override these
 <Pressable
-  onPress={handlePress}
   style={({ pressed }) => ({
-    flexDirection: 'row',  // ← THIS WILL BE OVERRIDDEN
+    flexDirection: 'row',    // ← OVERRIDDEN
+    alignItems: 'center',    // ← OVERRIDDEN
+    gap: 10,                 // ← OVERRIDDEN
     opacity: pressed ? 0.7 : 1,
   })}
 >
@@ -121,46 +120,73 @@
 
 **Root cause**: `@tailwind base` in `global.css` sets default styles that override callback-style properties on Pressable.
 
-### Files already fixed:
-- `app/(tabs)/more.tsx` ✅
-- `app/invite-partner.tsx` ✅
-- `app/settings/index.tsx` ✅
+**Note**: Static `style={{...}}` (without a `({ pressed })` callback) is NOT affected. Only callback-style Pressable styles break.
 
-### Files that still have this bug:
-- `components/home/SleepWakeToggle.tsx` ⚠️
-- `app/dates/index.tsx` ⚠️
+**Status**: All files in the codebase now follow the safe pattern. No remaining bugs.
+
+---
+
+## Animation Pattern Reference
+
+All animations use React Native's built-in `Animated` API (not Reanimated), consistent with the existing codebase. `react-native-reanimated` v4.1.1 is installed but unused.
+
+```tsx
+// Standard pattern used throughout:
+const anim = useRef(new Animated.Value(0)).current;
+
+useEffect(() => {
+  Animated.timing(anim, {
+    toValue: 1,
+    duration: 300,
+    useNativeDriver: true, // Always true for transform/opacity
+  }).start();
+}, [anim]);
+```
+
+### Existing Animation Components
+| Component | Pattern | Location |
+|-----------|---------|----------|
+| EmptyState bobbing | `Animated.loop` + `Animated.sequence` | `components/ui/EmptyState.tsx` |
+| Toast slide-in | `Animated.parallel` (opacity + translateY) | `components/ui/Toast.tsx` |
+| Thinking of You heartbeat | `Animated.sequence` (scale up/down) | `components/home/ThinkingOfYouButton.tsx` |
+| Heart bloom | `Animated.parallel` (scale + opacity + translateY) | `components/home/HeartBloom.tsx` |
+| Envelope opening | `Animated.sequence` (flap + slide + fade) | `components/notes/EnvelopeAnimation.tsx` |
+| Confetti burst | `Animated.parallel` (12 particles × 5 properties) | `components/bucket/ConfettiBurst.tsx` |
+| Flip number | `Animated.timing` (translateY + opacity on change) | `components/countdowns/FlipNumber.tsx` |
+| Floating hearts | `Animated.sequence` per heart (translateY + opacity loop) | `components/home/FloatingHearts.tsx` |
 
 ---
 
 ## What Still Needs to Be Done
 
-### Priority 1: Remaining NativeWind Bug Fixes
-- [ ] Fix `flexDirection: 'row'` on Pressable in `SleepWakeToggle.tsx`
-- [ ] Fix `flexDirection: 'row'` on Pressable in `app/dates/index.tsx`
-- [ ] Audit all other files for the same pattern (search for `flexDirection` inside Pressable callback styles)
-
-### Priority 2: Testing
+### Priority 1: Real Device Testing
 - [ ] Test auth flows on real device (sign up, sign in, forgot password)
 - [ ] Test invite partner flow end-to-end on two devices
 - [ ] Test data sync between two devices (camelCase fix should resolve sync errors)
 - [ ] Test offline queue and reconnection behavior
 - [ ] Verify Couple Profile screen no longer crashes with invalid dates
+- [ ] Test all new animations on device (envelope, confetti, flip numbers, floating hearts)
+- [ ] Verify NativeWind fixes render correctly on Android and iOS
 
-### Priority 3: Phase 3 Completion
+### Priority 2: Phase 3 Completion (Supabase)
 - [ ] Conflict resolution for simultaneous edits (currently last-write-wins)
 - [ ] Cloud photo storage — migrate images from AsyncStorage to Supabase Storage
 - [ ] Photo compression + thumbnail generation
 - [ ] Push notifications for key events (new note, thinking of you, countdown reached zero)
-- [ ] "This Day in Our History" feature
+- [ ] "This Day in Our History" feature (Phase 4.2 in APP_PLAN.md)
 
-### Priority 4: Polish & Missing Features
-- [ ] Envelope opening animation for love notes (planned but not implemented)
-- [ ] Confetti animation for bucket list completion
-- [ ] Number flip animation for countdown timer digits
-- [ ] Heart floating micro-interactions on dashboard
-- [ ] Next Visit planner (LDR feature from Phase 1.7)
-- [ ] Love Language Quiz (Phase 4)
-- [ ] Export/PDF Yearbook (Phase 4)
+### Priority 3: Remaining Features
+- [ ] Next Visit planner (LDR feature — Phase 1.7 in APP_PLAN.md)
+- [ ] Love Language Quiz (Phase 4.3)
+- [ ] Export/PDF Yearbook (Phase 4.5)
+- [ ] Watch Party / Sync Timer (Phase 4.4)
+- [ ] Spotify Shared Playlist integration (Phase 4.7)
+
+### Priority 4: Additional Polish
+- [ ] Slot-machine animation for "Surprise Me" random date picker (currently instant)
+- [ ] Satisfying checkmark draw animation on bucket list (before confetti)
+- [ ] Nickname card-flip reveal animation
+- [ ] Photo challenge feature in Daily Questions
 
 ---
 
@@ -198,12 +224,27 @@
 | Settings | `app/settings/` | Multiple stores |
 | Sync Engine | `lib/sync.ts` | — |
 
+### Animations Implemented
+| Animation | Feature | Status |
+|-----------|---------|--------|
+| Envelope opening | Love notes (unread) | Done |
+| Confetti burst | Bucket list completion | Done |
+| Flip number | Countdown timers + dashboard duration | Done |
+| Floating hearts | Dashboard around duration counter | Done |
+| Celebration badge | Countdown expired | Done |
+| Bobbing emoji | Empty states | Done |
+| Heartbeat | Thinking of You button | Done |
+| Heart bloom | Thinking of You received | Done |
+| Toast slide | Toast notifications | Done |
+
 ### Codebase Stats
-- **115 source files** (`.ts` + `.tsx`)
+- **120 source files** (`.ts` + `.tsx`)
 - **48 routes** (Expo Router auto-discovery)
 - **18+ Zustand stores** with AsyncStorage persistence
 - **4 color themes**: Rose, Lavender, Sunset, Ocean
 - **3 font families**: Playfair Display, Inter, Dancing Script
+- **9 animation components** using React Native Animated API
+- **0 TypeScript errors**, 0 `any` types, 0 console.log in production code
 
 ---
 
@@ -228,9 +269,15 @@
 | `app/_layout.tsx` | Root layout — route guard, auth listener, Stack screens |
 | `app/setup/_layout.tsx` | Setup route layout (fixes route warning) |
 | `app/(tabs)/more.tsx` | More screen — grouped menu cards with MenuItem component |
+| `app/(tabs)/countdowns.tsx` | Countdowns — FlipNumber + CelebrationBadge |
 | `app/invite-partner.tsx` | Partner invite/connection screen |
 | `app/settings/index.tsx` | Settings — theme picker, invite shortcut, sign out |
 | `components/home/QuickActions.tsx` | Quick actions — horizontal scrollable circles |
+| `components/home/DurationCounter.tsx` | Dashboard counter — uses FlipNumber |
+| `components/home/FloatingHearts.tsx` | Floating hearts around duration counter |
+| `components/notes/EnvelopeAnimation.tsx` | Envelope opening for unread notes |
+| `components/bucket/ConfettiBurst.tsx` | Confetti burst (reused in bucket list + countdowns) |
+| `components/countdowns/FlipNumber.tsx` | Animated number display with flip effect |
 | `components/ui/Button.tsx` | DO NOT CHANGE — user confirmed buttons are good |
 | `global.css` | Contains `@tailwind base` — source of Pressable layout bug |
 
@@ -243,5 +290,6 @@
 - **Themes**: 4 themes (Rose, Lavender, Sunset, Ocean) in `lib/constants.ts`
 - **Typography**: Playfair Display (headings), Inter (body), Dancing Script (romantic accents)
 - **Navigation**: Expo Router file-based routing with Stack + bottom tabs
+- **Animations**: All use built-in `Animated` API (Reanimated installed but unused)
 - **This app is for 2 users only** — don't over-engineer
-- **NativeWind caveat**: Never put layout properties (`flexDirection`, etc.) inside Pressable callback styles — use a plain View wrapper instead
+- **NativeWind caveat**: Never put layout properties inside Pressable callback styles — use a plain View wrapper instead
