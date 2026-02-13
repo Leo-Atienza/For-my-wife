@@ -195,23 +195,28 @@ export default function DateIdeasScreen() {
         <Pressable
           onPress={handleSurpriseMe}
           style={({ pressed }) => ({
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            backgroundColor: theme.primarySoft,
-            borderRadius: 12,
-            paddingVertical: 12,
-            borderWidth: 1,
-            borderColor: theme.accent,
             opacity: pressed ? 0.85 : 1,
           })}
           accessibilityLabel="Surprise me with a random date idea"
         >
-          <Shuffle size={18} color={theme.primary} />
-          <Text style={{ fontSize: 15, fontFamily: 'Inter_600SemiBold', color: theme.primary }}>
-            Surprise Me!
-          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              backgroundColor: theme.primarySoft,
+              borderRadius: 12,
+              paddingVertical: 12,
+              borderWidth: 1,
+              borderColor: theme.accent,
+            }}
+          >
+            <Shuffle size={18} color={theme.primary} />
+            <Text style={{ fontSize: 15, fontFamily: 'Inter_600SemiBold', color: theme.primary }}>
+              Surprise Me!
+            </Text>
+          </View>
         </Pressable>
       </View>
 

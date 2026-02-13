@@ -22,43 +22,48 @@ export const SleepWakeToggle = () => {
     <Pressable
       onPress={handleToggle}
       style={({ pressed }) => ({
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-        backgroundColor: theme.surface,
-        borderRadius: 16,
-        padding: 14,
-        borderWidth: 1,
-        borderColor: isSleeping ? theme.primary : theme.accent,
         opacity: pressed ? 0.9 : 1,
       })}
       accessibilityLabel={isSleeping ? 'Mark as awake' : 'Mark as sleeping'}
       accessibilityRole="button"
     >
-      {isSleeping ? (
-        <Moon size={22} color={theme.primary} />
-      ) : (
-        <Sun size={22} color="#F59E0B" />
-      )}
-      <View style={{ flex: 1 }}>
-        <Text
-          style={{
-            fontSize: 14,
-            fontFamily: 'Inter_600SemiBold',
-            color: theme.textPrimary,
-          }}
-        >
-          {isSleeping ? 'Going to sleep...' : 'Good morning!'}
-        </Text>
-        <Text
-          style={{
-            fontSize: 12,
-            fontFamily: 'Inter_400Regular',
-            color: theme.textMuted,
-          }}
-        >
-          Tap to change your status
-        </Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 10,
+          backgroundColor: theme.surface,
+          borderRadius: 16,
+          padding: 14,
+          borderWidth: 1,
+          borderColor: isSleeping ? theme.primary : theme.accent,
+        }}
+      >
+        {isSleeping ? (
+          <Moon size={22} color={theme.primary} />
+        ) : (
+          <Sun size={22} color="#F59E0B" />
+        )}
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: 'Inter_600SemiBold',
+              color: theme.textPrimary,
+            }}
+          >
+            {isSleeping ? 'Going to sleep...' : 'Good morning!'}
+          </Text>
+          <Text
+            style={{
+              fontSize: 12,
+              fontFamily: 'Inter_400Regular',
+              color: theme.textMuted,
+            }}
+          >
+            Tap to change your status
+          </Text>
+        </View>
       </View>
     </Pressable>
   );

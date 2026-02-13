@@ -86,44 +86,44 @@ export const QuickActions = () => {
           key={action.label}
           onPress={() => router.push(action.route as never)}
           style={({ pressed }) => ({
-            alignItems: 'center',
-            gap: 6,
             transform: [{ scale: pressed ? 0.92 : 1 }],
           })}
           accessibilityRole="button"
           accessibilityLabel={action.label}
         >
-          <View
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 28,
-              backgroundColor: theme.primarySoft,
-              borderWidth: 1.5,
-              borderColor: theme.accent,
-              justifyContent: 'center',
-              alignItems: 'center',
-              shadowColor: theme.primary,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 4,
-              elevation: 2,
-            }}
-          >
-            {action.icon}
+          <View style={{ alignItems: 'center', gap: 6 }}>
+            <View
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                backgroundColor: theme.primarySoft,
+                borderWidth: 1.5,
+                borderColor: theme.accent,
+                justifyContent: 'center',
+                alignItems: 'center',
+                shadowColor: theme.primary,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 4,
+                elevation: 2,
+              }}
+            >
+              {action.icon}
+            </View>
+            <Text
+              style={{
+                fontSize: 11,
+                fontFamily: 'Inter_500Medium',
+                color: theme.textMuted,
+                textAlign: 'center',
+                maxWidth: 64,
+              }}
+              numberOfLines={1}
+            >
+              {action.label}
+            </Text>
           </View>
-          <Text
-            style={{
-              fontSize: 11,
-              fontFamily: 'Inter_500Medium',
-              color: theme.textMuted,
-              textAlign: 'center',
-              maxWidth: 64,
-            }}
-            numberOfLines={1}
-          >
-            {action.label}
-          </Text>
         </Pressable>
       ))}
     </ScrollView>

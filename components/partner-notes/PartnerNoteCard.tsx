@@ -22,84 +22,89 @@ export const PartnerNoteCard = ({ note, isAboutMe, onPress }: PartnerNoteCardPro
     <Pressable
       onPress={onPress}
       style={({ pressed }) => ({
-        backgroundColor: isSealed ? theme.primarySoft : theme.surface,
-        borderRadius: 16,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: isSealed ? theme.primary : theme.accent,
-        gap: 10,
         transform: [{ scale: pressed ? 0.98 : 1 }],
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 3,
-        elevation: 2,
       })}
       accessibilityLabel={isSealed ? 'Sealed note - tap to discover' : categoryLabel}
     >
-      {/* Category row */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Icon size={14} color={isSealed ? theme.primary : theme.textMuted} />
-          <Text
-            style={{
-              fontSize: 12,
-              fontFamily: 'Inter_500Medium',
-              color: isSealed ? theme.primary : theme.textMuted,
-            }}
-          >
-            {categoryLabel}
-          </Text>
+      <View
+        style={{
+          backgroundColor: isSealed ? theme.primarySoft : theme.surface,
+          borderRadius: 16,
+          padding: 16,
+          borderWidth: 1,
+          borderColor: isSealed ? theme.primary : theme.accent,
+          gap: 10,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.05,
+          shadowRadius: 3,
+          elevation: 2,
+        }}
+      >
+        {/* Category row */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Icon size={14} color={isSealed ? theme.primary : theme.textMuted} />
+            <Text
+              style={{
+                fontSize: 12,
+                fontFamily: 'Inter_500Medium',
+                color: isSealed ? theme.primary : theme.textMuted,
+              }}
+            >
+              {categoryLabel}
+            </Text>
+          </View>
+          {isSealed && <Lock size={14} color={theme.primary} />}
         </View>
-        {isSealed && <Lock size={14} color={theme.primary} />}
-      </View>
 
-      {/* Content */}
-      {isSealed ? (
-        <View style={{ alignItems: 'center', paddingVertical: 8, gap: 4 }}>
+        {/* Content */}
+        {isSealed ? (
+          <View style={{ alignItems: 'center', paddingVertical: 8, gap: 4 }}>
+            <Text
+              style={{
+                fontSize: 15,
+                fontFamily: 'DancingScript_400Regular',
+                color: theme.primary,
+                textAlign: 'center',
+              }}
+            >
+              A note waiting to be discovered...
+            </Text>
+            <Text
+              style={{
+                fontSize: 12,
+                fontFamily: 'Inter_400Regular',
+                color: theme.textMuted,
+              }}
+            >
+              Tap to reveal
+            </Text>
+          </View>
+        ) : (
           <Text
             style={{
               fontSize: 15,
-              fontFamily: 'DancingScript_400Regular',
-              color: theme.primary,
-              textAlign: 'center',
-            }}
-          >
-            A note waiting to be discovered...
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
               fontFamily: 'Inter_400Regular',
-              color: theme.textMuted,
+              color: theme.textPrimary,
+              lineHeight: 22,
             }}
           >
-            Tap to reveal
+            {truncateText(note.content, 120)}
           </Text>
-        </View>
-      ) : (
+        )}
+
+        {/* Date */}
         <Text
           style={{
-            fontSize: 15,
+            fontSize: 11,
             fontFamily: 'Inter_400Regular',
-            color: theme.textPrimary,
-            lineHeight: 22,
+            color: theme.textMuted,
           }}
         >
-          {truncateText(note.content, 120)}
+          {format(new Date(note.createdAt), 'MMM d, yyyy')}
         </Text>
-      )}
-
-      {/* Date */}
-      <Text
-        style={{
-          fontSize: 11,
-          fontFamily: 'Inter_400Regular',
-          color: theme.textMuted,
-        }}
-      >
-        {format(new Date(note.createdAt), 'MMM d, yyyy')}
-      </Text>
+      </View>
     </Pressable>
   );
 };

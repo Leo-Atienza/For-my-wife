@@ -43,11 +43,12 @@ export const Card = ({ children, onPress, style, loading = false }: CardProps) =
         onPress={onPress}
         disabled={loading}
         style={({ pressed }) => ({
-          ...cardStyle,
           transform: [{ scale: pressed ? 0.98 : 1 }],
         })}
       >
-        {content}
+        <View style={cardStyle}>
+          {content}
+        </View>
       </Pressable>
     );
   }
