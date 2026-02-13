@@ -1,5 +1,5 @@
-import { View, Text, FlatList, Pressable, Alert } from 'react-native';
-import { useState, useCallback } from 'react';
+import { View, Text, FlatList, Pressable, Alert, Animated } from 'react-native';
+import { useState, useCallback, useRef } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus, Check, Trash2 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Card } from '@/components/ui/Card';
 import { ConfettiBurst } from '@/components/bucket/ConfettiBurst';
+import { CheckmarkDraw } from '@/components/bucket/CheckmarkDraw';
 import { AddBucketItemModal } from '@/components/bucket/AddBucketItemModal';
 import { BUCKET_CATEGORIES } from '@/lib/constants';
 import { formatDate } from '@/lib/dates';
@@ -24,6 +25,8 @@ export default function BucketListScreen() {
   const [selectedCategory, setSelectedCategory] = useState<BucketCategory | 'all' | 'completed'>('all');
   const [showAdd, setShowAdd] = useState(false);
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
+  const [showConfettiFor, setShowConfettiFor] = useState<string | null>(null);
+  const circleFillAnim = useRef(new Animated.Value(0)).current;
 
   const filteredItems =
     selectedCategory === 'all'
@@ -36,7 +39,22 @@ export default function BucketListScreen() {
     toggleComplete(id);
     if (!wasCompleted) {
       setJustCompleted(id);
-      setTimeout(() => setJustCompleted(null), 1500);
+      setShowConfettiFor(null);
+
+      // Animate circle fill
+      circleFillAnim.setValue(0);
+      Animated.timing(circleFillAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
+
+      // Delay confetti until after checkmark draws (500ms)
+      setTimeout(() => setShowConfettiFor(id), 500);
+      setTimeout(() => {
+        setJustCompleted(null);
+        setShowConfettiFor(null);
+      }, 2000);
     }
   };
 
@@ -81,12 +99,33 @@ export default function BucketListScreen() {
             borderRadius: 15,
             borderWidth: 2,
             borderColor: item.isCompleted ? theme.success : theme.accent,
-            backgroundColor: item.isCompleted ? theme.success : 'transparent',
+            backgroundColor: item.isCompleted
+              ? isJustDone
+                ? undefined
+                : theme.success
+              : 'transparent',
             justifyContent: 'center',
             alignItems: 'center',
+            overflow: 'hidden',
           }}
         >
-          {item.isCompleted && <Check size={16} color="#FFFFFF" />}
+          {isJustDone && (
+            <Animated.View
+              style={{
+                position: 'absolute',
+                width: 30,
+                height: 30,
+                borderRadius: 15,
+                backgroundColor: theme.success,
+                transform: [{ scale: circleFillAnim }],
+              }}
+            />
+          )}
+          {item.isCompleted && (
+            isJustDone
+              ? <CheckmarkDraw active size={16} color="#FFFFFF" />
+              : <Check size={16} color="#FFFFFF" />
+          )}
         </Pressable>
 
         <View style={{ flex: 1 }}>
@@ -112,7 +151,7 @@ export default function BucketListScreen() {
           </View>
         </View>
 
-        <ConfettiBurst active={isJustDone} />
+        <ConfettiBurst active={showConfettiFor === item.id} />
 
         <Pressable
           onPress={() =>

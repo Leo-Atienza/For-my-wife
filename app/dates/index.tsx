@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Pressable } from 'react-native';
+import { View, Text, FlatList, Pressable, Animated } from 'react-native';
 import { useState, useCallback, useRef } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Heart, Shuffle, Plus } from 'lucide-react-native';
@@ -26,8 +26,12 @@ export default function DateIdeasScreen() {
 
   const [selectedCategory, setSelectedCategory] = useState<DateIdeaCategory | 'favorites' | 'all'>('all');
   const [surpriseIdea, setSurpriseIdea] = useState<DateIdea | null>(null);
+  const [slotIdea, setSlotIdea] = useState<DateIdea | null>(null);
+  const [isSpinning, setIsSpinning] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const listRef = useRef<FlatList>(null);
+  const slotAnim = useRef(new Animated.Value(1)).current;
+  const revealAnim = useRef(new Animated.Value(0)).current;
 
   const allIdeas = getAllIdeas();
 
@@ -39,10 +43,53 @@ export default function DateIdeasScreen() {
 
   const handleSurpriseMe = useCallback(() => {
     const pool = selectedCategory === 'all' ? allIdeas : filteredIdeas;
-    if (pool.length === 0) return;
-    const randomIdx = Math.floor(Math.random() * pool.length);
-    setSurpriseIdea(pool[randomIdx]);
-  }, [allIdeas, filteredIdeas, selectedCategory]);
+    if (pool.length === 0 || isSpinning) return;
+
+    setIsSpinning(true);
+    setSurpriseIdea(null);
+    revealAnim.setValue(0);
+
+    // Slot-machine: cycle through random ideas with decreasing speed
+    const totalCycles = 12;
+    let cycle = 0;
+
+    const runCycle = () => {
+      const randomIdx = Math.floor(Math.random() * pool.length);
+      setSlotIdea(pool[randomIdx]);
+
+      // Quick flash animation per cycle
+      slotAnim.setValue(0);
+      Animated.timing(slotAnim, {
+        toValue: 1,
+        duration: 60,
+        useNativeDriver: true,
+      }).start();
+
+      cycle++;
+      if (cycle < totalCycles) {
+        // Gradually slow down: 80ms -> 250ms
+        const delay = 80 + (cycle / totalCycles) * 170;
+        setTimeout(runCycle, delay);
+      } else {
+        // Final pick
+        const finalIdx = Math.floor(Math.random() * pool.length);
+        const finalPick = pool[finalIdx];
+        setSlotIdea(null);
+        setSurpriseIdea(finalPick);
+        setIsSpinning(false);
+
+        // Reveal animation: scale up + fade in
+        Animated.spring(revealAnim, {
+          toValue: 1,
+          friction: 5,
+          tension: 80,
+          useNativeDriver: true,
+        }).start();
+      }
+    };
+
+    runCycle();
+  }, [allIdeas, filteredIdeas, selectedCategory, isSpinning, slotAnim, revealAnim]);
 
   const handleAddCustom = (title: string, description: string, category: DateIdeaCategory) => {
     addCustomIdea(title, description, category);
@@ -220,11 +267,48 @@ export default function DateIdeasScreen() {
         </Pressable>
       </View>
 
+      {/* Slot-machine cycling */}
+      {isSpinning && slotIdea && (
+        <View style={{ paddingHorizontal: 24, marginBottom: 12 }}>
+          <Card style={{ borderColor: theme.accent, borderWidth: 1.5 }}>
+            <Animated.View style={{ alignItems: 'center', gap: 4, opacity: slotAnim }}>
+              <Text style={{ fontSize: 11, fontFamily: 'Inter_500Medium', color: theme.textMuted }}>
+                SHUFFLING...
+              </Text>
+              <Text
+                style={{
+                  fontSize: 17,
+                  fontFamily: 'PlayfairDisplay_700Bold',
+                  color: theme.textPrimary,
+                  textAlign: 'center',
+                }}
+              >
+                {slotIdea.title}
+              </Text>
+            </Animated.View>
+          </Card>
+        </View>
+      )}
+
       {/* Surprise result */}
-      {surpriseIdea && (
+      {surpriseIdea && !isSpinning && (
         <View style={{ paddingHorizontal: 24, marginBottom: 12 }}>
           <Card style={{ borderColor: theme.primary, borderWidth: 2 }}>
-            <View style={{ alignItems: 'center', gap: 6 }}>
+            <Animated.View
+              style={{
+                alignItems: 'center',
+                gap: 6,
+                opacity: revealAnim,
+                transform: [
+                  {
+                    scale: revealAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.85, 1],
+                    }),
+                  },
+                ],
+              }}
+            >
               <Text style={{ fontSize: 12, fontFamily: 'Inter_500Medium', color: theme.primary }}>
                 YOUR DATE IDEA
               </Text>
@@ -248,7 +332,7 @@ export default function DateIdeasScreen() {
               >
                 {surpriseIdea.description}
               </Text>
-            </View>
+            </Animated.View>
           </Card>
         </View>
       )}

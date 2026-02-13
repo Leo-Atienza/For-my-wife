@@ -13,7 +13,32 @@
 
 ---
 
-## What Was Done (This Session)
+## What Was Done (This Session — Slot Machine Animation)
+
+### Slot-Machine Animation for "Surprise Me" Date Picker
+
+Added a slot-machine style animation to the "Surprise Me" button in `app/dates/index.tsx`. Previously, tapping "Surprise Me" instantly showed a random date idea. Now it:
+
+1. **Cycles through 12 random ideas** with a flickering opacity animation, showing "SHUFFLING..." label
+2. **Gradually slows down** (80ms → 250ms between cycles) for that classic slot-machine feel
+3. **Reveals the final pick** with a spring scale-up + fade-in animation
+4. **Prevents double-taps** during the spin (`isSpinning` guard)
+
+Uses the same `Animated` API pattern as all other animations in the codebase. No new dependencies.
+
+### Checkmark Draw Animation for Bucket List
+
+Added an animated checkmark to `app/bucket-list/index.tsx` with a new `components/bucket/CheckmarkDraw.tsx` component. When completing a bucket list item:
+
+1. **Circle fills** with a scale animation (0 → 1) over 200ms
+2. **Checkmark draws** itself with a spring pop + rotation (100ms delay after circle)
+3. **Confetti fires** 500ms later, after the checkmark is fully drawn
+
+Previously the checkmark appeared instantly and confetti fired simultaneously. Now there's a satisfying sequential reveal: fill → draw → burst.
+
+---
+
+## What Was Done (Previous Session)
 
 ### 1. NativeWind Pressable Bug — Full Codebase Sweep
 
@@ -183,8 +208,8 @@ useEffect(() => {
 - [ ] Spotify Shared Playlist integration (Phase 4.7)
 
 ### Priority 4: Additional Polish
-- [ ] Slot-machine animation for "Surprise Me" random date picker (currently instant)
-- [ ] Satisfying checkmark draw animation on bucket list (before confetti)
+- [x] Slot-machine animation for "Surprise Me" random date picker
+- [x] Satisfying checkmark draw animation on bucket list (before confetti)
 - [ ] Nickname card-flip reveal animation
 - [ ] Photo challenge feature in Daily Questions
 
@@ -236,6 +261,8 @@ useEffect(() => {
 | Heartbeat | Thinking of You button | Done |
 | Heart bloom | Thinking of You received | Done |
 | Toast slide | Toast notifications | Done |
+| Slot-machine shuffle | Surprise Me date picker | Done |
+| Checkmark draw | Bucket list completion | Done |
 
 ### Codebase Stats
 - **120 source files** (`.ts` + `.tsx`)
