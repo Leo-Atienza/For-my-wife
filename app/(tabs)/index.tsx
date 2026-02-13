@@ -102,7 +102,7 @@ export default function HomeScreen() {
       }}
       showsVerticalScrollIndicator={false}
     >
-      {/* Sync status */}
+      {/* Sync status — only shows when offline or syncing */}
       <SyncStatusIndicator />
 
       {/* Header with couple photo and names */}
@@ -157,11 +157,12 @@ export default function HomeScreen() {
         </Text>
       </View>
 
-      {/* Thinking of You + Partner Status */}
+      {/* Thinking of You */}
       <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
         <ThinkingOfYouButton />
       </View>
 
+      {/* Partner sleep status — subtle inline */}
       <PartnerSleepStatus />
 
       {/* Duration counter */}
@@ -186,11 +187,11 @@ export default function HomeScreen() {
       {/* Sleep/Wake toggle */}
       <SleepWakeToggle />
 
-      {/* Weekly Recap */}
-      <WeeklyRecapCard />
-
       {/* Daily quote */}
       <DailyQuote />
+
+      {/* Weekly Recap */}
+      <WeeklyRecapCard />
     </ScrollView>
     </View>
   );

@@ -29,19 +29,35 @@ export function SyncStatusIndicator() {
     return null;
   }
 
-  const statusText = !isConnected
-    ? `Offline \u2014 ${pendingCount > 0 ? `${pendingCount} change${pendingCount > 1 ? 's' : ''} queued` : 'changes will sync when online'}`
-    : `Syncing ${pendingCount} change${pendingCount > 1 ? 's' : ''}...`;
+  // When online but syncing — show subtle inline text
+  if (isConnected && pendingCount > 0) {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+        <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: theme.primary }} />
+        <Text
+          style={{
+            fontSize: 11,
+            fontFamily: 'Inter_400Regular',
+            color: theme.textMuted,
+          }}
+        >
+          Syncing {pendingCount} change{pendingCount > 1 ? 's' : ''}...
+        </Text>
+      </View>
+    );
+  }
 
-  const statusColor = !isConnected ? theme.textMuted : theme.primary;
-  const bgColor = !isConnected ? SEMANTIC_COLORS.warningBg : theme.primarySoft;
+  // Offline — show more prominent warning
+  const statusText = pendingCount > 0
+    ? `Offline \u2014 ${pendingCount} change${pendingCount > 1 ? 's' : ''} queued`
+    : 'Offline \u2014 changes will sync when online';
 
   return (
     <View
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: bgColor,
+        backgroundColor: SEMANTIC_COLORS.warningBg,
         borderRadius: 8,
         paddingHorizontal: 12,
         paddingVertical: 8,
@@ -53,14 +69,14 @@ export function SyncStatusIndicator() {
           width: 8,
           height: 8,
           borderRadius: 4,
-          backgroundColor: !isConnected ? SEMANTIC_COLORS.warning : theme.primary,
+          backgroundColor: SEMANTIC_COLORS.warning,
         }}
       />
       <Text
         style={{
           fontSize: 12,
           fontFamily: 'Inter_500Medium',
-          color: statusColor,
+          color: theme.textMuted,
           flex: 1,
         }}
       >

@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
   PenLine,
@@ -9,8 +9,6 @@ import {
   CheckSquare,
   Smile,
   Music,
-  MessageCircle,
-  NotebookPen,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import type { ReactNode } from 'react';
@@ -21,60 +19,56 @@ interface ActionItem {
   route: string;
 }
 
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const PADDING = 24;
+const GAP = 10;
+const COLS = 4;
+const ITEM_WIDTH = (SCREEN_WIDTH - PADDING * 2 - GAP * (COLS - 1)) / COLS;
+
 export const QuickActions = () => {
   const router = useRouter();
   const theme = useTheme();
 
   const actions: ActionItem[] = [
     {
-      icon: <PenLine size={24} color={theme.primary} />,
-      label: 'Love Notes',
+      icon: <PenLine size={20} color={theme.primary} />,
+      label: 'Notes',
       route: '/(tabs)/notes',
     },
     {
-      icon: <Camera size={24} color={theme.primary} />,
+      icon: <Camera size={20} color={theme.primary} />,
       label: 'Memories',
       route: '/(tabs)/memories',
     },
     {
-      icon: <Clock size={24} color={theme.primary} />,
+      icon: <Clock size={20} color={theme.primary} />,
       label: 'Countdowns',
       route: '/(tabs)/countdowns',
     },
     {
-      icon: <BookOpen size={24} color={theme.primary} />,
+      icon: <BookOpen size={20} color={theme.primary} />,
       label: 'Timeline',
       route: '/timeline',
     },
     {
-      icon: <CalendarHeart size={24} color={theme.primary} />,
-      label: 'Date Ideas',
+      icon: <CalendarHeart size={20} color={theme.primary} />,
+      label: 'Dates',
       route: '/dates',
     },
     {
-      icon: <CheckSquare size={24} color={theme.primary} />,
+      icon: <CheckSquare size={20} color={theme.primary} />,
       label: 'Bucket List',
       route: '/bucket-list',
     },
     {
-      icon: <Smile size={24} color={theme.primary} />,
+      icon: <Smile size={20} color={theme.primary} />,
       label: 'Mood',
       route: '/mood',
     },
     {
-      icon: <Music size={24} color={theme.primary} />,
+      icon: <Music size={20} color={theme.primary} />,
       label: 'Songs',
       route: '/songs',
-    },
-    {
-      icon: <MessageCircle size={24} color={theme.primary} />,
-      label: 'Questions',
-      route: '/questions',
-    },
-    {
-      icon: <NotebookPen size={24} color={theme.primary} />,
-      label: 'Partner Notes',
-      route: '/partner-notes',
     },
   ];
 
@@ -83,7 +77,7 @@ export const QuickActions = () => {
       style={{
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 12,
+        gap: GAP,
       }}
     >
       {actions.map((action) => (
@@ -92,12 +86,13 @@ export const QuickActions = () => {
           onPress={() => router.push(action.route as never)}
           style={({ pressed }) => ({
             backgroundColor: theme.surface,
-            borderRadius: 16,
-            padding: 16,
+            borderRadius: 14,
+            paddingVertical: 12,
+            paddingHorizontal: 4,
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 8,
-            width: '31%',
+            gap: 6,
+            width: ITEM_WIDTH,
             borderWidth: 1,
             borderColor: theme.accent,
             transform: [{ scale: pressed ? 0.96 : 1 }],
@@ -113,7 +108,7 @@ export const QuickActions = () => {
           {action.icon}
           <Text
             style={{
-              fontSize: 12,
+              fontSize: 11,
               fontFamily: 'Inter_500Medium',
               color: theme.textPrimary,
             }}

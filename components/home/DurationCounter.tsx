@@ -55,6 +55,27 @@ export const DurationCounter = ({ anniversaryDate }: DurationCounterProps) => {
 
   if (!duration) return null;
 
+  // Show friendly fallback if duration is invalid (all zeros from invalid date)
+  if (isNaN(duration.days) || (duration.days === 0 && duration.hours === 0 && duration.minutes === 0 && duration.seconds === 0)) {
+    return (
+      <Card>
+        <View style={{ alignItems: 'center', gap: 6 }}>
+          <Text style={{ fontSize: 28 }}>{'\ud83d\udc95'}</Text>
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: 'DancingScript_400Regular',
+              color: theme.textMuted,
+              textAlign: 'center',
+            }}
+          >
+            Set your anniversary date in settings
+          </Text>
+        </View>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <Text

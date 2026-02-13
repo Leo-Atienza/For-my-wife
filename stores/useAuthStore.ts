@@ -2,23 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
-import { useNotesStore } from './useNotesStore';
-import { useMemoriesStore } from './useMemoriesStore';
-import { useCountdownsStore } from './useCountdownsStore';
-import { useTimelineStore } from './useTimelineStore';
-import { useBucketStore } from './useBucketStore';
-import { useMoodStore } from './useMoodStore';
-import { useLocationStore } from './useLocationStore';
-import { useNicknameStore } from './useNicknameStore';
-import { useCoupleStore } from './useCoupleStore';
-import { useProfileStore } from './useProfileStore';
-import { useDateIdeasStore } from './useDateIdeasStore';
-import { useJournalStore } from './useJournalStore';
-import { useQuestionsStore } from './useQuestionsStore';
-import { useSongStore } from './useSongStore';
-import { usePartnerNotesStore } from './usePartnerNotesStore';
-import { useThinkingStore } from './useThinkingStore';
-import { useSleepWakeStore } from './useSleepWakeStore';
+import { resetAllStores } from '@/lib/store-reset';
 import type { PartnerRole } from '@/lib/types';
 import type { Session, User } from '@supabase/supabase-js';
 
@@ -179,24 +163,8 @@ export const useAuthStore = create<AuthState>()(
 
       signOut: async () => {
         await supabase.auth.signOut();
-        // Clear all local stores
-        useNotesStore.getState().reset();
-        useMemoriesStore.getState().reset();
-        useCountdownsStore.getState().reset();
-        useTimelineStore.getState().reset();
-        useBucketStore.getState().reset();
-        useMoodStore.getState().reset();
-        useLocationStore.getState().reset();
-        useNicknameStore.getState().reset();
-        useCoupleStore.getState().reset();
-        useProfileStore.getState().reset();
-        useDateIdeasStore.getState().reset();
-        useJournalStore.getState().reset();
-        useQuestionsStore.getState().reset();
-        useSongStore.getState().reset();
-        usePartnerNotesStore.getState().reset();
-        useThinkingStore.getState().reset();
-        useSleepWakeStore.getState().reset();
+        // Clear all local stores (lazy imports to avoid require cycles)
+        await resetAllStores();
         set({
           session: null,
           user: null,

@@ -265,23 +265,6 @@ function AppContent() {
             animation: 'fade',
           }}
         />
-        <Stack.Screen name="notes" options={{ headerShown: false }} />
-        <Stack.Screen name="memories" options={{ headerShown: false }} />
-        <Stack.Screen name="countdowns" options={{ headerShown: false }} />
-        <Stack.Screen name="distance" options={{ headerShown: false }} />
-        <Stack.Screen name="timeline" options={{ headerShown: false }} />
-        <Stack.Screen name="dates" options={{ headerShown: false }} />
-        <Stack.Screen name="bucket-list" options={{ headerShown: false }} />
-        <Stack.Screen name="mood" options={{ headerShown: false }} />
-        <Stack.Screen name="journal" options={{ headerShown: false }} />
-        <Stack.Screen name="questions" options={{ headerShown: false }} />
-        <Stack.Screen name="songs" options={{ headerShown: false }} />
-        <Stack.Screen name="status" options={{ headerShown: false }} />
-        <Stack.Screen name="profile" options={{ headerShown: false }} />
-        <Stack.Screen name="settings" options={{ headerShown: false }} />
-        <Stack.Screen name="partner-notes" options={{ headerShown: false }} />
-        <Stack.Screen name="touch" options={{ headerShown: false }} />
-        <Stack.Screen name="recap" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="dark" />
     </>

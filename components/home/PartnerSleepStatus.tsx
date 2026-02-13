@@ -25,14 +25,14 @@ export const PartnerSleepStatus = () => {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: isSleeping ? '#1a1a2e' : theme.primarySoft,
+        backgroundColor: theme.primarySoft,
         borderRadius: 12,
         paddingVertical: 8,
         paddingHorizontal: 12,
       }}
     >
       {isSleeping ? (
-        <Moon size={16} color="#A78BFA" />
+        <Moon size={16} color={theme.primary} />
       ) : (
         <Sun size={16} color="#F59E0B" />
       )}
@@ -40,7 +40,7 @@ export const PartnerSleepStatus = () => {
         style={{
           fontSize: 13,
           fontFamily: 'Inter_500Medium',
-          color: isSleeping ? '#E5E7EB' : theme.textPrimary,
+          color: theme.textPrimary,
         }}
       >
         {partnerName} is {isSleeping ? 'sleeping' : 'awake'}

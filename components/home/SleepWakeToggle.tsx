@@ -25,18 +25,18 @@ export const SleepWakeToggle = () => {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
-        backgroundColor: isSleeping ? '#1a1a2e' : theme.surface,
+        backgroundColor: theme.surface,
         borderRadius: 16,
         padding: 14,
         borderWidth: 1,
-        borderColor: isSleeping ? '#2d2d5e' : theme.accent,
+        borderColor: isSleeping ? theme.primary : theme.accent,
         opacity: pressed ? 0.9 : 1,
       })}
       accessibilityLabel={isSleeping ? 'Mark as awake' : 'Mark as sleeping'}
       accessibilityRole="button"
     >
       {isSleeping ? (
-        <Moon size={22} color="#A78BFA" />
+        <Moon size={22} color={theme.primary} />
       ) : (
         <Sun size={22} color="#F59E0B" />
       )}
@@ -45,7 +45,7 @@ export const SleepWakeToggle = () => {
           style={{
             fontSize: 14,
             fontFamily: 'Inter_600SemiBold',
-            color: isSleeping ? '#E5E7EB' : theme.textPrimary,
+            color: theme.textPrimary,
           }}
         >
           {isSleeping ? 'Going to sleep...' : 'Good morning!'}
@@ -54,7 +54,7 @@ export const SleepWakeToggle = () => {
           style={{
             fontSize: 12,
             fontFamily: 'Inter_400Regular',
-            color: isSleeping ? '#9CA3AF' : theme.textMuted,
+            color: theme.textMuted,
           }}
         >
           Tap to change your status

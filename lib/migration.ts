@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { pushToSupabase } from './sync';
+import type { LocationEntry } from '@/lib/types';
 import { useNotesStore } from '@/stores/useNotesStore';
 import { useMemoriesStore } from '@/stores/useMemoriesStore';
 import { useCountdownsStore } from '@/stores/useCountdownsStore';
@@ -69,13 +70,21 @@ export const migrateLocalDataToCloud = async (): Promise<void> => {
       await pushToSupabase('mood_entries', entry);
     }
 
-    // Location entries
+    // Location entries (map camelCase to snake_case for Supabase)
     const { locations } = useLocationStore.getState();
+    const mapLocation = (loc: LocationEntry) => ({
+      id: loc.id,
+      partner: loc.partner,
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      city_name: loc.cityName,
+      updated_at: loc.updatedAt,
+    });
     if (locations.partner1) {
-      await pushToSupabase('location_entries', locations.partner1);
+      await pushToSupabase('location_entries', mapLocation(locations.partner1));
     }
     if (locations.partner2) {
-      await pushToSupabase('location_entries', locations.partner2);
+      await pushToSupabase('location_entries', mapLocation(locations.partner2));
     }
 
     // Nicknames

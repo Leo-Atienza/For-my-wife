@@ -40,7 +40,15 @@ export const useLocationStore = create<LocationState>()(
             [partner]: entry,
           },
         }));
-        pushToSupabase('location_entries', entry);
+        // Map camelCase fields to snake_case for Supabase
+        pushToSupabase('location_entries', {
+          id: entry.id,
+          partner: entry.partner,
+          latitude: entry.latitude,
+          longitude: entry.longitude,
+          city_name: entry.cityName,
+          updated_at: entry.updatedAt,
+        });
       },
 
       loadFromRemote: (records) => {

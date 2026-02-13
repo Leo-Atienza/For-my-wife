@@ -10,6 +10,12 @@ export interface DurationBreakdown {
 
 export const getRelationshipDuration = (anniversaryDate: string): DurationBreakdown => {
   const start = parseISO(anniversaryDate);
+
+  // Guard against invalid dates
+  if (isNaN(start.getTime())) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0, totalDays: 0 };
+  }
+
   const now = new Date();
 
   const totalDays = differenceInDays(now, start);
