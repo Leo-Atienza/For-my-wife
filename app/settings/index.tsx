@@ -1,7 +1,10 @@
 import { View, Text, Pressable, ScrollView, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { UserPlus, ChevronRight, LogOut } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useCoupleStore } from '@/stores/useCoupleStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { THEMES } from '@/lib/constants';
@@ -9,10 +12,12 @@ import { clearAllData } from '@/lib/storage';
 import type { ThemeName } from '@/lib/types';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const currentTheme = useCoupleStore((state) => state.profile?.theme ?? 'rose');
   const setTheme = useCoupleStore((state) => state.setTheme);
+  const signOut = useAuthStore((state) => state.signOut);
 
   const handleReset = () => {
     Alert.alert(
@@ -31,6 +36,22 @@ export default function SettingsScreen() {
     );
   };
 
+  const handleSignOut = () => {
+    Alert.alert(
+      'Sign Out?',
+      'You can sign back in anytime with your email and password.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sign Out',
+          onPress: async () => {
+            await signOut();
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
       <PageHeader title="Settings" showBack />
@@ -41,6 +62,64 @@ export default function SettingsScreen() {
           gap: 24,
         }}
       >
+        {/* Invite partner shortcut */}
+        <Pressable
+          onPress={() => router.push('/invite-partner')}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.85 : 1,
+          })}
+          accessibilityRole="button"
+          accessibilityLabel="Invite partner"
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: theme.primarySoft,
+              borderRadius: 16,
+              padding: 16,
+              borderWidth: 1.5,
+              borderColor: theme.accent,
+            }}
+          >
+            <View
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: 21,
+                backgroundColor: theme.primary + '15',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 14,
+              }}
+            >
+              <UserPlus size={20} color={theme.primary} />
+            </View>
+            <View style={{ flex: 1, marginRight: 8 }}>
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontFamily: 'Inter_600SemiBold',
+                  color: theme.textPrimary,
+                }}
+              >
+                {'\u{1F48D}'} Invite Partner
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontFamily: 'Inter_400Regular',
+                  color: theme.textMuted,
+                  marginTop: 2,
+                }}
+              >
+                Share your invite code or check connection status
+              </Text>
+            </View>
+            <ChevronRight size={18} color={theme.textMuted + '80'} />
+          </View>
+        </Pressable>
+
         {/* Theme selector with live preview */}
         <View style={{ gap: 12 }}>
           <Text
@@ -151,6 +230,45 @@ export default function SettingsScreen() {
             </Text>
           </View>
         </Card>
+
+        {/* Account */}
+        <View style={{ gap: 12 }}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontFamily: 'PlayfairDisplay_700Bold',
+              color: theme.textPrimary,
+            }}
+          >
+            Account
+          </Text>
+          <Pressable
+            onPress={handleSignOut}
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.85 : 1,
+            })}
+            accessibilityRole="button"
+            accessibilityLabel="Sign out"
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: theme.surface,
+                borderRadius: 12,
+                padding: 16,
+                borderWidth: 1,
+                borderColor: theme.accent,
+              }}
+            >
+              <LogOut size={20} color={theme.textMuted} />
+              <Text style={{ fontSize: 14, fontFamily: 'Inter_500Medium', color: theme.textPrimary, flex: 1, marginLeft: 12 }}>
+                Sign Out
+              </Text>
+              <ChevronRight size={18} color={theme.textMuted + '80'} />
+            </View>
+          </Pressable>
+        </View>
 
         {/* Danger zone */}
         <View style={{ gap: 12 }}>

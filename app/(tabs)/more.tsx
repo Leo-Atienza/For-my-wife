@@ -17,6 +17,8 @@ import {
   Palette,
   NotebookPen,
   Fingerprint,
+  ChevronRight,
+  UserPlus,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -36,6 +38,85 @@ interface MenuSection {
   items: MenuItemData[];
 }
 
+const MenuItem = ({
+  item,
+  isLast,
+  onPress,
+}: {
+  item: MenuItemData;
+  isLast: boolean;
+  onPress: () => void;
+}) => {
+  const theme = useTheme();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={item.label}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.7 : 1,
+        backgroundColor: pressed ? theme.primarySoft : 'transparent',
+      })}
+    >
+      {/* Row container — plain View ensures flexDirection: 'row' is never overridden */}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 14,
+          paddingHorizontal: 16,
+          borderBottomWidth: isLast ? 0 : 1,
+          borderBottomColor: theme.accent + '60',
+        }}
+      >
+        {/* Icon */}
+        <View
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 14,
+            backgroundColor: theme.primarySoft,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 14,
+          }}
+        >
+          {item.icon}
+        </View>
+
+        {/* Label + subtitle */}
+        <View style={{ flex: 1, marginRight: 8 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: 'Inter_600SemiBold',
+              color: theme.textPrimary,
+            }}
+            numberOfLines={1}
+          >
+            {item.emoji} {item.label}
+          </Text>
+          <Text
+            style={{
+              fontSize: 13,
+              fontFamily: 'Inter_400Regular',
+              color: theme.textMuted,
+              marginTop: 2,
+            }}
+            numberOfLines={1}
+          >
+            {item.subtitle}
+          </Text>
+        </View>
+
+        {/* Chevron */}
+        <ChevronRight size={18} color={theme.textMuted + '80'} />
+      </View>
+    </Pressable>
+  );
+};
+
 const MenuCard = ({
   items,
   onNavigate,
@@ -53,59 +134,20 @@ const MenuCard = ({
         borderWidth: 1,
         borderColor: theme.accent,
         overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.04,
+        shadowRadius: 3,
+        elevation: 1,
       }}
     >
       {items.map((item, index) => (
-        <Pressable
+        <MenuItem
           key={item.label}
+          item={item}
+          isLast={index === items.length - 1}
           onPress={() => onNavigate(item.route)}
-          style={({ pressed }) => ({
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 14,
-            paddingVertical: 14,
-            paddingHorizontal: 16,
-            backgroundColor: pressed ? theme.primarySoft : 'transparent',
-            borderBottomWidth: index < items.length - 1 ? 1 : 0,
-            borderBottomColor: theme.accent,
-          })}
-          accessibilityRole="button"
-          accessibilityLabel={item.label}
-        >
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              backgroundColor: theme.primarySoft,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {item.icon}
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontFamily: 'Inter_600SemiBold',
-                color: theme.textPrimary,
-              }}
-            >
-              {item.emoji} {item.label}
-            </Text>
-            <Text
-              style={{
-                fontSize: 12,
-                fontFamily: 'Inter_400Regular',
-                color: theme.textMuted,
-                marginTop: 1,
-              }}
-            >
-              {item.subtitle}
-            </Text>
-          </View>
-        </Pressable>
+        />
       ))}
     </View>
   );
@@ -122,28 +164,28 @@ export default function MoreScreen() {
       emoji: '\u{1F389}',
       items: [
         {
-          icon: <BookOpen size={20} color={theme.primary} />,
+          icon: <BookOpen size={22} color={theme.primary} />,
           label: 'Timeline',
           subtitle: 'Your relationship milestones',
           route: '/timeline',
           emoji: '\u{1F4D6}',
         },
         {
-          icon: <CalendarHeart size={20} color={theme.primary} />,
+          icon: <CalendarHeart size={22} color={theme.primary} />,
           label: 'Date Ideas',
           subtitle: 'Plan your next date',
           route: '/dates',
           emoji: '\u{1F495}',
         },
         {
-          icon: <CheckSquare size={20} color={theme.primary} />,
+          icon: <CheckSquare size={22} color={theme.primary} />,
           label: 'Bucket List',
           subtitle: 'Things to do together',
           route: '/bucket-list',
           emoji: '\u2728',
         },
         {
-          icon: <MessageCircle size={20} color={theme.primary} />,
+          icon: <MessageCircle size={22} color={theme.primary} />,
           label: 'Daily Questions',
           subtitle: 'Answer together, then reveal',
           route: '/questions',
@@ -156,49 +198,49 @@ export default function MoreScreen() {
       emoji: '\u{1F49E}',
       items: [
         {
-          icon: <Smile size={20} color={theme.primary} />,
+          icon: <Smile size={22} color={theme.primary} />,
           label: 'Mood Check-In',
           subtitle: 'Share how you\'re feeling',
           route: '/mood',
           emoji: '\u{1F60A}',
         },
         {
-          icon: <Palette size={20} color={theme.primary} />,
+          icon: <Palette size={22} color={theme.primary} />,
           label: 'Status Board',
           subtitle: 'Your current vibe',
           route: '/status',
           emoji: '\u{1F3A8}',
         },
         {
-          icon: <Mail size={20} color={theme.primary} />,
+          icon: <Mail size={22} color={theme.primary} />,
           label: 'Letter Box',
           subtitle: 'Weekly sealed letters',
           route: '/journal',
           emoji: '\u{1F48C}',
         },
         {
-          icon: <Music size={20} color={theme.primary} />,
+          icon: <Music size={22} color={theme.primary} />,
           label: 'Song Dedications',
           subtitle: 'Build your shared playlist',
           route: '/songs',
           emoji: '\u{1F3B5}',
         },
         {
-          icon: <NotebookPen size={20} color={theme.primary} />,
+          icon: <NotebookPen size={22} color={theme.primary} />,
           label: 'Partner Notes',
           subtitle: 'Notes about your partner',
           route: '/partner-notes',
           emoji: '\u{1F4DD}',
         },
         {
-          icon: <Fingerprint size={20} color={theme.primary} />,
+          icon: <Fingerprint size={22} color={theme.primary} />,
           label: 'Virtual Touch',
           subtitle: 'Touch screens together',
           route: '/touch',
           emoji: '\u{1F91D}',
         },
         {
-          icon: <MapPin size={20} color={theme.primary} />,
+          icon: <MapPin size={22} color={theme.primary} />,
           label: 'Distance',
           subtitle: 'See how far apart you are',
           route: '/distance',
@@ -211,28 +253,35 @@ export default function MoreScreen() {
       emoji: '\u{1F491}',
       items: [
         {
-          icon: <Heart size={20} color={theme.primary} />,
+          icon: <UserPlus size={22} color={theme.primary} />,
+          label: 'Invite Partner',
+          subtitle: 'Connect with your partner',
+          route: '/invite-partner',
+          emoji: '\u{1F48D}',
+        },
+        {
+          icon: <Heart size={22} color={theme.primary} />,
           label: 'Couple Profile',
           subtitle: 'Your shared profile',
           route: '/profile/couple',
           emoji: '\u{1F496}',
         },
         {
-          icon: <User size={20} color={theme.primary} />,
+          icon: <User size={22} color={theme.primary} />,
           label: 'My Profile',
           subtitle: 'View and edit your profile',
           route: '/profile/partner1',
           emoji: '\u{1F64B}',
         },
         {
-          icon: <Sparkles size={20} color={theme.primary} />,
+          icon: <Sparkles size={22} color={theme.primary} />,
           label: 'Nicknames',
           subtitle: 'Your nickname history',
           route: '/profile/nicknames',
           emoji: '\u{1F31F}',
         },
         {
-          icon: <Settings size={20} color={theme.primary} />,
+          icon: <Settings size={22} color={theme.primary} />,
           label: 'Settings',
           subtitle: 'Theme & preferences',
           route: '/settings',
@@ -247,20 +296,23 @@ export default function MoreScreen() {
       <PageHeader title="More" />
       <ScrollView
         contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingBottom: insets.bottom + 80,
-          gap: 20,
+          paddingHorizontal: 16,
+          paddingBottom: insets.bottom + 90,
         }}
         showsVerticalScrollIndicator={false}
       >
-        {sections.map((section) => (
-          <View key={section.title} style={{ gap: 10 }}>
+        {sections.map((section, sectionIndex) => (
+          <View
+            key={section.title}
+            style={{ marginTop: sectionIndex === 0 ? 4 : 28 }}
+          >
             <Text
               style={{
-                fontSize: 16,
+                fontSize: 18,
                 fontFamily: 'PlayfairDisplay_700Bold',
                 color: theme.textPrimary,
                 marginLeft: 4,
+                marginBottom: 10,
               }}
             >
               {section.emoji} {section.title}
