@@ -11,6 +11,7 @@ interface QuestionsState {
   getTodayEntry: () => DailyQuestionEntry | undefined;
   createTodayEntry: () => DailyQuestionEntry;
   answerQuestion: (entryId: string, partner: PartnerRole, answer: string) => void;
+  submitPhoto: (entryId: string, partner: PartnerRole, photoUri: string) => void;
   loadFromRemote: (records: DailyQuestionEntry[]) => void;
   syncRemoteInsert: (record: DailyQuestionEntry) => void;
   syncRemoteUpdate: (record: DailyQuestionEntry) => void;
@@ -73,6 +74,23 @@ export const useQuestionsStore = create<QuestionsState>()(
                   ...(partner === 'partner1'
                     ? { partner1Answer: answer }
                     : { partner2Answer: answer }),
+                }
+              : e
+          ),
+        }));
+        const updated = get().entries.find((e) => e.id === entryId);
+        if (updated) pushToSupabase('daily_question_entries', updated);
+      },
+
+      submitPhoto: (entryId, partner, photoUri) => {
+        set((state) => ({
+          entries: state.entries.map((e) =>
+            e.id === entryId
+              ? {
+                  ...e,
+                  ...(partner === 'partner1'
+                    ? { partner1Photo: photoUri }
+                    : { partner2Photo: photoUri }),
                 }
               : e
           ),
