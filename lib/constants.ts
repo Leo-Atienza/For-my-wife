@@ -217,6 +217,17 @@ export const DAILY_QUESTIONS: DailyQuestion[] = [
   { id: 'wyr8', question: 'Would you rather have a movie night or a game night?', category: 'would-you-rather' },
   { id: 'wyr9', question: 'Would you rather travel the world together or build a dream home?', category: 'would-you-rather' },
   { id: 'wyr10', question: 'Would you rather have more time or more money for our dates?', category: 'would-you-rather' },
+  // Photo Challenges
+  { id: 'pc1', question: 'Send a photo of your view right now', category: 'photo-challenge' },
+  { id: 'pc2', question: 'Show me what you had for lunch today', category: 'photo-challenge' },
+  { id: 'pc3', question: 'Take a selfie making your silliest face', category: 'photo-challenge' },
+  { id: 'pc4', question: 'Photo of something that reminded you of me today', category: 'photo-challenge' },
+  { id: 'pc5', question: 'Show me your current outfit', category: 'photo-challenge' },
+  { id: 'pc6', question: 'Take a photo of something beautiful near you', category: 'photo-challenge' },
+  { id: 'pc7', question: 'Show me your workspace right now', category: 'photo-challenge' },
+  { id: 'pc8', question: 'Photo of your favorite comfort item', category: 'photo-challenge' },
+  { id: 'pc9', question: 'Take a photo that captures your current mood', category: 'photo-challenge' },
+  { id: 'pc10', question: 'Show me the last thing that made you smile', category: 'photo-challenge' },
 ];
 
 // ============================================

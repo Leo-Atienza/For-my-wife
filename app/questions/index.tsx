@@ -1,7 +1,8 @@
-import { View, Text, ScrollView, Pressable } from 'react-native';
-import { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Pressable, Image } from 'react-native';
+import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MessageCircle, Eye, EyeOff } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { MessageCircle, Eye, EyeOff, Camera } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useQuestionsStore } from '@/stores/useQuestionsStore';
 import { useProfileStore } from '@/stores/useProfileStore';
@@ -16,6 +17,7 @@ export default function QuestionsScreen() {
   const insets = useSafeAreaInsets();
   const createTodayEntry = useQuestionsStore((state) => state.createTodayEntry);
   const answerQuestion = useQuestionsStore((state) => state.answerQuestion);
+  const submitPhoto = useQuestionsStore((state) => state.submitPhoto);
   const entries = useQuestionsStore((state) => state.entries);
   const partner1 = useProfileStore((state) => state.partner1);
   const partner2 = useProfileStore((state) => state.partner2);
@@ -25,6 +27,7 @@ export default function QuestionsScreen() {
   const [showAnswers, setShowAnswers] = useState(false);
 
   const todayEntry = createTodayEntry();
+  const isPhotoChallenge = todayEntry.category === 'photo-challenge';
 
   const myAnswer =
     selectedPartner === 'partner1'
@@ -36,7 +39,21 @@ export default function QuestionsScreen() {
       ? todayEntry.partner2Answer
       : todayEntry.partner1Answer;
 
-  const bothAnswered = !!todayEntry.partner1Answer && !!todayEntry.partner2Answer;
+  const myPhoto =
+    selectedPartner === 'partner1'
+      ? todayEntry.partner1Photo
+      : todayEntry.partner2Photo;
+
+  const partnerPhoto =
+    selectedPartner === 'partner1'
+      ? todayEntry.partner2Photo
+      : todayEntry.partner1Photo;
+
+  const bothAnswered = isPhotoChallenge
+    ? !!todayEntry.partner1Photo && !!todayEntry.partner2Photo
+    : !!todayEntry.partner1Answer && !!todayEntry.partner2Answer;
+
+  const hasMyResponse = isPhotoChallenge ? !!myPhoto : !!myAnswer;
 
   const handleSubmit = () => {
     if (!answer.trim()) return;
@@ -44,7 +61,39 @@ export default function QuestionsScreen() {
     setAnswer('');
   };
 
+  const handlePickPhoto = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      submitPhoto(todayEntry.id, selectedPartner, result.assets[0].uri);
+    }
+  };
+
+  const handleTakePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) return;
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      submitPhoto(todayEntry.id, selectedPartner, result.assets[0].uri);
+    }
+  };
+
   const pastEntries = entries.filter((e) => e.dateKey !== todayEntry.dateKey).slice(0, 10);
+
+  const getCategoryLabel = (category: string) => {
+    if (category === 'would-you-rather') return 'Would You Rather';
+    if (category === 'photo-challenge') return 'Photo Challenge';
+    return "Today's Question";
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
@@ -108,23 +157,25 @@ export default function QuestionsScreen() {
           <View style={{ alignItems: 'center', gap: 8 }}>
             <View
               style={{
-                backgroundColor: theme.primarySoft,
+                backgroundColor: isPhotoChallenge ? '#FEF3C7' : theme.primarySoft,
                 paddingHorizontal: 10,
                 paddingVertical: 4,
                 borderRadius: 8,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
               }}
             >
+              {isPhotoChallenge && <Camera size={12} color="#D97706" />}
               <Text
                 style={{
                   fontSize: 11,
                   fontFamily: 'Inter_600SemiBold',
-                  color: theme.primary,
+                  color: isPhotoChallenge ? '#D97706' : theme.primary,
                   textTransform: 'uppercase',
                 }}
               >
-                {todayEntry.category === 'would-you-rather'
-                  ? 'Would You Rather'
-                  : "Today's Question"}
+                {getCategoryLabel(todayEntry.category)}
               </Text>
             </View>
             <Text
@@ -141,25 +192,49 @@ export default function QuestionsScreen() {
           </View>
         </Card>
 
-        {/* Answer section */}
-        {myAnswer ? (
+        {/* Answer / Photo section */}
+        {hasMyResponse ? (
           <Card>
             <View style={{ gap: 8 }}>
               <Text style={{ fontSize: 13, fontFamily: 'Inter_500Medium', color: theme.primary }}>
-                Your answer:
+                {isPhotoChallenge ? 'Your photo:' : 'Your answer:'}
               </Text>
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontFamily: 'Inter_400Regular',
-                  color: theme.textPrimary,
-                  lineHeight: 22,
-                }}
-              >
-                {myAnswer}
-              </Text>
+              {isPhotoChallenge && myPhoto ? (
+                <Image
+                  source={{ uri: myPhoto }}
+                  style={{
+                    width: '100%',
+                    height: 200,
+                    borderRadius: 12,
+                  }}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontFamily: 'Inter_400Regular',
+                    color: theme.textPrimary,
+                    lineHeight: 22,
+                  }}
+                >
+                  {myAnswer}
+                </Text>
+              )}
             </View>
           </Card>
+        ) : isPhotoChallenge ? (
+          <View style={{ gap: 12 }}>
+            <Button
+              title="Take a Photo"
+              onPress={handleTakePhoto}
+            />
+            <Button
+              title="Choose from Gallery"
+              onPress={handlePickPhoto}
+              variant="secondary"
+            />
+          </View>
         ) : (
           <View style={{ gap: 12 }}>
             <Input
@@ -179,7 +254,7 @@ export default function QuestionsScreen() {
         )}
 
         {/* Partner's answer (revealed only when both answer) */}
-        {myAnswer && (
+        {hasMyResponse && (
           <View style={{ gap: 8 }}>
             <Pressable
               onPress={() => setShowAnswers(!showAnswers)}
@@ -203,31 +278,43 @@ export default function QuestionsScreen() {
               >
                 {bothAnswered
                   ? showAnswers
-                    ? 'Hide partner\'s answer'
-                    : 'Reveal partner\'s answer'
-                  : 'Waiting for partner to answer...'}
+                    ? isPhotoChallenge ? "Hide partner's photo" : "Hide partner's answer"
+                    : isPhotoChallenge ? "Reveal partner's photo" : "Reveal partner's answer"
+                  : isPhotoChallenge ? 'Waiting for partner to share...' : 'Waiting for partner to answer...'}
               </Text>
             </Pressable>
 
-            {bothAnswered && showAnswers && partnerAnswer && (
+            {bothAnswered && showAnswers && (
               <Card>
                 <View style={{ gap: 8 }}>
                   <Text style={{ fontSize: 13, fontFamily: 'Inter_500Medium', color: theme.primary }}>
                     {selectedPartner === 'partner1'
                       ? partner2?.name ?? 'Partner'
                       : partner1?.name ?? 'Me'}
-                    's answer:
+                    {isPhotoChallenge ? "'s photo:" : "'s answer:"}
                   </Text>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      fontFamily: 'Inter_400Regular',
-                      color: theme.textPrimary,
-                      lineHeight: 22,
-                    }}
-                  >
-                    {partnerAnswer}
-                  </Text>
+                  {isPhotoChallenge && partnerPhoto ? (
+                    <Image
+                      source={{ uri: partnerPhoto }}
+                      style={{
+                        width: '100%',
+                        height: 200,
+                        borderRadius: 12,
+                      }}
+                      resizeMode="cover"
+                    />
+                  ) : partnerAnswer ? (
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        fontFamily: 'Inter_400Regular',
+                        color: theme.textPrimary,
+                        lineHeight: 22,
+                      }}
+                    >
+                      {partnerAnswer}
+                    </Text>
+                  ) : null}
                 </View>
               </Card>
             )}
@@ -249,9 +336,25 @@ export default function QuestionsScreen() {
             {pastEntries.map((entry) => (
               <Card key={entry.id}>
                 <View style={{ gap: 6 }}>
-                  <Text style={{ fontSize: 11, fontFamily: 'Inter_400Regular', color: theme.textMuted }}>
-                    {entry.dateKey}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={{ fontSize: 11, fontFamily: 'Inter_400Regular', color: theme.textMuted }}>
+                      {entry.dateKey}
+                    </Text>
+                    {entry.category === 'photo-challenge' && (
+                      <View
+                        style={{
+                          backgroundColor: '#FEF3C7',
+                          paddingHorizontal: 6,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}
+                      >
+                        <Text style={{ fontSize: 9, fontFamily: 'Inter_600SemiBold', color: '#D97706' }}>
+                          PHOTO
+                        </Text>
+                      </View>
+                    )}
+                  </View>
                   <Text
                     style={{
                       fontSize: 14,
@@ -261,15 +364,36 @@ export default function QuestionsScreen() {
                   >
                     {entry.question}
                   </Text>
-                  {entry.partner1Answer && (
-                    <Text style={{ fontSize: 13, fontFamily: 'Inter_400Regular', color: theme.textMuted }}>
-                      {partner1?.name}: {entry.partner1Answer}
-                    </Text>
-                  )}
-                  {entry.partner2Answer && (
-                    <Text style={{ fontSize: 13, fontFamily: 'Inter_400Regular', color: theme.textMuted }}>
-                      {partner2?.name}: {entry.partner2Answer}
-                    </Text>
+                  {entry.category === 'photo-challenge' ? (
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                      {entry.partner1Photo && (
+                        <Image
+                          source={{ uri: entry.partner1Photo }}
+                          style={{ width: 80, height: 80, borderRadius: 8 }}
+                          resizeMode="cover"
+                        />
+                      )}
+                      {entry.partner2Photo && (
+                        <Image
+                          source={{ uri: entry.partner2Photo }}
+                          style={{ width: 80, height: 80, borderRadius: 8 }}
+                          resizeMode="cover"
+                        />
+                      )}
+                    </View>
+                  ) : (
+                    <>
+                      {entry.partner1Answer && (
+                        <Text style={{ fontSize: 13, fontFamily: 'Inter_400Regular', color: theme.textMuted }}>
+                          {partner1?.name}: {entry.partner1Answer}
+                        </Text>
+                      )}
+                      {entry.partner2Answer && (
+                        <Text style={{ fontSize: 13, fontFamily: 'Inter_400Regular', color: theme.textMuted }}>
+                          {partner2?.name}: {entry.partner2Answer}
+                        </Text>
+                      )}
+                    </>
                   )}
                 </View>
               </Card>

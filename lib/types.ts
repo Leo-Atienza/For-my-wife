@@ -130,20 +130,24 @@ export interface JournalLetter {
   createdAt: string;
 }
 
+export type QuestionCategory = 'question' | 'would-you-rather' | 'photo-challenge';
+
 export interface DailyQuestion {
   id: string;
   question: string;
-  category: 'question' | 'would-you-rather';
+  category: QuestionCategory;
 }
 
 export interface DailyQuestionEntry {
   id: string;
   questionId: string;
   question: string;
-  category: 'question' | 'would-you-rather';
+  category: QuestionCategory;
   dateKey: string;
   partner1Answer?: string;
   partner2Answer?: string;
+  partner1Photo?: string;
+  partner2Photo?: string;
   createdAt: string;
 }
 
