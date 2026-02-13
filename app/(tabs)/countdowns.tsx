@@ -1,5 +1,5 @@
-import { View, FlatList, Text, Pressable, RefreshControl } from 'react-native';
-import { useState, useCallback } from 'react';
+import { View, FlatList, Text, Pressable, RefreshControl, Animated } from 'react-native';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { Plus } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,7 +10,62 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { FlipNumber } from '@/components/countdowns/FlipNumber';
+import { ConfettiBurst } from '@/components/bucket/ConfettiBurst';
 import type { CountdownEvent } from '@/lib/types';
+
+const CelebrationBadge = () => {
+  const theme = useTheme();
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const [showConfetti, setShowConfetti] = useState(true);
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.2,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [scaleAnim]);
+
+  return (
+    <View
+      style={{
+        backgroundColor: theme.primarySoft,
+        borderRadius: 12,
+        padding: 16,
+        alignItems: 'center',
+        position: 'relative',
+        overflow: 'visible',
+      }}
+    >
+      <ConfettiBurst active={showConfetti} onComplete={() => setShowConfetti(false)} />
+      <Animated.Text
+        style={{
+          fontSize: 32,
+          transform: [{ scale: scaleAnim }],
+        }}
+      >
+        {'\ud83c\udf89'}
+      </Animated.Text>
+      <Text
+        style={{
+          fontSize: 16,
+          fontFamily: 'Inter_600SemiBold',
+          color: theme.success,
+          marginTop: 4,
+        }}
+      >
+        It&apos;s here!
+      </Text>
+    </View>
+  );
+};
 
 const CountdownCard = ({ countdown }: { countdown: CountdownEvent }) => {
   const theme = useTheme();
@@ -34,24 +89,7 @@ const CountdownCard = ({ countdown }: { countdown: CountdownEvent }) => {
         </View>
 
         {values.isExpired ? (
-          <View
-            style={{
-              backgroundColor: theme.primarySoft,
-              borderRadius: 12,
-              padding: 12,
-              alignItems: 'center',
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                fontFamily: 'Inter_600SemiBold',
-                color: theme.success,
-              }}
-            >
-              {'\ud83c\udf89'} It&apos;s here!
-            </Text>
-          </View>
+          <CelebrationBadge />
         ) : (
           <View
             style={{
