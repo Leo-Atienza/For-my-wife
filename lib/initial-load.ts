@@ -74,8 +74,8 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       pullFromSupabase<DailyQuestionEntry>('daily_question_entries'),
       pullFromSupabase<SongDedicationEntry>('song_dedications'),
       pullFromSupabase<Record<string, unknown>>('partner_notes'),
-      pullFromSupabase<{ id: string; from_partner: PartnerRole; created_at: string }>('thinking_of_you'),
-      pullFromSupabase<{ id: string; partner: PartnerRole; status: 'sleeping' | 'awake'; created_at: string }>('sleep_wake_status'),
+      pullFromSupabase<{ id: string; fromPartner: PartnerRole; createdAt: string }>('thinking_of_you'),
+      pullFromSupabase<{ id: string; partner: PartnerRole; status: 'sleeping' | 'awake'; createdAt: string }>('sleep_wake_status'),
     ]);
 
     // Merge remote data with local data (preserving offline-created records)
@@ -132,22 +132,9 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       mergeById(usePartnerNotesStore.getState().notes, partnerNotes as { id: string }[])
     );
 
-    // Map remote field names to local for thinking taps
-    const mappedTaps = thinkingTaps.map((t) => ({
-      id: t.id,
-      fromPartner: t.from_partner,
-      createdAt: t.created_at,
-    }));
-    useThinkingStore.getState().loadFromRemote(mappedTaps);
-
-    // Map remote field names to local for sleep/wake
-    const mappedSleepWake = sleepWakeEntries.map((e) => ({
-      id: e.id,
-      partner: e.partner,
-      status: e.status,
-      createdAt: e.created_at,
-    }));
-    useSleepWakeStore.getState().loadFromRemote(mappedSleepWake);
+    // pullFromSupabase auto-converts snake_case → camelCase
+    useThinkingStore.getState().loadFromRemote(thinkingTaps);
+    useSleepWakeStore.getState().loadFromRemote(sleepWakeEntries);
 
     console.log('Initial data load from Supabase complete');
   } catch (error) {

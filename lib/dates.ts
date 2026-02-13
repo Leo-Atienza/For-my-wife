@@ -33,15 +33,23 @@ export const getRelationshipDuration = (anniversaryDate: string): DurationBreakd
 };
 
 export const formatDate = (dateString: string): string => {
-  return format(parseISO(dateString), 'MMM d, yyyy');
+  if (!dateString) return 'Not set';
+  const date = parseISO(dateString);
+  if (isNaN(date.getTime())) return 'Not set';
+  return format(date, 'MMM d, yyyy');
 };
 
 export const formatDateShort = (dateString: string): string => {
-  return format(parseISO(dateString), 'MMM d');
+  if (!dateString) return 'Not set';
+  const date = parseISO(dateString);
+  if (isNaN(date.getTime())) return 'Not set';
+  return format(date, 'MMM d');
 };
 
 export const formatRelativeTime = (dateString: string): string => {
+  if (!dateString) return 'Not set';
   const date = parseISO(dateString);
+  if (isNaN(date.getTime())) return 'Not set';
   const now = new Date();
   const daysDiff = differenceInDays(now, date);
 

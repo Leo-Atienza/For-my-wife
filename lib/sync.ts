@@ -5,6 +5,53 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { syncEvents } from './sync-events';
 
 // ============================================
+// camelCase ↔ snake_case transformation
+// ============================================
+
+// Special field aliases where simple camelCase→snake_case doesn't match the DB column
+const CAMEL_TO_SNAKE_ALIASES: Record<string, string> = {
+  imageUri: 'image_url',
+  couplePhoto: 'couple_photo_url',
+  photoUrl: 'photo_url',
+};
+
+const SNAKE_TO_CAMEL_ALIASES: Record<string, string> = {
+  image_url: 'imageUri',
+  couple_photo_url: 'couplePhoto',
+  photo_url: 'photoUrl',
+};
+
+const camelToSnakeKey = (key: string): string => {
+  if (CAMEL_TO_SNAKE_ALIASES[key]) return CAMEL_TO_SNAKE_ALIASES[key];
+  return key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+};
+
+const snakeToCamelKey = (key: string): string => {
+  if (SNAKE_TO_CAMEL_ALIASES[key]) return SNAKE_TO_CAMEL_ALIASES[key];
+  return key.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase());
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const camelToSnake = (obj: Record<string, any>): Record<string, any> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const result: Record<string, any> = {};
+  for (const key of Object.keys(obj)) {
+    result[camelToSnakeKey(key)] = obj[key];
+  }
+  return result;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const snakeToCamel = (obj: Record<string, any>): Record<string, any> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const result: Record<string, any> = {};
+  for (const key of Object.keys(obj)) {
+    result[snakeToCamelKey(key)] = obj[key];
+  }
+  return result;
+};
+
+// ============================================
 // Offline Queue
 // ============================================
 
@@ -77,20 +124,20 @@ export const pushToSupabase = async (
   const spaceId = getSpaceId();
   if (!spaceId) return;
 
-  const recordWithSpace = { ...record, space_id: spaceId };
+  const snakeRecord = camelToSnake({ ...record, space_id: spaceId });
 
   const online = await isOnline();
   if (!online) {
-    await addPendingOp({ table, operation: 'upsert', record: recordWithSpace });
+    await addPendingOp({ table, operation: 'upsert', record: snakeRecord });
     return;
   }
 
-  const { error } = await supabase.from(table).upsert(recordWithSpace);
+  const { error } = await supabase.from(table).upsert(snakeRecord);
 
   if (error) {
     console.error(`Sync push error (${table}):`, error.message);
     syncEvents.emit("Couldn't save \u2014 we'll retry later");
-    await addPendingOp({ table, operation: 'upsert', record: recordWithSpace });
+    await addPendingOp({ table, operation: 'upsert', record: snakeRecord });
   }
 };
 
@@ -136,7 +183,7 @@ export const pullFromSupabase = async <T>(
     return [];
   }
 
-  return (data ?? []) as T[];
+  return (data ?? []).map((row) => snakeToCamel(row)) as T[];
 };
 
 // ============================================
@@ -220,9 +267,9 @@ export const subscribeToTable = <T extends { id: string }>(
       },
       (payload) => {
         if (payload.eventType === 'INSERT' && callbacks.onInsert) {
-          callbacks.onInsert(payload.new as T);
+          callbacks.onInsert(snakeToCamel(payload.new as Record<string, unknown>) as T);
         } else if (payload.eventType === 'UPDATE' && callbacks.onUpdate) {
-          callbacks.onUpdate(payload.new as T);
+          callbacks.onUpdate(snakeToCamel(payload.new as Record<string, unknown>) as T);
         } else if (payload.eventType === 'DELETE' && callbacks.onDelete) {
           callbacks.onDelete(payload.old as { id: string });
         }

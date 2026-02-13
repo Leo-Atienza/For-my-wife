@@ -1,127 +1,124 @@
-# Session Context — Auth Login Fix + RLS Policy Fix
+# Session Context — Bug Fixes + UI Polish (Cute Theme)
 
 > Hand-off document for the next Claude agent. Read this FIRST, then CLAUDE.md, then APP_PLAN.md.
 
 ## Current Branch & Git State
 
 - **Branch**: `main`
-- **Status**: All changes committed. Clean working tree.
+- **Status**: Uncommitted changes — ready for commit.
 
-## What Was Done (Previous Sessions)
+---
+
+## What Was Done (Earlier Sessions)
 
 ### Button Component Rewrite
 - Replaced `Pressable` with `TouchableOpacity` in `components/ui/Button.tsx`
-- Buttons now render correctly on Android — solid background, white text
-- Button text color issue is **resolved**
+- Buttons render correctly on Android (solid background, white text)
 
-### Auth Screen Polish
-- Sign-in: centered layout, bigger heart/title, form spacing
-- Sign-up: added "← Sign In" back button
-- Forgot password, reset password, email confirmation screens added
-- Not-found catch-all route added
+### Auth System (Fully Working)
+- Sign-in, sign-up, forgot password, reset password, email confirmation screens
+- Fixed RLS infinite recursion on `space_members` using `user_space_ids()` SECURITY DEFINER
+- Fixed `onAuthStateChange` race condition (skip SIGNED_IN during `signIn()` loading)
+- Post-login navigation to `/auth/create-space` when no spaceId
 
-### Ngrok Fix
-- Installed `@expo/ngrok` (was missing, caused `--tunnel` crash)
+### Previous UI/UX Polish
+- Toast.tsx — Lucide icons instead of emoji
+- Input.tsx — `error?: string` prop with red border
+- EmptyState.tsx — Gentle bobbing animation
+- Card.tsx — `loading?: boolean` prop
+- PageHeader.tsx — 44x44px touch target
+- Pull-to-refresh on Notes, Memories, Countdowns
+- NaN duration counter guard with fallback card
+- SleepWake hardcoded colors → theme-aware
+- Require cycle fix via `lib/store-reset.ts`
+
+---
 
 ## What Was Done (This Session)
 
-### 1. Login Flow — Fixed (Multiple Issues)
+### 1. BUG FIX: Invalid date crash on Couple Profile screen (was APP CRASH)
+- Added `isNaN(date.getTime())` guards to `formatDate()`, `formatDateShort()`, and `formatRelativeTime()` in `lib/dates.ts`
+- All three functions now return `'Not set'` for null/undefined/invalid date strings instead of throwing `RangeError`
 
-**Problem**: User could not log in even with correct credentials. Button would load briefly then reset.
+### 2. BUG FIX: camelCase → snake_case sync failure (was DATA LOSS)
+- Added centralized `camelToSnake()` and `snakeToCamel()` utilities in `lib/sync.ts`
+- Special alias map for non-standard field names: `imageUri` ↔ `image_url`, `couplePhoto` ↔ `couple_photo_url`, `photoUrl` ↔ `photo_url`
+- `pushToSupabase()` now auto-converts camelCase records to snake_case before upserting
+- `pullFromSupabase()` now auto-converts snake_case records to camelCase before returning
+- `subscribeToTable()` realtime callbacks now auto-convert incoming records
+- Removed manual snake_case mapping from `initial-load.ts` (thinking/sleepwake stores)
+- Removed `mapThinkingRecord`/`mapSleepWakeRecord` from `hooks/useSync.ts`
+- Already-fixed stores (thinking, sleepWake, location, partnerNotes) still work fine — already-snake_case keys pass through unchanged
 
-**Root cause 1 — RLS infinite recursion on `space_members`**:
-The SELECT policy on `space_members` referenced itself: `USING (space_id IN (SELECT space_id FROM space_members ...))`. This caused PostgreSQL error `42P17: infinite recursion detected`.
+### 3. BUG FIX: "setup" route warning
+- Added `app/setup/_layout.tsx` (minimal Stack layout with ErrorBoundary)
+- This makes `"setup"` a valid route name in Expo Router, matching the `<Stack.Screen name="setup">` in `app/_layout.tsx`
 
-**Fix**: Replaced the policy to use the existing `user_space_ids()` SECURITY DEFINER function:
-```sql
-DROP POLICY "Users can read space members" ON space_members;
-CREATE POLICY "Users can read space members"
-  ON space_members FOR SELECT
-  USING (space_id IN (SELECT user_space_ids()));
-```
+### 4. UI: QuickActions redesign (home screen)
+- Replaced cramped 4-column grid with horizontal scrollable row
+- Each action is a circular icon button (56x56) with label below
+- Uses theme-colored soft background and accent border
+- Feels like cute, tappable widgets that work on any screen size
 
-**Root cause 2 — RLS on `spaces` blocked INSERT...RETURNING**:
-The `spaces` SELECT policy only allowed reading spaces you're a member of. But when creating a space, the `.select().single()` call needs to read the just-created row before the user has joined as a member.
+### 5. UI: More screen redesign
+- Replaced individual row cards with grouped card sections
+- Items within each section share a single rounded card container with dividers
+- Section headers use PlayfairDisplay bold font (no more all-caps)
+- Added emoji alongside each menu item label for cute feel
+- Section titles: "Fun Activities", "Stay Connected", "You & Me"
+- Pressed state highlights with theme primarySoft color
 
-**Fix**: Added `created_by = auth.uid()` to the SELECT policy:
-```sql
-DROP POLICY "Users can read their spaces" ON spaces;
-CREATE POLICY "Users can read their spaces"
-  ON spaces FOR SELECT
-  USING (
-    created_by = auth.uid()
-    OR id IN (SELECT user_space_ids())
-  );
-```
-
-**Root cause 3 — `onAuthStateChange` race condition**:
-The listener in `_layout.tsx` called `setSession()` immediately on `SIGNED_IN`, before `signIn()` had finished loading space info. The route guard saw session without spaceId and stayed on the auth screen.
-
-**Fix** (`_layout.tsx`): Skip `SIGNED_IN` events when `useAuthStore.getState().isLoading` is true (meaning `signIn()` is mid-flight and handling session + space info atomically).
-
-**Root cause 4 — `signIn()` didn't handle `space_members` query failure gracefully**:
-If the query threw, the outer catch set an error but never set the session — the user was authenticated in Supabase but the app didn't know.
-
-**Fix** (`useAuthStore.ts`): Wrapped the `space_members` query in its own try/catch. Session is always set regardless of whether space info loads.
-
-**Root cause 5 — Post-login navigation when no space exists**:
-After successful sign-in with no space, the route guard saw `session: true, spaceId: null` but since the user was already in the auth group, it did nothing.
-
-**Fix** (`sign-in.tsx`): After successful sign-in, if `spaceId` is null, explicitly navigate to `/auth/create-space`.
-
-### 2. EAS Build Config
-- Created `eas.json` with `development`, `preview` (APK), and `production` (AAB) profiles
-- To build APK: `npx eas-cli build -p android --profile preview`
-
-### 3. Schema Updated
-- `supabase/schema.sql` now has the corrected RLS policies so future database recreations won't have the recursion bug
+---
 
 ## What Still Needs to Be Done
 
-### UI/UX Polish
-- Review and improve screens across the app (deferred — user wants to do this later)
+### Priority 1: Testing
+- Test auth flows on real device
+- Test data sync between two devices (camelCase fix should resolve all sync errors)
+- Test offline queue and reconnection
+- Verify Couple Profile screen no longer crashes with invalid dates
 
-### Test Auth Flows on Device
-- Sign up → "Check Your Email" → "Go to Sign In" → sign in works
-- Sign in with wrong password → error shows, button re-enables
-- Forgot Password → sends reset link
-- Navigate between sign-in ↔ sign-up → smooth transitions
-- Test on Android specifically
+### Priority 2: Visual Consistency Review
+- Review all screens for visual consistency with the "cute, clean, pleasant" directive
+- Verify QuickActions horizontal scroll looks good on different screen sizes
 
-### Phase 3 Two-Device Testing (After Auth is Solid)
-- Note sync between two devices
-- Offline queue (airplane mode → create note → reconnect)
-- Photo upload + compression + retry
-- Push notifications with route navigation
-- Distance tracking with GPS permissions
-- Conflict resolution (both devices edit same note)
+### Priority 3: Phase 3 Features
+- Two-device testing (note sync, photo upload, push notifications, distance)
+- Conflict resolution
 
-Requires **two physical devices** (or device + emulator) signed into the same couple space.
+---
 
-## Known Risks
+## Known Warnings (Non-Blocking)
 
-1. **`expo-image-manipulator` v14** — uses legacy `manipulateAsync` API. May throw at runtime if API changed.
-2. **`File` from `expo-file-system`** — requires Expo SDK 52+. App is on SDK 54, should be fine.
-3. **`updatedAt` backward compat** — old persisted data won't have `updatedAt`. `isNewerRecord` helper handles this.
-4. **Deep link redirect chain** — In Expo Go, the scheme is `exp+us-couple-app://` not `us-couple-app://`. May need adjustment for testing vs standalone builds.
-5. **The `.env` file contains real credentials** — do NOT commit it. It should be in `.gitignore`.
-6. **`expo-notifications` warning** — Android Push notifications show an error banner in Expo Go. This is expected — push notifications only work in standalone builds, not Expo Go.
-7. **Other RLS policies may have similar issues** — all data table policies use `user_space_ids()` which is SECURITY DEFINER, so they should be fine. But watch for errors on first use of each feature.
+1. **`expo-notifications` error** — Expected in Expo Go. Push notifications only work in standalone builds.
+2. **SafeAreaView deprecation** — Warning about deprecated SafeAreaView. Already using `react-native-safe-area-context` in most places.
+3. **Realtime send() fallback** — Supabase realtime auto-falling back to REST API.
+
+---
 
 ## Key Files Reference
 
 | File | Purpose |
 |------|---------|
-| `components/ui/Button.tsx` | Button component — uses TouchableOpacity |
-| `app/auth/sign-in.tsx` | Sign in screen — navigates to create-space if no spaceId |
-| `app/auth/sign-up.tsx` | Sign up screen (has back button) |
-| `app/auth/create-space.tsx` | Create or join a couple space |
-| `app/auth/forgot-password.tsx` | Forgot password flow |
-| `app/auth/reset-password.tsx` | Reset password form |
-| `app/auth/confirm.tsx` | Email confirmation landing |
-| `app/_layout.tsx` | Root layout — route guard, auth state listener, deep link handler |
-| `stores/useAuthStore.ts` | Auth state — signIn loads space info before setting session |
-| `hooks/useTheme.ts` | Theme hook — falls back to 'rose' when no profile exists |
-| `lib/constants.ts` | Theme colors — rose primary is `#E11D48` |
-| `supabase/schema.sql` | Database schema with corrected RLS policies |
-| `eas.json` | EAS build config (preview = APK, production = AAB) |
+| `lib/dates.ts` | Date formatting — now has invalid date guards |
+| `lib/sync.ts` | Sync engine — centralized camelCase↔snake_case + offline queue |
+| `lib/initial-load.ts` | Initial data pull — uses auto-converted camelCase data |
+| `hooks/useSync.ts` | Realtime subscriptions — auto-converted by subscribeToTable |
+| `lib/types.ts` | TypeScript interfaces (camelCase) |
+| `supabase/schema.sql` | DB schema (snake_case columns) |
+| `app/_layout.tsx` | Root layout — route guard, auth listener, Stack screens |
+| `app/setup/_layout.tsx` | Setup route layout (fixes route warning) |
+| `app/(tabs)/more.tsx` | More screen — grouped cards with emojis |
+| `components/home/QuickActions.tsx` | Quick actions — horizontal scrollable circles |
+| `components/ui/Button.tsx` | DO NOT CHANGE — user confirmed buttons are good |
+
+---
+
+## Architecture Notes
+
+- **State**: Zustand with AsyncStorage persistence
+- **Sync**: `pushToSupabase()` auto-converts camelCase→snake_case, `pullFromSupabase()` auto-converts snake_case→camelCase
+- **Themes**: 4 themes (Rose, Lavender, Sunset, Ocean) in `lib/constants.ts`
+- **Typography**: Playfair Display (headings), Inter (body), Dancing Script (romantic accents)
+- **Navigation**: Expo Router file-based routing with Stack
+- **This app is for 2 users only** — don't over-engineer
