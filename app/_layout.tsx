@@ -27,6 +27,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useLocationTracking } from '@/hooks/useLocationTracking';
 import { loadAllDataFromSupabase } from '@/lib/initial-load';
 import { migrateLocalDataToCloud } from '@/lib/migration';
+import { checkThisDayInHistory } from '@/lib/history-notification';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ToastProvider, useToast } from '@/components/ui/Toast';
 import { syncEvents } from '@/lib/sync-events';
@@ -198,6 +199,8 @@ function AppContent() {
       loadAllDataFromSupabase()
         .then(() => {
           migrateLocalDataToCloud();
+          // Check for "This Day in History" entries after data is loaded
+          checkThisDayInHistory();
         })
         .catch((err) => {
           console.error('Initial load failed, skipping migration to prevent data loss:', err);

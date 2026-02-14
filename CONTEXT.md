@@ -1,21 +1,72 @@
-# Session Context — New Features, Supabase Updates & Push Notifications
+# Session Context — New Features, Polish & Export
 
 > Hand-off document for the next Claude agent. Read this FIRST, then CLAUDE.md, then APP_PLAN.md.
 
 ## Current Branch & Git State
 
-- **Branch**: `claude/follow-context-instructions-CqPUy`
-- **Status**: Clean working tree, pushed to remote.
+- **Branch**: `main`
+- **Status**: Modified files with new features, not yet committed.
 - **Last 5 commits**:
+  - `e1f4d14` — Merge pull request #9 (context update)
+  - `500e308` — Update CONTEXT.md with new features, remaining tasks, and architecture notes
+  - `6f85ac4` — Merge pull request #8 (new features)
   - `a1d3dc8` — Add Next Visit Planner, Love Language Quiz, Watch Party, and This Day in History
   - `de88859` — Merge pull request #7 (nickname reveal, photo challenges, context update)
-  - `f5e1b59` — Update CONTEXT.md with nickname reveal, photo challenges, and next steps
-  - `eaefd25` — Add nickname card-flip reveal animation and photo challenge feature
-  - `e818266` — 2 polish animations completed (slot-machine + checkmark draw)
 
 ---
 
-## What Was Done (This Session — 4 New Features + Infrastructure)
+## What Was Done (Latest Session — 7 Enhancements + 1 New Feature)
+
+### 1. Love Language Results on Profiles
+Added love language display to individual profile screen (`app/profile/[partner].tsx`). Shows primary love language with emoji, label, and description. Links to the full quiz. Shows "Take the quiz" prompt when no results exist.
+
+### 2. Mood Trend Chart
+Added visual mood trend chart to mood screen (`app/mood/index.tsx`). Maps each mood emoji to a happiness score (0-4), displays as a dot chart with connecting lines over the last 14 days. Separate charts for each partner with scrollable horizontal layout.
+
+### 3. "This Day in History" Push Notification
+Created `lib/history-notification.ts` — daily local notification when entries from the same date in previous years exist. Checks memories, milestones, and love notes. Runs once per day (tracked via AsyncStorage). Integrated into app startup in `_layout.tsx` after initial data load.
+
+### 4. Next Visit Auto-Prompt
+Added post-visit photo prompt to past visit cards (`app/next-visit/index.tsx`). Shows a "Add photos from this visit" banner with Camera icon that navigates to `/memories/new`. Styled as a dashed-border card with romantic theme.
+
+### 5. Watch Party Partner Join Confirmation
+Enhanced watch party screen (`app/watch-party/index.tsx`). Sends push notification when partner opens the watch party screen while a session is active (e.g., "Leo joined Movie Night!"). Added "Watching together" badge with Users icon on the active timer display.
+
+### 6. Visual Map for Distance Screen
+Added animated visual map component to distance screen (`app/distance/index.tsx`). Shows both partners as positioned dots on a styled canvas based on their lat/lng. Features pulsing animations, connecting line, heart at midpoint, city labels. No external maps library needed.
+
+### 7. Export / PDF Yearbook (Phase 4.5)
+Created full yearbook export feature:
+- `lib/yearbook.ts` — HTML template generation with themed styling, cover page, stats, timeline, love notes, memories, songs, bucket list, footer
+- `app/export/index.tsx` — Export screen with "What's included" preview, item counts, and "Generate & Share PDF" button
+- Uses `expo-print` (HTML → PDF) and `expo-sharing` (share sheet)
+- Added to More menu with FileDown icon
+
+### 8. Bug Fixes
+- Fixed TypeScript error in `app/watch-party/index.tsx` — `session.duration` possibly undefined
+- Added `onSubmitEditing` and `returnKeyType` props to `components/ui/Input.tsx`
+- All TypeScript strict mode checks pass (0 errors)
+- Expo build compiles successfully for both Android and iOS
+
+**Files created:**
+- `lib/history-notification.ts` — This Day in History daily notification
+- `lib/yearbook.ts` — HTML yearbook generation
+- `app/export/index.tsx` — Export Yearbook screen
+
+**Files modified:**
+- `app/profile/[partner].tsx` — Love language results on profile
+- `app/mood/index.tsx` — Mood trend chart
+- `app/_layout.tsx` — History notification integration
+- `app/next-visit/index.tsx` — Post-visit photo prompt
+- `app/watch-party/index.tsx` — Partner join notification + watching together badge
+- `app/distance/index.tsx` — Visual map component
+- `app/(tabs)/more.tsx` — Export Yearbook menu item
+- `components/ui/Input.tsx` — Added onSubmitEditing + returnKeyType props
+- `package.json` — Added expo-print, expo-sharing
+
+---
+
+## What Was Done (Previous Session — 4 New Features + Infrastructure)
 
 ### 1. Next Visit Planner (Phase 1.7 — LDR Feature)
 

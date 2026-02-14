@@ -22,6 +22,7 @@ import {
   Plane,
   HeartHandshake,
   Film,
+  FileDown,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -303,6 +304,13 @@ export default function MoreScreen() {
           subtitle: 'Your nickname history',
           route: '/profile/nicknames',
           emoji: '\u{1F31F}',
+        },
+        {
+          icon: <FileDown size={22} color={theme.primary} />,
+          label: 'Export Yearbook',
+          subtitle: 'PDF of your love story',
+          route: '/export',
+          emoji: '\u{1F4D6}',
         },
         {
           icon: <Settings size={22} color={theme.primary} />,

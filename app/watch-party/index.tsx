@@ -11,9 +11,13 @@ import {
   Clock,
   Trash2,
   X,
+  Users,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useWatchPartyStore } from '@/stores/useWatchPartyStore';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useProfileStore } from '@/stores/useProfileStore';
+import { sendPushToPartner } from '@/lib/notifications';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
@@ -65,8 +69,9 @@ const ActiveTimer = ({ session }: { session: WatchPartySession }) => {
   }, [pulseAnim]);
 
   const config = TYPE_CONFIG[session.type];
-  const isCountdown = session.duration && session.duration > 0;
-  const remaining = isCountdown ? Math.max(0, session.duration - elapsed) : elapsed;
+  const durationValue = session.duration ?? 0;
+  const isCountdown = durationValue > 0;
+  const remaining = isCountdown ? Math.max(0, durationValue - elapsed) : elapsed;
   const isFinished = isCountdown && remaining === 0;
 
   return (
@@ -112,6 +117,28 @@ const ActiveTimer = ({ session }: { session: WatchPartySession }) => {
               : 'Time remaining'
             : 'Elapsed time'}
         </Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            backgroundColor: '#ffffff20',
+            paddingHorizontal: 14,
+            paddingVertical: 6,
+            borderRadius: 20,
+          }}
+        >
+          <Users size={14} color="#fff" />
+          <Text
+            style={{
+              fontSize: 12,
+              fontFamily: 'Inter_500Medium',
+              color: '#ffffffcc',
+            }}
+          >
+            Watching together
+          </Text>
+        </View>
         <Pressable
           onPress={() => stopSession(session.id)}
           style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
@@ -210,8 +237,36 @@ export default function WatchPartyScreen() {
   const [selectedType, setSelectedType] = useState<'movie' | 'dinner' | 'activity'>('movie');
   const [timerMinutes, setTimerMinutes] = useState('');
 
+  const myRole = useAuthStore((state) => state.myRole);
+  const partner1 = useProfileStore((state) => state.partner1);
+  const partner2 = useProfileStore((state) => state.partner2);
+  const partnerName =
+    myRole === 'partner1'
+      ? partner2?.name ?? 'Your partner'
+      : partner1?.name ?? 'Your partner';
+
   const activeSession = getActiveSession();
   const inactiveSessions = sessions.filter((s) => !s.isActive);
+
+  // Send "joined" notification when opening screen with an active session started by partner
+  const joinNotifiedRef = useRef(false);
+  useEffect(() => {
+    if (activeSession && activeSession.startedBy !== myRole && !joinNotifiedRef.current) {
+      joinNotifiedRef.current = true;
+      const myName =
+        myRole === 'partner1'
+          ? partner1?.name ?? 'Your partner'
+          : partner2?.name ?? 'Your partner';
+      sendPushToPartner(
+        'Watch Party',
+        `${myName} joined "${activeSession.title}"! \u{1F3AC}`,
+        '/watch-party'
+      );
+    }
+    if (!activeSession) {
+      joinNotifiedRef.current = false;
+    }
+  }, [activeSession, myRole, partner1, partner2]);
 
   const handleCreate = () => {
     if (!title.trim()) return;

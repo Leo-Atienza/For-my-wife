@@ -1,7 +1,7 @@
-import { View, Text, ScrollView, Pressable } from 'react-native';
-import { useState } from 'react';
+import { View, Text, ScrollView, Pressable, Animated } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MapPin, Settings } from 'lucide-react-native';
+import { MapPin, Settings, Heart } from 'lucide-react-native';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -23,6 +23,254 @@ function formatTimeAgo(isoString: string): string {
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
 }
+
+interface LocationData {
+  latitude: number;
+  longitude: number;
+  cityName?: string;
+  updatedAt: string;
+}
+
+const MAP_WIDTH = 280;
+const MAP_HEIGHT = 180;
+const DOT_SIZE = 16;
+const PULSE_SIZE = 40;
+
+const VisualMap = ({
+  loc1,
+  loc2,
+  partner1Name,
+  partner2Name,
+}: {
+  loc1: LocationData;
+  loc2: LocationData;
+  partner1Name: string;
+  partner2Name: string;
+}) => {
+  const theme = useTheme();
+  const pulse1 = useRef(new Animated.Value(0)).current;
+  const pulse2 = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const anim1 = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse1, { toValue: 1, duration: 1500, useNativeDriver: true }),
+        Animated.timing(pulse1, { toValue: 0, duration: 0, useNativeDriver: true }),
+      ])
+    );
+    const anim2 = Animated.loop(
+      Animated.sequence([
+        Animated.delay(750),
+        Animated.timing(pulse2, { toValue: 1, duration: 1500, useNativeDriver: true }),
+        Animated.timing(pulse2, { toValue: 0, duration: 0, useNativeDriver: true }),
+      ])
+    );
+    anim1.start();
+    anim2.start();
+    return () => {
+      anim1.stop();
+      anim2.stop();
+    };
+  }, [pulse1, pulse2]);
+
+  // Normalize lat/lng to positions within the map canvas
+  const minLat = Math.min(loc1.latitude, loc2.latitude);
+  const maxLat = Math.max(loc1.latitude, loc2.latitude);
+  const minLng = Math.min(loc1.longitude, loc2.longitude);
+  const maxLng = Math.max(loc1.longitude, loc2.longitude);
+
+  const latRange = maxLat - minLat || 1;
+  const lngRange = maxLng - minLng || 1;
+
+  // Add padding so dots aren't at edges
+  const pad = 40;
+  const usableW = MAP_WIDTH - pad * 2;
+  const usableH = MAP_HEIGHT - pad * 2;
+
+  const x1 = pad + ((loc1.longitude - minLng) / lngRange) * usableW;
+  const y1 = pad + ((maxLat - loc1.latitude) / latRange) * usableH; // Flip Y since lat goes up
+  const x2 = pad + ((loc2.longitude - minLng) / lngRange) * usableW;
+  const y2 = pad + ((maxLat - loc2.latitude) / latRange) * usableH;
+
+  // Calculate line between dots
+  const midX = (x1 + x2) / 2;
+  const midY = (y1 + y2) / 2;
+
+  return (
+    <Card>
+      <View style={{ alignItems: 'center', gap: 8 }}>
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: 'DancingScript_400Regular',
+            color: theme.textMuted,
+          }}
+        >
+          Your map
+        </Text>
+        <View
+          style={{
+            width: MAP_WIDTH,
+            height: MAP_HEIGHT,
+            backgroundColor: theme.primarySoft,
+            borderRadius: 16,
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Dashed line between dots */}
+          <View
+            style={{
+              position: 'absolute',
+              left: Math.min(x1, x2),
+              top: Math.min(y1, y2),
+              width: Math.abs(x2 - x1) || 1,
+              height: Math.abs(y2 - y1) || 1,
+              borderWidth: 1,
+              borderColor: theme.accent,
+              borderStyle: 'dashed',
+            }}
+          />
+
+          {/* Heart at midpoint */}
+          <View
+            style={{
+              position: 'absolute',
+              left: midX - 10,
+              top: midY - 10,
+            }}
+          >
+            <Heart size={20} color={theme.primary + '60'} fill={theme.primary + '30'} />
+          </View>
+
+          {/* Partner 1 pulse */}
+          <Animated.View
+            style={{
+              position: 'absolute',
+              left: x1 - PULSE_SIZE / 2,
+              top: y1 - PULSE_SIZE / 2,
+              width: PULSE_SIZE,
+              height: PULSE_SIZE,
+              borderRadius: PULSE_SIZE / 2,
+              backgroundColor: theme.primary + '30',
+              opacity: pulse1.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.6, 0],
+              }),
+              transform: [
+                {
+                  scale: pulse1.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.5, 1.5],
+                  }),
+                },
+              ],
+            }}
+          />
+
+          {/* Partner 1 dot */}
+          <View
+            style={{
+              position: 'absolute',
+              left: x1 - DOT_SIZE / 2,
+              top: y1 - DOT_SIZE / 2,
+              width: DOT_SIZE,
+              height: DOT_SIZE,
+              borderRadius: DOT_SIZE / 2,
+              backgroundColor: theme.primary,
+              borderWidth: 3,
+              borderColor: '#fff',
+              shadowColor: theme.primary,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              elevation: 3,
+            }}
+          />
+
+          {/* Partner 1 label */}
+          <Text
+            style={{
+              position: 'absolute',
+              left: x1 - 30,
+              top: y1 + DOT_SIZE / 2 + 4,
+              width: 60,
+              textAlign: 'center',
+              fontSize: 10,
+              fontFamily: 'Inter_600SemiBold',
+              color: theme.textPrimary,
+            }}
+            numberOfLines={1}
+          >
+            {loc1.cityName ?? partner1Name}
+          </Text>
+
+          {/* Partner 2 pulse */}
+          <Animated.View
+            style={{
+              position: 'absolute',
+              left: x2 - PULSE_SIZE / 2,
+              top: y2 - PULSE_SIZE / 2,
+              width: PULSE_SIZE,
+              height: PULSE_SIZE,
+              borderRadius: PULSE_SIZE / 2,
+              backgroundColor: theme.accent + '50',
+              opacity: pulse2.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.6, 0],
+              }),
+              transform: [
+                {
+                  scale: pulse2.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.5, 1.5],
+                  }),
+                },
+              ],
+            }}
+          />
+
+          {/* Partner 2 dot */}
+          <View
+            style={{
+              position: 'absolute',
+              left: x2 - DOT_SIZE / 2,
+              top: y2 - DOT_SIZE / 2,
+              width: DOT_SIZE,
+              height: DOT_SIZE,
+              borderRadius: DOT_SIZE / 2,
+              backgroundColor: theme.accent,
+              borderWidth: 3,
+              borderColor: '#fff',
+              shadowColor: theme.accent,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              elevation: 3,
+            }}
+          />
+
+          {/* Partner 2 label */}
+          <Text
+            style={{
+              position: 'absolute',
+              left: x2 - 30,
+              top: y2 + DOT_SIZE / 2 + 4,
+              width: 60,
+              textAlign: 'center',
+              fontSize: 10,
+              fontFamily: 'Inter_600SemiBold',
+              color: theme.textPrimary,
+            }}
+            numberOfLines={1}
+          >
+            {loc2.cityName ?? partner2Name}
+          </Text>
+        </View>
+      </View>
+    </Card>
+  );
+};
 
 export default function DistanceScreen() {
   const insets = useSafeAreaInsets();
@@ -168,6 +416,9 @@ export default function DistanceScreen() {
             </View>
           </Card>
         )}
+
+        {/* Visual Map */}
+        {hasDistance && loc1 && loc2 && <VisualMap loc1={loc1} loc2={loc2} partner1Name={partner1?.name ?? 'You'} partner2Name={partner2?.name ?? 'Partner'} />}
 
         {/* Manual location inputs (fallback) */}
         <Text style={{ fontSize: 16, fontFamily: 'DancingScript_400Regular', color: theme.primary, marginTop: 8 }}>

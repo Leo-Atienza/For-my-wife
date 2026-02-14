@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import {
   Plane,
   Plus,
@@ -20,6 +21,7 @@ import {
   Trash2,
   ChevronDown,
   ChevronUp,
+  Camera,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useNextVisitStore } from '@/stores/useNextVisitStore';
@@ -32,6 +34,7 @@ import type { NextVisit, PartnerRole } from '@/lib/types';
 
 const VisitCard = ({ visit }: { visit: NextVisit }) => {
   const theme = useTheme();
+  const router = useRouter();
   const [expanded, setExpanded] = useState(false);
   const [newActivity, setNewActivity] = useState('');
   const [newPackingItem, setNewPackingItem] = useState('');
@@ -389,6 +392,52 @@ const VisitCard = ({ visit }: { visit: NextVisit }) => {
               </Pressable>
             </View>
           </View>
+
+          {/* Post-visit photo prompt for past visits */}
+          {isPast && (
+            <Pressable
+              onPress={() => router.push('/memories/new')}
+              style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 10,
+                  backgroundColor: theme.primarySoft,
+                  borderRadius: 14,
+                  padding: 14,
+                  marginBottom: 12,
+                  borderWidth: 1,
+                  borderColor: theme.accent,
+                  borderStyle: 'dashed',
+                }}
+              >
+                <Camera size={20} color={theme.primary} />
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontFamily: 'Inter_600SemiBold',
+                      color: theme.primary,
+                    }}
+                  >
+                    Add photos from this visit
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontFamily: 'Inter_400Regular',
+                      color: theme.textMuted,
+                      marginTop: 2,
+                    }}
+                  >
+                    Save your favorite moments to the Memory Wall
+                  </Text>
+                </View>
+              </View>
+            </Pressable>
+          )}
 
           {/* Delete button */}
           <Pressable

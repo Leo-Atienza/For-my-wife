@@ -1,22 +1,26 @@
-import { View, Text, ScrollView } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, ScrollView, Pressable } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useNicknameStore } from '@/stores/useNicknameStore';
+import { useLoveLanguageStore } from '@/stores/useLoveLanguageStore';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { LOVE_LANGUAGE_LABELS, LOVE_LANGUAGE_EMOJIS, LOVE_LANGUAGE_DESCRIPTIONS } from '@/lib/love-languages';
 import type { PartnerRole } from '@/lib/types';
 
 export default function PartnerProfileScreen() {
   const { partner } = useLocalSearchParams<{ partner: string }>();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
+  const router = useRouter();
 
   const role = partner as PartnerRole;
   const profileData = useProfileStore((state) => state[role]);
   const getActiveNickname = useNicknameStore((state) => state.getActiveNickname);
+  const loveLanguageResult = useLoveLanguageStore((state) => state.getResult(role));
 
   if (!profileData) {
     return (
@@ -83,6 +87,81 @@ export default function PartnerProfileScreen() {
               </Text>
             </View>
           </Card>
+        )}
+
+        {/* Love Language */}
+        {loveLanguageResult ? (
+          <Pressable
+            onPress={() => router.push('/love-language')}
+            style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+          >
+            <Card>
+              <View style={{ alignItems: 'center', gap: 8 }}>
+                <Text style={{ fontSize: 36 }}>
+                  {LOVE_LANGUAGE_EMOJIS[loveLanguageResult.primary]}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: 'Inter_600SemiBold',
+                    color: theme.textPrimary,
+                  }}
+                >
+                  {LOVE_LANGUAGE_LABELS[loveLanguageResult.primary]}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontFamily: 'Inter_400Regular',
+                    color: theme.textMuted,
+                    textAlign: 'center',
+                    lineHeight: 18,
+                  }}
+                >
+                  {LOVE_LANGUAGE_DESCRIPTIONS[loveLanguageResult.primary]}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    fontFamily: 'Inter_400Regular',
+                    color: theme.primary,
+                    marginTop: 4,
+                  }}
+                >
+                  Tap to view full results
+                </Text>
+              </View>
+            </Card>
+          </Pressable>
+        ) : (
+          <Pressable
+            onPress={() => router.push('/love-language')}
+            style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+          >
+            <Card>
+              <View style={{ alignItems: 'center', gap: 6 }}>
+                <Text style={{ fontSize: 28 }}>{'\u{1F49D}'}</Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontFamily: 'Inter_500Medium',
+                    color: theme.textMuted,
+                  }}
+                >
+                  Love language not discovered yet
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontFamily: 'Inter_400Regular',
+                    color: theme.primary,
+                  }}
+                >
+                  Take the quiz
+                </Text>
+              </View>
+            </Card>
+          </Pressable>
         )}
 
         {/* Fun facts */}

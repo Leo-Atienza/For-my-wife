@@ -2,7 +2,7 @@ import { TextInput, View, Text } from 'react-native';
 import { useState } from 'react';
 import { useTheme } from '@/hooks/useTheme';
 
-interface InputProps {
+export interface InputProps {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
@@ -15,6 +15,8 @@ interface InputProps {
   secureTextEntry?: boolean;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   error?: string;
+  onSubmitEditing?: () => void;
+  returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send' | 'default';
 }
 
 export const Input = ({
@@ -30,6 +32,8 @@ export const Input = ({
   secureTextEntry = false,
   autoCapitalize,
   error,
+  onSubmitEditing,
+  returnKeyType,
 }: InputProps) => {
   const theme = useTheme();
   const [isFocused, setIsFocused] = useState(false);
@@ -59,6 +63,8 @@ export const Input = ({
         keyboardType={keyboardType}
         secureTextEntry={secureTextEntry}
         autoCapitalize={autoCapitalize}
+        onSubmitEditing={onSubmitEditing}
+        returnKeyType={returnKeyType}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         style={{
