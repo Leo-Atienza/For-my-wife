@@ -358,6 +358,83 @@ CREATE POLICY "Space access" ON sleep_wake_status FOR ALL
   USING (space_id IN (SELECT user_space_ids()))
   WITH CHECK (space_id IN (SELECT user_space_ids()));
 
+-- Next Visit Planner (LDR feature)
+CREATE TABLE next_visits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE,
+  location TEXT,
+  notes TEXT,
+  activities JSONB DEFAULT '[]',
+  packing_items JSONB DEFAULT '[]',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Love Language Quiz results
+CREATE TABLE love_language_results (
+  id TEXT PRIMARY KEY,
+  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
+  partner TEXT NOT NULL,
+  primary_language TEXT NOT NULL,
+  scores JSONB NOT NULL,
+  completed_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Watch Party sessions
+CREATE TABLE watch_party_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  type TEXT CHECK (type IN ('movie', 'dinner', 'activity')) NOT NULL,
+  started_by TEXT NOT NULL,
+  started_at TIMESTAMPTZ,
+  duration INTEGER,
+  is_active BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Enable RLS on new tables
+ALTER TABLE next_visits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE love_language_results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE watch_party_sessions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Space access" ON next_visits FOR ALL
+  USING (space_id IN (SELECT user_space_ids()))
+  WITH CHECK (space_id IN (SELECT user_space_ids()));
+
+CREATE POLICY "Space access" ON love_language_results FOR ALL
+  USING (space_id IN (SELECT user_space_ids()))
+  WITH CHECK (space_id IN (SELECT user_space_ids()));
+
+CREATE POLICY "Space access" ON watch_party_sessions FOR ALL
+  USING (space_id IN (SELECT user_space_ids()))
+  WITH CHECK (space_id IN (SELECT user_space_ids()));
+
+-- ============================================
+-- Photo challenge columns for daily_question_entries
+-- ============================================
+
+ALTER TABLE daily_question_entries
+  ADD COLUMN IF NOT EXISTS partner1_photo TEXT,
+  ADD COLUMN IF NOT EXISTS partner2_photo TEXT;
+
+-- ============================================
+-- Add updated_at columns to tables that need conflict resolution
+-- ============================================
+
+ALTER TABLE love_notes ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE memories ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE milestones ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE countdown_events ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE bucket_items ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE mood_entries ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE date_ideas ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE partner_notes ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+
 -- ============================================
 -- Storage bucket for photos
 -- ============================================
@@ -413,3 +490,6 @@ ALTER PUBLICATION supabase_realtime ADD TABLE location_entries;
 ALTER PUBLICATION supabase_realtime ADD TABLE partner_notes;
 ALTER PUBLICATION supabase_realtime ADD TABLE thinking_of_you;
 ALTER PUBLICATION supabase_realtime ADD TABLE sleep_wake_status;
+ALTER PUBLICATION supabase_realtime ADD TABLE next_visits;
+ALTER PUBLICATION supabase_realtime ADD TABLE love_language_results;
+ALTER PUBLICATION supabase_realtime ADD TABLE watch_party_sessions;

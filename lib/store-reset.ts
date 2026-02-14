@@ -22,6 +22,9 @@ export const resetAllStores = async (): Promise<void> => {
     import('@/stores/usePartnerNotesStore'),
     import('@/stores/useThinkingStore'),
     import('@/stores/useSleepWakeStore'),
+    import('@/stores/useNextVisitStore'),
+    import('@/stores/useLoveLanguageStore'),
+    import('@/stores/useWatchPartyStore'),
   ]);
 
   const storeKeys = [
@@ -42,6 +45,9 @@ export const resetAllStores = async (): Promise<void> => {
     'usePartnerNotesStore',
     'useThinkingStore',
     'useSleepWakeStore',
+    'useNextVisitStore',
+    'useLoveLanguageStore',
+    'useWatchPartyStore',
   ];
 
   for (let i = 0; i < stores.length; i++) {

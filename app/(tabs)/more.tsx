@@ -19,6 +19,9 @@ import {
   Fingerprint,
   ChevronRight,
   UserPlus,
+  Plane,
+  HeartHandshake,
+  Film,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -191,6 +194,20 @@ export default function MoreScreen() {
           route: '/questions',
           emoji: '\u{1F4AC}',
         },
+        {
+          icon: <Film size={22} color={theme.primary} />,
+          label: 'Watch Party',
+          subtitle: 'Shared timers for movie nights',
+          route: '/watch-party',
+          emoji: '\u{1F3AC}',
+        },
+        {
+          icon: <HeartHandshake size={22} color={theme.primary} />,
+          label: 'Love Languages',
+          subtitle: 'Discover how you feel loved',
+          route: '/love-language',
+          emoji: '\u{1F49D}',
+        },
       ],
     },
     {
@@ -245,6 +262,13 @@ export default function MoreScreen() {
           subtitle: 'See how far apart you are',
           route: '/distance',
           emoji: '\u{1F4CD}',
+        },
+        {
+          icon: <Plane size={22} color={theme.primary} />,
+          label: 'Next Visit',
+          subtitle: 'Plan your next time together',
+          route: '/next-visit',
+          emoji: '\u2708\ufe0f',
         },
       ],
     },

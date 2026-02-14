@@ -281,6 +281,89 @@ export interface PartnerNote {
 }
 
 // ============================================
+// Next Visit Planner (LDR Feature — Phase 1.7)
+// ============================================
+
+export interface NextVisit {
+  id: string;
+  title: string;
+  startDate: string;
+  endDate?: string;
+  location?: string;
+  notes?: string;
+  activities: VisitActivity[];
+  packingItems: PackingItem[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface VisitActivity {
+  id: string;
+  title: string;
+  date?: string;
+  isCompleted: boolean;
+}
+
+export interface PackingItem {
+  id: string;
+  item: string;
+  isPacked: boolean;
+  partner: PartnerRole;
+}
+
+// ============================================
+// Love Language Quiz (Phase 4.3)
+// ============================================
+
+export type LoveLanguageType =
+  | 'words-of-affirmation'
+  | 'quality-time'
+  | 'receiving-gifts'
+  | 'acts-of-service'
+  | 'physical-touch';
+
+export interface LoveLanguageResult {
+  partner: PartnerRole;
+  primary: LoveLanguageType;
+  scores: Record<LoveLanguageType, number>;
+  completedAt: string;
+}
+
+export interface LoveLanguageQuestion {
+  id: string;
+  optionA: { text: string; language: LoveLanguageType };
+  optionB: { text: string; language: LoveLanguageType };
+}
+
+// ============================================
+// Watch Party / Sync Timer (Phase 4.4)
+// ============================================
+
+export interface WatchPartySession {
+  id: string;
+  title: string;
+  type: 'movie' | 'dinner' | 'activity';
+  startedBy: PartnerRole;
+  startedAt?: string;
+  duration?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// ============================================
+// This Day in Our History (Phase 4.2)
+// ============================================
+
+export interface HistoryEntry {
+  type: 'memory' | 'milestone' | 'note' | 'countdown';
+  title: string;
+  date: string;
+  imageUri?: string;
+  id: string;
+}
+
+// ============================================
 // Onboarding Types
 // ============================================
 

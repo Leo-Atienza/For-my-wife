@@ -15,6 +15,7 @@ import { SleepWakeToggle } from '@/components/home/SleepWakeToggle';
 import { PartnerSleepStatus } from '@/components/home/PartnerSleepStatus';
 import { WeeklyRecapCard } from '@/components/home/WeeklyRecapCard';
 import { SyncStatusIndicator } from '@/components/home/SyncStatusIndicator';
+import { ThisDayInHistory } from '@/components/home/ThisDayInHistory';
 import { getGreeting } from '@/lib/utils';
 
 export default function HomeScreen() {
@@ -190,6 +191,9 @@ export default function HomeScreen() {
 
       {/* Sleep/Wake toggle */}
       <SleepWakeToggle />
+
+      {/* This Day in Our History */}
+      <ThisDayInHistory />
 
       {/* Daily quote */}
       <DailyQuote />

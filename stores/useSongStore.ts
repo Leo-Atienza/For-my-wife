@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
 import { generateId } from '@/lib/utils';
 import { pushToSupabase, deleteFromSupabase } from '@/lib/sync';
+import { sendPushToPartner } from '@/lib/notifications';
 import type { SongDedicationEntry, PartnerRole } from '@/lib/types';
 
 interface SongState {
@@ -36,6 +37,7 @@ export const useSongStore = create<SongState>()(
           songs: [song, ...state.songs],
         }));
         pushToSupabase('song_dedications', song);
+        sendPushToPartner('Song Dedication', `Your partner dedicated "${title}" by ${artist} to you \u{1F3B5}`, '/songs');
       },
 
       removeSong: (id) => {

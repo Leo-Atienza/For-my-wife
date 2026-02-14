@@ -18,6 +18,8 @@ import { useSongStore } from '@/stores/useSongStore';
 import { usePartnerNotesStore } from '@/stores/usePartnerNotesStore';
 import { useThinkingStore } from '@/stores/useThinkingStore';
 import { useSleepWakeStore } from '@/stores/useSleepWakeStore';
+import { useNextVisitStore } from '@/stores/useNextVisitStore';
+import { useWatchPartyStore } from '@/stores/useWatchPartyStore';
 import { subscribeToTable, flushPendingOperations } from '@/lib/sync';
 import { flushPendingUploads } from '@/lib/photo-storage';
 import { supabase } from '@/lib/supabase';
@@ -181,6 +183,22 @@ export const useSync = () => {
       onDelete: (old) => useProfileStore.getState().syncRemoteDelete(old.id),
     });
     if (individualProfileChannel) channels.push(individualProfileChannel);
+
+    // Next Visits
+    const nextVisitChannel = subscribeToTable<RemoteRecord>('next_visits', {
+      onInsert: (record) => useNextVisitStore.getState().syncRemoteInsert(record as never),
+      onUpdate: (record) => useNextVisitStore.getState().syncRemoteUpdate(record as never),
+      onDelete: (old) => useNextVisitStore.getState().syncRemoteDelete(old.id),
+    });
+    if (nextVisitChannel) channels.push(nextVisitChannel);
+
+    // Watch Party Sessions
+    const watchPartyChannel = subscribeToTable<RemoteRecord>('watch_party_sessions', {
+      onInsert: (record) => useWatchPartyStore.getState().syncRemoteInsert(record as never),
+      onUpdate: (record) => useWatchPartyStore.getState().syncRemoteUpdate(record as never),
+      onDelete: (old) => useWatchPartyStore.getState().syncRemoteDelete(old.id),
+    });
+    if (watchPartyChannel) channels.push(watchPartyChannel);
 
     channelsRef.current = channels;
 
