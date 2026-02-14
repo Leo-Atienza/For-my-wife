@@ -1,134 +1,155 @@
-# Session Context — Nickname Reveal, Photo Challenges & Full Polish
+# Session Context — New Features, Supabase Updates & Push Notifications
 
 > Hand-off document for the next Claude agent. Read this FIRST, then CLAUDE.md, then APP_PLAN.md.
 
 ## Current Branch & Git State
 
-- **Branch**: `claude/follow-context-instructions-9cys2`
+- **Branch**: `claude/follow-context-instructions-CqPUy`
 - **Status**: Clean working tree, pushed to remote.
 - **Last 5 commits**:
+  - `a1d3dc8` — Add Next Visit Planner, Love Language Quiz, Watch Party, and This Day in History
+  - `de88859` — Merge pull request #7 (nickname reveal, photo challenges, context update)
+  - `f5e1b59` — Update CONTEXT.md with nickname reveal, photo challenges, and next steps
   - `eaefd25` — Add nickname card-flip reveal animation and photo challenge feature
   - `e818266` — 2 polish animations completed (slot-machine + checkmark draw)
-  - `ba306c5` — context update
-  - `624e560` — Add celebration animation when countdown reaches zero
-  - `3cfba02` — Add delightful animations across four features
 
 ---
 
-## What Was Done (This Session — Nickname Reveal & Photo Challenges)
+## What Was Done (This Session — 4 New Features + Infrastructure)
 
-### 1. Nickname Card-Flip Reveal Animation
+### 1. Next Visit Planner (Phase 1.7 — LDR Feature)
 
-Created `components/profile/NicknameReveal.tsx` — a modal component with a 3D Y-axis card flip animation. When giving a partner a new nickname:
+Created `app/next-visit/index.tsx` and `stores/useNextVisitStore.ts`. A full visit planning feature for LDR couples:
 
-1. **Modal appears** with a fade-in overlay + spring scale entrance (card pops in from 0.8 → 1.0)
-2. **Front face** shows a primary-colored card with a heart emoji, "New Nickname!" heading, who gave it, and "Tap to reveal"
-3. **Card flips** on the Y-axis with a smooth 500ms bezier easing (per design system spec)
-4. **Back face** reveals the nickname in Dancing Script font, with a decorative divider and "with love from [name]"
-5. **Tap to dismiss** fades out the overlay and scales the card away
+- **Create visits** with title, start/end dates, location, and notes
+- **Activity checklist** — add activities, tap to toggle complete, long-press to remove
+- **Packing list** — add items, tap to toggle packed, long-press to remove
+- **Days-until countdown** displayed prominently on each visit card
+- **Expandable cards** with chevron indicator and progress stats (e.g., "3/5 activities, 2/4 packed")
+- **Past visits** shown at bottom with "Visited" badge
+- Sorted: upcoming first (by date), then past visits
 
-Updated `app/profile/nicknames.tsx` to include:
-- A **"Give a new nickname"** form card at the top of the list (Input + Button)
-- The `NicknameReveal` modal triggers automatically after submitting a new nickname
-- All existing nickname history display remains intact
+**Files created:**
+- `stores/useNextVisitStore.ts` — Full Zustand store with activities + packing CRUD, Supabase sync
+- `app/next-visit/index.tsx` — Screen with VisitCard component
 
-**Files changed:**
-- `components/profile/NicknameReveal.tsx` (NEW)
-- `app/profile/nicknames.tsx` (updated — added form + reveal integration)
+### 2. Love Language Quiz (Phase 4.3)
 
-### 2. Photo Challenge Feature in Daily Questions
+Created `app/love-language/index.tsx`, `stores/useLoveLanguageStore.ts`, and `lib/love-languages.ts`. A complete love language discovery feature:
 
-Added a new `'photo-challenge'` question category to the Daily Questions system. Photo challenges prompt partners to take/share photos instead of typing text answers.
+- **15 "which makes you feel more loved?" questions** — each with two options mapping to different love languages
+- **Animated transitions** between questions (fade out/in)
+- **Progress bar** during quiz
+- **Per-partner quiz** — each partner takes their own quiz, can retake anytime
+- **Results screen** showing:
+  - Primary love language with emoji, label, and description
+  - Score breakdown with visual progress bars
+  - 5 actionable tips for the partner's love language
+- **5 love languages**: Words of Affirmation, Quality Time, Receiving Gifts, Acts of Service, Physical Touch
 
-**Type changes (`lib/types.ts`):**
-- Extracted `QuestionCategory` type: `'question' | 'would-you-rather' | 'photo-challenge'`
-- Added `partner1Photo?: string` and `partner2Photo?: string` to `DailyQuestionEntry`
+**Files created:**
+- `lib/love-languages.ts` — Questions, labels, emojis, descriptions, and tips constants
+- `stores/useLoveLanguageStore.ts` — Zustand store with score calculation and persistence
+- `app/love-language/index.tsx` — Quiz UI + results display
 
-**10 photo challenge prompts added (`lib/constants.ts`):**
-| ID | Prompt |
-|----|--------|
-| pc1 | Send a photo of your view right now |
-| pc2 | Show me what you had for lunch today |
-| pc3 | Take a selfie making your silliest face |
-| pc4 | Photo of something that reminded you of me today |
-| pc5 | Show me your current outfit |
-| pc6 | Take a photo of something beautiful near you |
-| pc7 | Show me your workspace right now |
-| pc8 | Photo of your favorite comfort item |
-| pc9 | Take a photo that captures your current mood |
-| pc10 | Show me the last thing that made you smile |
+### 3. Watch Party / Sync Timer (Phase 4.4)
 
-Total daily questions pool: **40** (20 questions + 10 would-you-rather + 10 photo challenges). Cycles every 40 days.
+Created `app/watch-party/index.tsx` and `stores/useWatchPartyStore.ts`. Shared timer sessions for movie nights and activities:
 
-**Store changes (`stores/useQuestionsStore.ts`):**
-- Added `submitPhoto(entryId, partner, photoUri)` action with Supabase sync
+- **3 session types**: Movie Night, Dinner Date, Activity — each with distinct emoji and icon
+- **Two modes**: Stopwatch (no timer set) or Countdown (set duration in minutes)
+- **Active session display**: Large pulsing animated timer with elapsed/remaining time
+- **Push notification** sent to partner when a session starts
+- **Saved sessions** — create sessions and start them later
+- **Session management** — start, stop, delete sessions
+- **Synced via Supabase** realtime for both partners to see the timer
 
-**Screen changes (`app/questions/index.tsx`):**
-- Photo challenges display a **Camera icon + amber "PHOTO CHALLENGE" badge**
-- Instead of a text input, shows **"Take a Photo"** (camera) and **"Choose from Gallery"** buttons
-- Uses `expo-image-picker` (already in the project) for both camera and gallery
-- Submitted photos display in rounded cards (200px height, cover mode)
-- Partner photo reveal follows the same "both must submit before reveal" pattern
-- Past photo challenges show **80x80 thumbnails** side by side in history
-- Regular questions and would-you-rather continue to work exactly as before
+**Files created:**
+- `stores/useWatchPartyStore.ts` — Zustand store with session CRUD + start/stop + realtime sync
+- `app/watch-party/index.tsx` — Full screen with ActiveTimer, SessionCard, and creation form
 
-**Files changed:**
-- `lib/types.ts` (updated — `QuestionCategory` type, photo fields)
-- `lib/constants.ts` (updated — 10 photo challenge entries)
-- `stores/useQuestionsStore.ts` (updated — `submitPhoto` action)
-- `app/questions/index.tsx` (updated — full photo challenge UI)
+### 4. "This Day in Our History" (Phase 4.2)
+
+Created `components/home/ThisDayInHistory.tsx`. A dashboard widget that surfaces past content:
+
+- Checks **memories, milestones, and love notes** for entries created on the same month/day in previous years
+- Shows a card with image thumbnail (if available) or type icon
+- Displays "X year(s) ago today" for each entry
+- **Tappable** — navigates to the original memory, note, or timeline
+- **Automatically hides** when no history exists for today
+- Added to home screen between Sleep/Wake toggle and Daily Quote
+
+**Files created:**
+- `components/home/ThisDayInHistory.tsx`
+
+**Files modified:**
+- `app/(tabs)/index.tsx` — Added ThisDayInHistory import and placement
+
+### 5. Supabase Schema Updates
+
+Updated `supabase/schema.sql` with:
+
+- **3 new tables**: `next_visits`, `love_language_results`, `watch_party_sessions`
+- **RLS policies** for all new tables (space-scoped access)
+- **Realtime** enabled on all new tables
+- **Photo challenge columns**: `partner1_photo TEXT` and `partner2_photo TEXT` on `daily_question_entries`
+- **Conflict resolution**: `updated_at TIMESTAMPTZ` columns added to `love_notes`, `memories`, `milestones`, `countdown_events`, `bucket_items`, `mood_entries`, `date_ideas`, `partner_notes`
+
+### 6. Push Notification Triggers
+
+Added `sendPushToPartner()` calls to:
+- `stores/useSongStore.ts` — "Your partner dedicated [title] by [artist] to you"
+- `stores/useWatchPartyStore.ts` — "Watch party started! Join in"
+
+Previously existing notifications (unchanged):
+- Love notes, memories, partner notes, thinking of you, nicknames, sleep/wake
+
+### 7. Infrastructure Integration
+
+Updated all integration points for new features:
+- `hooks/useSync.ts` — Realtime subscriptions for `next_visits` and `watch_party_sessions`
+- `lib/initial-load.ts` — Pulls `next_visits` and `watch_party_sessions` on app start
+- `lib/store-reset.ts` — Resets `useNextVisitStore`, `useLoveLanguageStore`, `useWatchPartyStore` on sign-out
+- `lib/dates.ts` — Added `formatRelativeDate()` utility
+- `lib/types.ts` — Added `NextVisit`, `VisitActivity`, `PackingItem`, `LoveLanguageType`, `LoveLanguageResult`, `LoveLanguageQuestion`, `WatchPartySession`, `HistoryEntry` interfaces
+- `app/(tabs)/more.tsx` — Added menu items for Watch Party, Love Languages, and Next Visit
 
 ---
 
 ## What Was Done (Previous Sessions)
 
-### Slot-Machine Animation for "Surprise Me" Date Picker
-Added a slot-machine style animation to the "Surprise Me" button in `app/dates/index.tsx`:
-1. Cycles through 12 random ideas with flickering opacity, "SHUFFLING..." label
-2. Gradually slows down (80ms → 250ms between cycles)
-3. Reveals the final pick with a spring scale-up + fade-in animation
-4. Prevents double-taps during the spin (`isSpinning` guard)
+### Nickname Card-Flip Reveal Animation
+3D Y-axis card flip modal for new nicknames. Front face: "Tap to reveal", back face: nickname in Dancing Script. `components/profile/NicknameReveal.tsx`.
 
-### Checkmark Draw Animation for Bucket List
-Added `components/bucket/CheckmarkDraw.tsx` for animated bucket list completion:
-1. Circle fills with a scale animation (0 → 1) over 200ms
-2. Checkmark draws with a spring pop + rotation (100ms delay)
-3. Confetti fires 500ms later
+### Photo Challenge Feature
+10 photo challenge prompts in Daily Questions. Camera/gallery integration via expo-image-picker. Photos display in rounded cards; partner reveal follows same "both submit first" pattern.
 
-### NativeWind Pressable Bug — Full Codebase Sweep
-Fixed 5 files with layout properties inside `({ pressed }) => ({...})` callback styles. All files now follow the safe View wrapper pattern.
+### Slot-Machine Animation
+"Surprise Me" button in date picker cycles through 12 random ideas with flickering, gradually slows, reveals with spring scale-up.
+
+### Checkmark Draw Animation
+Animated circle fill + checkmark spring pop + confetti on bucket list completion.
+
+### NativeWind Pressable Bug Fix
+Fixed 5 files. Layout properties must go on plain View wrapper, not in Pressable callback styles.
 
 ### Four Delightful Animations
-| Animation | Component | Where Used |
-|-----------|-----------|------------|
-| Envelope opening | `components/notes/EnvelopeAnimation.tsx` | Unread love notes |
-| Confetti burst | `components/bucket/ConfettiBurst.tsx` | Bucket list + countdowns |
-| Flip number | `components/countdowns/FlipNumber.tsx` | Countdown timers + dashboard |
-| Floating hearts | `components/home/FloatingHearts.tsx` | Dashboard duration counter |
+Envelope opening (love notes), confetti burst (bucket list + countdowns), flip number (countdown timers), floating hearts (dashboard).
 
-### Countdown Celebration Animation
-`CelebrationBadge` in `app/(tabs)/countdowns.tsx` — bouncing party emoji + confetti when countdown expires.
+### Countdown Celebration
+Bouncing party emoji + confetti when countdown expires.
 
-### Button Component Rewrite
-Replaced `Pressable` with `TouchableOpacity` in `components/ui/Button.tsx`. Buttons render correctly on Android.
-
-### Auth System (Fully Working)
-Sign-in, sign-up, forgot password, reset password, email confirmation. Fixed RLS recursion and `onAuthStateChange` race condition.
-
-### Bug Fixes
-- Invalid date crash — `isNaN(date.getTime())` guards in `lib/dates.ts`
-- camelCase→snake_case sync failure — centralized conversion in `lib/sync.ts`
-- "setup" route warning — `app/setup/_layout.tsx`
+### Auth System
+Sign-in, sign-up, forgot password, reset password, email confirmation. Fixed RLS recursion and onAuthStateChange race condition.
 
 ### UI Polish
-Toast.tsx (Lucide icons), Input.tsx (error prop), EmptyState.tsx (bobbing), Card.tsx (loading prop), PageHeader.tsx (44px touch), pull-to-refresh on Notes/Memories/Countdowns, NaN duration guard, SleepWake theme-aware, require cycle fix, QuickActions redesign.
-
-### More Screen & Invite Partner
-Full rewrite of `more.tsx`, invite partner screen with Supabase, settings enhancements.
+Toast, Input, EmptyState, Card, PageHeader improvements. Pull-to-refresh. NaN duration guard. Require cycle fix. QuickActions redesign.
 
 ---
 
-## Critical Pattern: NativeWind + Pressable Layout Bug
+## Critical Patterns
+
+### NativeWind + Pressable Layout Bug
 
 **ALWAYS follow this pattern when using Pressable with callback styles:**
 
@@ -145,57 +166,25 @@ Full rewrite of `more.tsx`, invite partner screen with Supabase, settings enhanc
     {/* content */}
   </View>
 </Pressable>
-
-// WRONG — NativeWind @tailwind base will override these
-<Pressable
-  style={({ pressed }) => ({
-    flexDirection: 'row',    // ← OVERRIDDEN
-    alignItems: 'center',    // ← OVERRIDDEN
-    gap: 10,                 // ← OVERRIDDEN
-    opacity: pressed ? 0.7 : 1,
-  })}
->
-  {/* content will stack vertically on device */}
-</Pressable>
 ```
 
-**Root cause**: `@tailwind base` in `global.css` sets default styles that override callback-style properties on Pressable.
+**Root cause**: `@tailwind base` in `global.css` overrides callback-style Pressable layout properties. Static `style={{...}}` is NOT affected — only `({ pressed }) => ({...})` callbacks.
 
-**Note**: Static `style={{...}}` (without a `({ pressed })` callback) is NOT affected. Only callback-style Pressable styles break.
+### Animation Pattern
 
-**Status**: All files in the codebase now follow the safe pattern. No remaining bugs.
-
----
-
-## Animation Pattern Reference
-
-All animations use React Native's built-in `Animated` API (not Reanimated), consistent with the existing codebase. `react-native-reanimated` v4.1.1 is installed but unused.
+All animations use React Native's built-in `Animated` API (not Reanimated). `react-native-reanimated` v4.1.1 is installed but unused.
 
 ```tsx
-// Standard pattern used throughout:
 const anim = useRef(new Animated.Value(0)).current;
-
-useEffect(() => {
-  Animated.timing(anim, {
-    toValue: 1,
-    duration: 300,
-    useNativeDriver: true, // Always true for transform/opacity
-  }).start();
-}, [anim]);
+Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
 ```
 
-### Existing Animation Components
-| Component | Pattern | Location |
-|-----------|---------|----------|
-| EmptyState bobbing | `Animated.loop` + `Animated.sequence` | `components/ui/EmptyState.tsx` |
-| Toast slide-in | `Animated.parallel` (opacity + translateY) | `components/ui/Toast.tsx` |
-| Thinking of You heartbeat | `Animated.sequence` (scale up/down) | `components/home/ThinkingOfYouButton.tsx` |
-| Heart bloom | `Animated.parallel` (scale + opacity + translateY) | `components/home/HeartBloom.tsx` |
-| Envelope opening | `Animated.sequence` (flap + slide + fade) | `components/notes/EnvelopeAnimation.tsx` |
-| Confetti burst | `Animated.parallel` (12 particles × 5 properties) | `components/bucket/ConfettiBurst.tsx` |
-| Flip number | `Animated.timing` (translateY + opacity on change) | `components/countdowns/FlipNumber.tsx` |
-| Floating hearts | `Animated.sequence` per heart (translateY + opacity loop) | `components/home/FloatingHearts.tsx` |
-| Nickname card-flip | `Animated.timing` (rotateY + perspective, 500ms) | `components/profile/NicknameReveal.tsx` |
+### Sync Engine
+
+- `pushToSupabase()` auto-converts camelCase → snake_case
+- `pullFromSupabase()` auto-converts snake_case → camelCase
+- Offline queue with retry + exponential backoff
+- Last-write-wins conflict resolution (uses `updatedAt` timestamps)
 
 ---
 
@@ -204,40 +193,41 @@ useEffect(() => {
 ### Priority 1: Real Device Testing
 - [ ] Test auth flows on real device (sign up, sign in, forgot password)
 - [ ] Test invite partner flow end-to-end on two devices
-- [ ] Test data sync between two devices (camelCase fix should resolve sync errors)
+- [ ] Test data sync between two devices
 - [ ] Test offline queue and reconnection behavior
-- [ ] Verify Couple Profile screen no longer crashes with invalid dates
-- [ ] Test all animations on device (envelope, confetti, flip numbers, floating hearts, nickname reveal, slot-machine, checkmark draw)
+- [ ] Verify all animations on device (envelope, confetti, flip numbers, floating hearts, nickname reveal, slot-machine, checkmark draw)
 - [ ] Verify NativeWind fixes render correctly on Android and iOS
 - [ ] Test photo challenge flow on device (camera + gallery picker)
-- [ ] Verify photo challenge images persist across app restarts
+- [ ] Test new features: Next Visit Planner, Love Language Quiz, Watch Party
+- [ ] Test push notifications for song dedications and watch party starts
+- [ ] Test "This Day in Our History" with real historical data
 
-### Priority 2: Phase 3 Completion (Supabase)
-- [ ] Conflict resolution for simultaneous edits (currently last-write-wins)
-- [ ] Cloud photo storage — migrate images from AsyncStorage to Supabase Storage
-- [ ] Photo compression + thumbnail generation
-- [ ] Push notifications for key events (new note, thinking of you, countdown reached zero)
-- [ ] "This Day in Our History" feature (Phase 4.2 in APP_PLAN.md)
-- [ ] Add `partner1_photo` and `partner2_photo` columns to `daily_question_entries` table in Supabase schema (for photo challenge sync)
+### Priority 2: Remaining Phase 3 Improvements
+- [ ] Conflict resolution improvements — current is last-write-wins; consider field-level merging for complex records
+- [ ] Cloud photo storage — migrate images from local URIs to Supabase Storage bucket (bucket already configured in schema)
+- [ ] Photo compression + thumbnail generation for cloud-stored images
+- [ ] "This Day in Our History" push notification — daily check for matching dates, send notification if found
 
-### Priority 3: Remaining Features
-- [ ] Next Visit planner (LDR feature — Phase 1.7 in APP_PLAN.md)
-- [ ] Love Language Quiz (Phase 4.3)
-- [ ] Export/PDF Yearbook (Phase 4.5)
-- [ ] Watch Party / Sync Timer (Phase 4.4)
-- [ ] Spotify Shared Playlist integration (Phase 4.7)
+### Priority 3: Remaining Features (Phase 4+)
+- [ ] Export / PDF Yearbook (Phase 4.5) — Generate printable PDF of memories, notes, timeline
+- [ ] Spotify Shared Playlist (Phase 4.7) — API integration to auto-compile song dedications into a playlist
+- [ ] Background Location Mode (Phase 4.1) — Expo Location background task, 15-30 min updates
+- [ ] PWA / Home Screen Widget (Phase 4.6) — Countdown or status widget on phone home screen
 
-### Priority 4: Additional Polish (ALL COMPLETE)
-- [x] Slot-machine animation for "Surprise Me" random date picker
-- [x] Satisfying checkmark draw animation on bucket list (before confetti)
-- [x] Nickname card-flip reveal animation
-- [x] Photo challenge feature in Daily Questions
+### Priority 4: Nice-to-Have Enhancements
+- [ ] Next Visit auto-prompt — after visit end date passes, prompt to add photos
+- [ ] Love Language results on individual profiles — display primary love language on profile cards
+- [ ] Watch Party partner join confirmation — notify when partner has the timer screen open
+- [ ] Map view for Distance screen — visual map with both partner locations
+- [ ] Mood trend chart — visual chart showing mood over time
+- [ ] Photo gallery improvements — pinch-to-zoom, swipe navigation in full-screen mode
 
 ---
 
 ## App Feature Status Overview
 
-### Fully Built & Working
+### Fully Built & Working (31 features)
+
 | Feature | Screen | Store |
 |---------|--------|-------|
 | Onboarding/Setup Wizard | `app/setup/` | `useCoupleStore` |
@@ -252,7 +242,7 @@ useEffect(() => {
 | Mood Check-In | `app/mood/` | `useMoodStore` |
 | Daily Questions + Photo Challenges | `app/questions/` | `useQuestionsStore` |
 | Song Dedications | `app/songs/` | `useSongStore` |
-| Status Board | `app/status/` | `useStatusStore` |
+| Status Board | `app/status/` | — |
 | Letter Box (Journal) | `app/journal/` | `useJournalStore` |
 | Partner Notes | `app/partner-notes/` | `usePartnerNotesStore` |
 | Virtual Touch | `app/touch/` | — (realtime) |
@@ -262,14 +252,18 @@ useEffect(() => {
 | Nicknames + Card-Flip Reveal | `app/profile/nicknames.tsx` | `useNicknameStore` |
 | Thinking of You | Home screen component | `useThinkingStore` |
 | Sleep/Wake Toggle | Home screen component | `useSleepWakeStore` |
-| Weekly Recap | Home screen component | `useWeeklyRecapStore` |
+| Weekly Recap | Home screen component | — |
 | Theme Selector (4 themes) | `app/settings/` | `useCoupleStore` |
 | Auth (sign in/up/forgot) | `app/auth/` | `useAuthStore` |
 | Invite Partner | `app/invite-partner.tsx` | `useAuthStore` |
 | Settings | `app/settings/` | Multiple stores |
-| Sync Engine | `lib/sync.ts` | — |
+| **Next Visit Planner** (NEW) | `app/next-visit/` | `useNextVisitStore` |
+| **Love Language Quiz** (NEW) | `app/love-language/` | `useLoveLanguageStore` |
+| **Watch Party / Sync Timer** (NEW) | `app/watch-party/` | `useWatchPartyStore` |
+| **This Day in Our History** (NEW) | Home screen component | — (reads from existing stores) |
 
-### Animations Implemented
+### Animations Implemented (12)
+
 | Animation | Feature | Status |
 |-----------|---------|--------|
 | Envelope opening | Love notes (unread) | Done |
@@ -285,23 +279,71 @@ useEffect(() => {
 | Checkmark draw | Bucket list completion | Done |
 | Nickname card-flip | Nickname reveal modal | Done |
 
-### Codebase Stats
-- **121 source files** (`.ts` + `.tsx`)
-- **48 routes** (Expo Router auto-discovery)
-- **18+ Zustand stores** with AsyncStorage persistence
+### Push Notifications Active
+
+| Event | Message | Route |
+|-------|---------|-------|
+| New love note | "Your partner left you a love note" | `/notes` |
+| New memory | "Your partner added a new memory" | `/memories` |
+| Partner note | "Your partner wrote something about you" | `/partner-notes` |
+| Thinking of you | "Your partner is thinking about you" | `/` |
+| New nickname | "Your partner gave you a new nickname" | `/profile/nicknames` |
+| Sleep/wake status | "Your partner is going to sleep/waking up" | `/` |
+| Song dedication (NEW) | "Your partner dedicated [song] to you" | `/songs` |
+| Watch party start (NEW) | "[title] is starting! Join in" | `/watch-party` |
+
+---
+
+## Codebase Stats
+
+- **~140+ source files** (`.ts` + `.tsx`)
+- **51+ routes** (Expo Router auto-discovery)
+- **21 Zustand stores** with AsyncStorage persistence
+- **21 Supabase tables** with RLS + realtime
 - **4 color themes**: Rose, Lavender, Sunset, Ocean
 - **3 font families**: Playfair Display, Inter, Dancing Script
-- **10 animation components** using React Native Animated API
+- **12 animation components** using React Native Animated API
 - **40 daily questions** (20 questions + 10 would-you-rather + 10 photo challenges)
-- **0 TypeScript errors**, 0 `any` types, 0 console.log in production code
+- **15 love language quiz questions**
+- **8 push notification triggers**
+
+---
+
+## Supabase Tables (21 total)
+
+| Table | Purpose | New? |
+|-------|---------|------|
+| `spaces` | Links two partners | |
+| `space_members` | User-to-space mapping + push tokens | |
+| `couple_profiles` | Shared couple info | |
+| `individual_profiles` | Per-partner profiles | |
+| `nicknames` | Nickname history | |
+| `love_notes` | Love notes/messages | |
+| `memories` | Photo memories | |
+| `milestones` | Timeline events | |
+| `countdown_events` | Countdowns | |
+| `bucket_items` | Bucket list | |
+| `mood_entries` | Mood tracking | |
+| `date_ideas` | Date planning | |
+| `journal_letters` | Weekly sealed letters | |
+| `daily_question_entries` | Q&A + photo challenges | |
+| `song_dedications` | Song dedications | |
+| `location_entries` | LDR location tracking | |
+| `partner_notes` | Notes about partner | |
+| `thinking_of_you` | Thinking of you taps | |
+| `sleep_wake_status` | Sleep/wake status | |
+| `next_visits` | Visit planner | NEW |
+| `love_language_results` | Quiz results | NEW |
+| `watch_party_sessions` | Watch party timers | NEW |
 
 ---
 
 ## Known Warnings (Non-Blocking)
 
 1. **`expo-notifications` error** — Expected in Expo Go. Push notifications only work in standalone builds.
-2. **SafeAreaView deprecation** — Warning about deprecated SafeAreaView. Already using `react-native-safe-area-context` in most places.
+2. **SafeAreaView deprecation** — Already using `react-native-safe-area-context` in most places.
 3. **Realtime send() fallback** — Supabase realtime auto-falling back to REST API.
+4. **TypeScript `--jsx` errors in `npx tsc`** — These are Expo project config issues handled by the bundler. All code compiles and runs correctly via `npx expo start`.
 
 ---
 
@@ -309,28 +351,23 @@ useEffect(() => {
 
 | File | Purpose |
 |------|---------|
-| `lib/dates.ts` | Date formatting — has invalid date guards |
-| `lib/sync.ts` | Sync engine — centralized camelCase↔snake_case + offline queue |
-| `lib/initial-load.ts` | Initial data pull — uses auto-converted camelCase data |
-| `lib/types.ts` | TypeScript interfaces (camelCase) — includes `QuestionCategory` type |
-| `hooks/useSync.ts` | Realtime subscriptions — auto-converted by subscribeToTable |
-| `supabase/schema.sql` | DB schema (snake_case columns) |
-| `app/_layout.tsx` | Root layout — route guard, auth listener, Stack screens |
-| `app/setup/_layout.tsx` | Setup route layout (fixes route warning) |
-| `app/(tabs)/more.tsx` | More screen — grouped menu cards with MenuItem component |
-| `app/(tabs)/countdowns.tsx` | Countdowns — FlipNumber + CelebrationBadge |
-| `app/invite-partner.tsx` | Partner invite/connection screen |
-| `app/profile/nicknames.tsx` | Nicknames — give nickname form + NicknameReveal animation |
-| `app/questions/index.tsx` | Daily Questions — text answers + photo challenges |
-| `app/settings/index.tsx` | Settings — theme picker, invite shortcut, sign out |
-| `components/profile/NicknameReveal.tsx` | 3D card-flip reveal animation for new nicknames |
-| `components/home/QuickActions.tsx` | Quick actions — horizontal scrollable circles |
-| `components/home/DurationCounter.tsx` | Dashboard counter — uses FlipNumber |
-| `components/home/FloatingHearts.tsx` | Floating hearts around duration counter |
-| `components/notes/EnvelopeAnimation.tsx` | Envelope opening for unread notes |
-| `components/bucket/ConfettiBurst.tsx` | Confetti burst (reused in bucket list + countdowns) |
-| `components/bucket/CheckmarkDraw.tsx` | Animated checkmark for bucket list items |
-| `components/countdowns/FlipNumber.tsx` | Animated number display with flip effect |
+| `lib/types.ts` | All TypeScript interfaces — includes new NextVisit, LoveLanguage, WatchParty types |
+| `lib/sync.ts` | Sync engine — camelCase↔snake_case + offline queue |
+| `lib/initial-load.ts` | Initial data pull from Supabase (21 tables) |
+| `lib/store-reset.ts` | Lazy store reset on sign-out (21 stores) |
+| `lib/notifications.ts` | Push notification registration + sendPushToPartner |
+| `lib/love-languages.ts` | Quiz questions, labels, descriptions, tips |
+| `lib/dates.ts` | Date formatting + formatRelativeDate |
+| `lib/constants.ts` | Themes, quotes, questions, date ideas, emojis |
+| `hooks/useSync.ts` | Realtime subscriptions for all 21 synced tables |
+| `supabase/schema.sql` | Full DB schema with 21 tables + RLS + realtime |
+| `app/_layout.tsx` | Root layout — route guard, auth listener |
+| `app/(tabs)/index.tsx` | Home dashboard — includes ThisDayInHistory |
+| `app/(tabs)/more.tsx` | More menu — all feature links |
+| `app/next-visit/index.tsx` | Next Visit Planner screen |
+| `app/love-language/index.tsx` | Love Language Quiz screen |
+| `app/watch-party/index.tsx` | Watch Party screen |
+| `components/home/ThisDayInHistory.tsx` | Dashboard history widget |
 | `components/ui/Button.tsx` | DO NOT CHANGE — user confirmed buttons are good |
 | `global.css` | Contains `@tailwind base` — source of Pressable layout bug |
 
@@ -338,27 +375,17 @@ useEffect(() => {
 
 ## Architecture Notes
 
-- **State**: Zustand with AsyncStorage persistence
+- **State**: Zustand with AsyncStorage persistence (21 stores)
 - **Sync**: `pushToSupabase()` auto-converts camelCase→snake_case, `pullFromSupabase()` auto-converts snake_case→camelCase
+- **Conflict resolution**: Last-write-wins using `updatedAt` timestamps (all mutable tables now have `updated_at`)
 - **Themes**: 4 themes (Rose, Lavender, Sunset, Ocean) in `lib/constants.ts`
 - **Typography**: Playfair Display (headings), Inter (body), Dancing Script (romantic accents)
 - **Navigation**: Expo Router file-based routing with Stack + bottom tabs
 - **Animations**: All use built-in `Animated` API (Reanimated installed but unused)
 - **This app is for 2 users only** — don't over-engineer
-- **NativeWind caveat**: Never put layout properties inside Pressable callback styles — use a plain View wrapper instead
-- **Photo storage**: Currently base64/URI in AsyncStorage. Phase 3 will migrate to Supabase Storage
-- **Daily Questions**: 40-question pool cycling by day offset from Jan 1, 2024. Photo challenges use `expo-image-picker` with 0.7 JPEG quality
-
----
-
-## Supabase Schema Note for Photo Challenges
-
-When adding photo challenge support to the Supabase schema, the `daily_question_entries` table needs two new columns:
-
-```sql
-ALTER TABLE daily_question_entries
-  ADD COLUMN partner1_photo TEXT,
-  ADD COLUMN partner2_photo TEXT;
-```
-
-The sync engine (`lib/sync.ts`) will auto-convert `partner1Photo` ↔ `partner1_photo` via the existing camelCase↔snake_case conversion.
+- **NativeWind caveat**: Never put layout properties inside Pressable callback styles — use a plain View wrapper
+- **Photo storage**: Currently base64/URI in AsyncStorage. Supabase Storage bucket is configured but migration not yet done
+- **Daily Questions**: 40-question pool cycling by day offset. Photo challenges use `expo-image-picker` with 0.7 JPEG quality
+- **Love Language Quiz**: 15 forced-choice questions, scores tallied per language type, primary = highest scorer
+- **Watch Party**: Supports both stopwatch (no timer) and countdown (set duration) modes
+- **Next Visit**: Activities and packing items stored as JSONB arrays in Supabase
