@@ -23,6 +23,7 @@ import {
   HeartHandshake,
   Film,
   FileDown,
+  ListMusic,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -242,6 +243,13 @@ export default function MoreScreen() {
           subtitle: 'Build your shared playlist',
           route: '/songs',
           emoji: '\u{1F3B5}',
+        },
+        {
+          icon: <ListMusic size={22} color={theme.primary} />,
+          label: 'Our Soundtrack',
+          subtitle: 'Your shared playlist',
+          route: '/playlist',
+          emoji: '\u{1F3B6}',
         },
         {
           icon: <NotebookPen size={22} color={theme.primary} />,

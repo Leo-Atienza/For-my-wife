@@ -7,6 +7,7 @@ import { useMemoriesStore } from '@/stores/useMemoriesStore';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { PhotoViewer } from '@/components/memories/PhotoViewer';
 import type { Memory } from '@/lib/types';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -14,10 +15,11 @@ const GRID_GAP = 4;
 const COLUMN_COUNT = 3;
 const ITEM_SIZE = (SCREEN_WIDTH - 48 - GRID_GAP * (COLUMN_COUNT - 1)) / COLUMN_COUNT;
 
-const MemoryThumbnail = ({ memory, onPress }: { memory: Memory; onPress: () => void }) => {
+const MemoryThumbnail = ({ memory, onPress, onLongPress }: { memory: Memory; onPress: () => void; onLongPress: () => void }) => {
   return (
     <Pressable
       onPress={onPress}
+      onLongPress={onLongPress}
       style={({ pressed }) => ({
         width: ITEM_SIZE,
         height: ITEM_SIZE,
@@ -41,6 +43,7 @@ export default function MemoriesScreen() {
   const theme = useTheme();
   const memories = useMemoriesStore((state) => state.memories);
   const [refreshing, setRefreshing] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(-1);
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 500);
@@ -87,10 +90,11 @@ export default function MemoriesScreen() {
         data={memories}
         keyExtractor={(item) => item.id}
         numColumns={COLUMN_COUNT}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <MemoryThumbnail
             memory={item}
             onPress={() => router.push(`/memories/${item.id}`)}
+            onLongPress={() => setViewerIndex(index)}
           />
         )}
         refreshControl={
@@ -109,6 +113,14 @@ export default function MemoriesScreen() {
         }}
         columnWrapperStyle={{ gap: GRID_GAP }}
         showsVerticalScrollIndicator={false}
+      />
+
+      {/* Full-screen photo viewer — long-press a thumbnail to open */}
+      <PhotoViewer
+        visible={viewerIndex >= 0}
+        memories={memories}
+        initialIndex={viewerIndex >= 0 ? viewerIndex : 0}
+        onClose={() => setViewerIndex(-1)}
       />
     </View>
   );

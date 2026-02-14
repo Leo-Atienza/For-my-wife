@@ -163,3 +163,50 @@ export const deletePhoto = async (urlOrPath: string): Promise<void> => {
 export const isRemoteUrl = (uri: string): boolean => {
   return uri.startsWith('http://') || uri.startsWith('https://');
 };
+
+const MIGRATION_KEY = 'photo-migration-complete';
+
+/**
+ * Migrate all local-URI memories to Supabase Storage.
+ * Runs once — skipped if already completed or no local photos exist.
+ * Updates each memory record with the cloud URL after successful upload.
+ */
+export const migratePhotosToCloud = async (
+  memories: Array<{ id: string; imageUri: string }>,
+  updateMemoryUri: (memoryId: string, newUri: string) => void,
+): Promise<{ migrated: number; failed: number }> => {
+  const spaceId = useAuthStore.getState().spaceId;
+  if (!spaceId) return { migrated: 0, failed: 0 };
+
+  // Check if migration already ran
+  const done = await AsyncStorage.getItem(MIGRATION_KEY);
+  if (done === 'true') return { migrated: 0, failed: 0 };
+
+  const localMemories = memories.filter((m) => !isRemoteUrl(m.imageUri));
+  if (localMemories.length === 0) {
+    await AsyncStorage.setItem(MIGRATION_KEY, 'true');
+    return { migrated: 0, failed: 0 };
+  }
+
+  let migrated = 0;
+  let failed = 0;
+
+  for (const memory of localMemories) {
+    const cloudUrl = await uploadPhoto(memory.imageUri, 'memories');
+    if (cloudUrl) {
+      updateMemoryUri(memory.id, cloudUrl);
+      migrated++;
+    } else {
+      // Queue for later retry
+      await queuePendingUpload(memory.imageUri, memory.id, 'memories');
+      failed++;
+    }
+  }
+
+  // Only mark complete if all succeeded
+  if (failed === 0) {
+    await AsyncStorage.setItem(MIGRATION_KEY, 'true');
+  }
+
+  return { migrated, failed };
+};

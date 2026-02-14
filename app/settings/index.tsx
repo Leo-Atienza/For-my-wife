@@ -1,7 +1,8 @@
-import { View, Text, Pressable, ScrollView, Alert } from 'react-native';
+import { View, Text, Pressable, ScrollView, Alert, Switch } from 'react-native';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { UserPlus, ChevronRight, LogOut } from 'lucide-react-native';
+import { UserPlus, ChevronRight, LogOut, MapPin } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useCoupleStore } from '@/stores/useCoupleStore';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -9,6 +10,11 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { THEMES } from '@/lib/constants';
 import { clearAllData } from '@/lib/storage';
+import {
+  isBackgroundLocationEnabled,
+  startBackgroundLocation,
+  stopBackgroundLocation,
+} from '@/lib/background-location';
 import type { ThemeName } from '@/lib/types';
 
 export default function SettingsScreen() {
@@ -18,6 +24,35 @@ export default function SettingsScreen() {
   const currentTheme = useCoupleStore((state) => state.profile?.theme ?? 'rose');
   const setTheme = useCoupleStore((state) => state.setTheme);
   const signOut = useAuthStore((state) => state.signOut);
+  const [bgLocationOn, setBgLocationOn] = useState(false);
+  const [bgLocationLoading, setBgLocationLoading] = useState(false);
+
+  useEffect(() => {
+    isBackgroundLocationEnabled().then(setBgLocationOn);
+  }, []);
+
+  const toggleBackgroundLocation = async (value: boolean) => {
+    setBgLocationLoading(true);
+    try {
+      if (value) {
+        const granted = await startBackgroundLocation();
+        if (!granted) {
+          Alert.alert(
+            'Permission Required',
+            'Background location requires "Always Allow" permission. Please enable it in your device settings.',
+          );
+          setBgLocationOn(false);
+          return;
+        }
+        setBgLocationOn(true);
+      } else {
+        await stopBackgroundLocation();
+        setBgLocationOn(false);
+      }
+    } finally {
+      setBgLocationLoading(false);
+    }
+  };
 
   const handleReset = () => {
     Alert.alert(
@@ -216,6 +251,47 @@ export default function SettingsScreen() {
                 </Pressable>
               );
             })}
+          </View>
+        </View>
+
+        {/* Background Location */}
+        <View style={{ gap: 12 }}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontFamily: 'PlayfairDisplay_700Bold',
+              color: theme.textPrimary,
+            }}
+          >
+            Location
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: theme.surface,
+              borderRadius: 12,
+              padding: 16,
+              borderWidth: 1,
+              borderColor: theme.accent,
+            }}
+          >
+            <MapPin size={20} color={theme.primary} />
+            <View style={{ flex: 1, marginLeft: 12, marginRight: 8 }}>
+              <Text style={{ fontSize: 14, fontFamily: 'Inter_600SemiBold', color: theme.textPrimary }}>
+                Background Location
+              </Text>
+              <Text style={{ fontSize: 12, fontFamily: 'Inter_400Regular', color: theme.textMuted, marginTop: 2 }}>
+                Share location every 15 min, even when app is closed
+              </Text>
+            </View>
+            <Switch
+              value={bgLocationOn}
+              onValueChange={toggleBackgroundLocation}
+              disabled={bgLocationLoading}
+              trackColor={{ false: '#ccc', true: theme.accent }}
+              thumbColor={bgLocationOn ? theme.primary : '#f4f3f4'}
+            />
           </View>
         </View>
 

@@ -1,11 +1,13 @@
-import { View, Text, Image, ScrollView, Dimensions } from 'react-native';
+import { useState } from 'react';
+import { View, Text, Image, ScrollView, Dimensions, Pressable } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MapPin, Calendar } from 'lucide-react-native';
+import { MapPin, Calendar, Maximize2 } from 'lucide-react-native';
 import { useMemoriesStore } from '@/stores/useMemoriesStore';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { PhotoViewer } from '@/components/memories/PhotoViewer';
 import { formatDate } from '@/lib/dates';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -15,8 +17,10 @@ export default function MemoryDetailScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
+  const memories = useMemoriesStore((state) => state.memories);
   const getMemoryById = useMemoriesStore((state) => state.getMemoryById);
   const memory = id ? getMemoryById(id) : undefined;
+  const [showViewer, setShowViewer] = useState(false);
 
   if (!memory) {
     return (
@@ -27,6 +31,8 @@ export default function MemoryDetailScreen() {
     );
   }
 
+  const memoryIndex = memories.findIndex((m) => m.id === memory.id);
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
       <PageHeader title="Memory" showBack />
@@ -35,14 +41,29 @@ export default function MemoryDetailScreen() {
           paddingBottom: insets.bottom + 20,
         }}
       >
-        <Image
-          source={{ uri: memory.imageUri }}
-          style={{
-            width: SCREEN_WIDTH,
-            height: SCREEN_WIDTH * 0.75,
-          }}
-          resizeMode="cover"
-        />
+        <Pressable onPress={() => setShowViewer(true)}>
+          <Image
+            source={{ uri: memory.imageUri }}
+            style={{
+              width: SCREEN_WIDTH,
+              height: SCREEN_WIDTH * 0.75,
+            }}
+            resizeMode="cover"
+          />
+          {/* Full-screen hint */}
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 12,
+              right: 12,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              borderRadius: 8,
+              padding: 6,
+            }}
+          >
+            <Maximize2 size={18} color="#fff" />
+          </View>
+        </Pressable>
         <View style={{ paddingHorizontal: 24, paddingTop: 20, gap: 12 }}>
           <Text
             style={{
@@ -73,6 +94,14 @@ export default function MemoryDetailScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Full-screen photo viewer with pinch-to-zoom and swipe navigation */}
+      <PhotoViewer
+        visible={showViewer}
+        memories={memories}
+        initialIndex={memoryIndex >= 0 ? memoryIndex : 0}
+        onClose={() => setShowViewer(false)}
+      />
     </View>
   );
 }

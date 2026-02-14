@@ -28,6 +28,9 @@ import { useLocationTracking } from '@/hooks/useLocationTracking';
 import { loadAllDataFromSupabase } from '@/lib/initial-load';
 import { migrateLocalDataToCloud } from '@/lib/migration';
 import { checkThisDayInHistory } from '@/lib/history-notification';
+import { migratePhotosToCloud, flushPendingUploads } from '@/lib/photo-storage';
+import { useMemoriesStore } from '@/stores/useMemoriesStore';
+import { isBackgroundLocationEnabled, startBackgroundLocation } from '@/lib/background-location';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ToastProvider, useToast } from '@/components/ui/Toast';
 import { syncEvents } from '@/lib/sync-events';
@@ -201,6 +204,17 @@ function AppContent() {
           migrateLocalDataToCloud();
           // Check for "This Day in History" entries after data is loaded
           checkThisDayInHistory();
+          // Migrate local photos to Supabase Storage + flush any pending uploads
+          const memState = useMemoriesStore.getState();
+          migratePhotosToCloud(
+            memState.memories,
+            (id, uri) => memState.updateMemory(id, { imageUri: uri }),
+          );
+          flushPendingUploads((id, uri) => memState.updateMemory(id, { imageUri: uri }));
+          // Restart background location if previously enabled
+          isBackgroundLocationEnabled().then((enabled) => {
+            if (enabled) startBackgroundLocation();
+          });
         })
         .catch((err) => {
           console.error('Initial load failed, skipping migration to prevent data loss:', err);

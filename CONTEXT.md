@@ -1,4 +1,4 @@
-# Session Context — New Features, Polish & Export
+# Session Context — Final Features & Polish
 
 > Hand-off document for the next Claude agent. Read this FIRST, then CLAUDE.md, then APP_PLAN.md.
 
@@ -7,15 +7,78 @@
 - **Branch**: `main`
 - **Status**: Modified files with new features, not yet committed.
 - **Last 5 commits**:
+  - `780120d` — Add Export Yearbook, history notification, and CheckmarkDraw component
+  - `ec8ef8d` — update
   - `e1f4d14` — Merge pull request #9 (context update)
   - `500e308` — Update CONTEXT.md with new features, remaining tasks, and architecture notes
   - `6f85ac4` — Merge pull request #8 (new features)
-  - `a1d3dc8` — Add Next Visit Planner, Love Language Quiz, Watch Party, and This Day in History
-  - `de88859` — Merge pull request #7 (nickname reveal, photo challenges, context update)
 
 ---
 
-## What Was Done (Latest Session — 7 Enhancements + 1 New Feature)
+## What Was Done (Latest Session — 4 New Features + 1 Enhancement)
+
+### 1. Photo Gallery Improvements (Pinch-to-Zoom + Swipe Navigation)
+Created `components/memories/PhotoViewer.tsx` — full-screen modal photo viewer:
+- **Pinch-to-zoom** using PanResponder with scale/translate transforms (supports up to 4x zoom)
+- **Horizontal swipe navigation** between all memories using paginated FlatList
+- **Caption overlay** with date and location at the bottom
+- **Photo counter** (e.g., "3 / 12") at the top
+- **Close button** with semi-transparent background
+- Integrated into `app/memories/[id].tsx` — tap the photo to open full-screen viewer with expand icon hint
+- Integrated into `app/(tabs)/memories.tsx` — long-press any thumbnail to open full-screen viewer at that index
+
+### 2. Cloud Photo Storage Migration
+Enhanced `lib/photo-storage.ts` with `migratePhotosToCloud()`:
+- **One-time migration** that finds all memories with local URIs and uploads them to Supabase Storage
+- Automatically compresses images to 1200px max width at 0.7 JPEG quality before upload
+- Queues failed uploads for retry via existing `queuePendingUpload()` system
+- Migration only runs once (tracked via AsyncStorage key)
+- Integrated into `app/_layout.tsx` — runs after initial data load along with `flushPendingUploads()`
+
+### 3. Background Location Mode (Phase 4.1)
+Created `lib/background-location.ts` — battery-friendly background GPS tracking:
+- Uses `expo-task-manager` + `expo-location` background task
+- **15-minute update interval** with 100-meter distance threshold
+- Android foreground service notification ("Sharing your location with your partner")
+- Requests "Always Allow" background permission
+- Auto-restarts on app launch if previously enabled
+- Reverse geocodes location for city name
+- Persists enable/disable state in AsyncStorage
+- Added toggle in `app/settings/index.tsx` — switch with permission request and error handling
+
+### 4. Spotify Shared Playlist / "Our Soundtrack" (Phase 4.7)
+Created `app/playlist/index.tsx` — beautiful playlist view:
+- **Animated vinyl record** that spins continuously
+- **Couple header** with partner names and stats (song count, unique artists)
+- **Per-partner song counts** displayed in stat cards
+- **Full song list** with track numbers, artist, dedication date, and messages
+- **Copy Playlist** — copies all songs to clipboard in numbered list format
+- **Open Spotify** — deep links to Spotify app (falls back to web browser)
+- Individual song taps open in Spotify app via `spotify://` deep link
+- Added to More menu as "Our Soundtrack" with ListMusic icon
+
+### 5. Infrastructure Updates
+- Installed `expo-task-manager` for background location support
+- All TypeScript strict mode checks pass (0 errors)
+- Expo build compiles successfully for Android
+
+**Files created:**
+- `components/memories/PhotoViewer.tsx` — Full-screen photo viewer with pinch-to-zoom
+- `lib/background-location.ts` — Background location task + start/stop functions
+- `app/playlist/index.tsx` — Our Soundtrack / shared playlist screen
+
+**Files modified:**
+- `app/memories/[id].tsx` — Photo viewer integration with expand button
+- `app/(tabs)/memories.tsx` — Long-press to open photo viewer, PhotoViewer import
+- `lib/photo-storage.ts` — Added `migratePhotosToCloud()` function
+- `app/_layout.tsx` — Photo migration, pending upload flush, background location restart
+- `app/settings/index.tsx` — Background location toggle with Switch
+- `app/(tabs)/more.tsx` — Our Soundtrack menu item
+- `package.json` — Added expo-task-manager
+
+---
+
+## What Was Done (Previous Session — 7 Enhancements + 1 New Feature)
 
 ### 1. Love Language Results on Profiles
 Added love language display to individual profile screen (`app/profile/[partner].tsx`). Shows primary love language with emoji, label, and description. Links to the full quiz. Shows "Take the quiz" prompt when no results exist.
@@ -255,14 +318,14 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 
 ### Priority 2: Remaining Phase 3 Improvements
 - [ ] Conflict resolution improvements — current is last-write-wins; consider field-level merging for complex records
-- [ ] Cloud photo storage — migrate images from local URIs to Supabase Storage bucket (bucket already configured in schema)
-- [ ] Photo compression + thumbnail generation for cloud-stored images
+- [x] Cloud photo storage — migrate images from local URIs to Supabase Storage bucket (auto-migration + pending upload retry)
+- [x] Photo compression + thumbnail generation for cloud-stored images (1200px max, 0.7 JPEG quality)
 - [x] "This Day in Our History" push notification — daily check for matching dates, send notification if found
 
 ### Priority 3: Remaining Features (Phase 4+)
 - [x] Export / PDF Yearbook (Phase 4.5) — Generate printable PDF of memories, notes, timeline
-- [ ] Spotify Shared Playlist (Phase 4.7) — API integration to auto-compile song dedications into a playlist
-- [ ] Background Location Mode (Phase 4.1) — Expo Location background task, 15-30 min updates
+- [x] Spotify Shared Playlist (Phase 4.7) — "Our Soundtrack" view with Spotify deep links, copy playlist, stats
+- [x] Background Location Mode (Phase 4.1) — Expo Location background task, 15-min updates, toggle in settings
 - [ ] PWA / Home Screen Widget (Phase 4.6) — Countdown or status widget on phone home screen
 
 ### Priority 4: Nice-to-Have Enhancements
@@ -271,13 +334,13 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 - [x] Watch Party partner join confirmation — notify when partner has the timer screen open
 - [x] Map view for Distance screen — visual map with both partner locations
 - [x] Mood trend chart — visual chart showing mood over time
-- [ ] Photo gallery improvements — pinch-to-zoom, swipe navigation in full-screen mode
+- [x] Photo gallery improvements — pinch-to-zoom, swipe navigation in full-screen mode
 
 ---
 
 ## App Feature Status Overview
 
-### Fully Built & Working (31 features)
+### Fully Built & Working (34 features)
 
 | Feature | Screen | Store |
 |---------|--------|-------|
@@ -312,8 +375,11 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | **Love Language Quiz** (NEW) | `app/love-language/` | `useLoveLanguageStore` |
 | **Watch Party / Sync Timer** (NEW) | `app/watch-party/` | `useWatchPartyStore` |
 | **This Day in Our History** (NEW) | Home screen component | — (reads from existing stores) |
+| **Photo Viewer** (NEW) | `components/memories/PhotoViewer.tsx` | — |
+| **Our Soundtrack / Playlist** (NEW) | `app/playlist/` | `useSongStore` |
+| **Background Location** (NEW) | `lib/background-location.ts` | `useLocationStore` |
 
-### Animations Implemented (12)
+### Animations Implemented (13)
 
 | Animation | Feature | Status |
 |-----------|---------|--------|
@@ -329,6 +395,7 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | Slot-machine shuffle | Surprise Me date picker | Done |
 | Checkmark draw | Bucket list completion | Done |
 | Nickname card-flip | Nickname reveal modal | Done |
+| Spinning vinyl | Our Soundtrack playlist | Done |
 
 ### Push Notifications Active
 
@@ -347,16 +414,17 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 
 ## Codebase Stats
 
-- **~140+ source files** (`.ts` + `.tsx`)
-- **51+ routes** (Expo Router auto-discovery)
+- **~145+ source files** (`.ts` + `.tsx`)
+- **52+ routes** (Expo Router auto-discovery)
 - **21 Zustand stores** with AsyncStorage persistence
 - **21 Supabase tables** with RLS + realtime
 - **4 color themes**: Rose, Lavender, Sunset, Ocean
 - **3 font families**: Playfair Display, Inter, Dancing Script
-- **12 animation components** using React Native Animated API
+- **13 animation components** using React Native Animated API
 - **40 daily questions** (20 questions + 10 would-you-rather + 10 photo challenges)
 - **15 love language quiz questions**
 - **8 push notification triggers**
+- **Background location** with 15-min interval via expo-task-manager
 
 ---
 
@@ -420,6 +488,10 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | `app/watch-party/index.tsx` | Watch Party screen |
 | `components/home/ThisDayInHistory.tsx` | Dashboard history widget |
 | `components/ui/Button.tsx` | DO NOT CHANGE — user confirmed buttons are good |
+| `components/memories/PhotoViewer.tsx` | Full-screen photo viewer with pinch-to-zoom + swipe |
+| `lib/background-location.ts` | Background location task (expo-task-manager) |
+| `lib/photo-storage.ts` | Photo upload, compression, migration, pending queue |
+| `app/playlist/index.tsx` | Our Soundtrack — shared playlist view |
 | `global.css` | Contains `@tailwind base` — source of Pressable layout bug |
 
 ---
@@ -435,7 +507,8 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 - **Animations**: All use built-in `Animated` API (Reanimated installed but unused)
 - **This app is for 2 users only** — don't over-engineer
 - **NativeWind caveat**: Never put layout properties inside Pressable callback styles — use a plain View wrapper
-- **Photo storage**: Currently base64/URI in AsyncStorage. Supabase Storage bucket is configured but migration not yet done
+- **Photo storage**: Auto-migrates local URIs to Supabase Storage on startup. Compression to 1200px/0.7 JPEG. Pending upload queue with retry
+- **Background location**: `expo-task-manager` background task, 15-min interval, 100m distance threshold, toggle in settings
 - **Daily Questions**: 40-question pool cycling by day offset. Photo challenges use `expo-image-picker` with 0.7 JPEG quality
 - **Love Language Quiz**: 15 forced-choice questions, scores tallied per language type, primary = highest scorer
 - **Watch Party**: Supports both stopwatch (no timer) and countdown (set duration) modes
