@@ -257,20 +257,20 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 - [ ] Conflict resolution improvements — current is last-write-wins; consider field-level merging for complex records
 - [ ] Cloud photo storage — migrate images from local URIs to Supabase Storage bucket (bucket already configured in schema)
 - [ ] Photo compression + thumbnail generation for cloud-stored images
-- [ ] "This Day in Our History" push notification — daily check for matching dates, send notification if found
+- [x] "This Day in Our History" push notification — daily check for matching dates, send notification if found
 
 ### Priority 3: Remaining Features (Phase 4+)
-- [ ] Export / PDF Yearbook (Phase 4.5) — Generate printable PDF of memories, notes, timeline
+- [x] Export / PDF Yearbook (Phase 4.5) — Generate printable PDF of memories, notes, timeline
 - [ ] Spotify Shared Playlist (Phase 4.7) — API integration to auto-compile song dedications into a playlist
 - [ ] Background Location Mode (Phase 4.1) — Expo Location background task, 15-30 min updates
 - [ ] PWA / Home Screen Widget (Phase 4.6) — Countdown or status widget on phone home screen
 
 ### Priority 4: Nice-to-Have Enhancements
-- [ ] Next Visit auto-prompt — after visit end date passes, prompt to add photos
-- [ ] Love Language results on individual profiles — display primary love language on profile cards
-- [ ] Watch Party partner join confirmation — notify when partner has the timer screen open
-- [ ] Map view for Distance screen — visual map with both partner locations
-- [ ] Mood trend chart — visual chart showing mood over time
+- [x] Next Visit auto-prompt — after visit end date passes, prompt to add photos
+- [x] Love Language results on individual profiles — display primary love language on profile cards
+- [x] Watch Party partner join confirmation — notify when partner has the timer screen open
+- [x] Map view for Distance screen — visual map with both partner locations
+- [x] Mood trend chart — visual chart showing mood over time
 - [ ] Photo gallery improvements — pinch-to-zoom, swipe navigation in full-screen mode
 
 ---
