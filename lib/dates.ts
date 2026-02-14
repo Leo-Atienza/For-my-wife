@@ -67,3 +67,10 @@ export const getDailyQuoteIndex = (): number => {
   const dayOfYear = Math.floor(diff / oneDay);
   return dayOfYear;
 };
+
+export const formatRelativeDate = (dateString: string): string => {
+  if (!dateString) return 'Not set';
+  const date = parseISO(dateString);
+  if (isNaN(date.getTime())) return 'Not set';
+  return format(date, 'MMM d, yyyy');
+};

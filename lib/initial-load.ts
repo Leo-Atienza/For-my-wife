@@ -16,6 +16,8 @@ import { useSongStore } from '@/stores/useSongStore';
 import { usePartnerNotesStore } from '@/stores/usePartnerNotesStore';
 import { useThinkingStore } from '@/stores/useThinkingStore';
 import { useSleepWakeStore } from '@/stores/useSleepWakeStore';
+import { useNextVisitStore } from '@/stores/useNextVisitStore';
+import { useWatchPartyStore } from '@/stores/useWatchPartyStore';
 import type {
   LoveNote,
   Memory,
@@ -31,6 +33,8 @@ import type {
   JournalLetter,
   DailyQuestionEntry,
   SongDedicationEntry,
+  NextVisit,
+  WatchPartySession,
   PartnerRole,
 } from '@/lib/types';
 
@@ -58,6 +62,8 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       partnerNotes,
       thinkingTaps,
       sleepWakeEntries,
+      nextVisits,
+      watchPartySessions,
     ] = await Promise.all([
       pullFromSupabase<LoveNote>('love_notes'),
       pullFromSupabase<Memory>('memories'),
@@ -76,6 +82,8 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       pullFromSupabase<Record<string, unknown>>('partner_notes'),
       pullFromSupabase<{ id: string; fromPartner: PartnerRole; createdAt: string }>('thinking_of_you'),
       pullFromSupabase<{ id: string; partner: PartnerRole; status: 'sleeping' | 'awake'; createdAt: string }>('sleep_wake_status'),
+      pullFromSupabase<NextVisit>('next_visits'),
+      pullFromSupabase<WatchPartySession>('watch_party_sessions'),
     ]);
 
     // Merge remote data with local data (preserving offline-created records)
@@ -135,6 +143,12 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
     // pullFromSupabase auto-converts snake_case → camelCase
     useThinkingStore.getState().loadFromRemote(thinkingTaps);
     useSleepWakeStore.getState().loadFromRemote(sleepWakeEntries);
+    useNextVisitStore.getState().loadFromRemote(
+      mergeById(useNextVisitStore.getState().visits, nextVisits)
+    );
+    useWatchPartyStore.getState().loadFromRemote(
+      mergeById(useWatchPartyStore.getState().sessions, watchPartySessions)
+    );
 
     console.log('Initial data load from Supabase complete');
   } catch (error) {
