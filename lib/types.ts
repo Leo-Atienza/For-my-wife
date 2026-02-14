@@ -364,6 +364,23 @@ export interface HistoryEntry {
 }
 
 // ============================================
+// Love Coupon Book
+// ============================================
+
+export interface LoveCoupon {
+  id: string;
+  title: string;
+  description: string;
+  emoji: string;
+  givenBy: PartnerRole;
+  isRedeemed: boolean;
+  redeemedAt?: string;
+  isCustom: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// ============================================
 // Onboarding Types
 // ============================================
 

@@ -493,3 +493,28 @@ ALTER PUBLICATION supabase_realtime ADD TABLE sleep_wake_status;
 ALTER PUBLICATION supabase_realtime ADD TABLE next_visits;
 ALTER PUBLICATION supabase_realtime ADD TABLE love_language_results;
 ALTER PUBLICATION supabase_realtime ADD TABLE watch_party_sessions;
+
+-- Love Coupons (redeemable romantic coupons)
+CREATE TABLE love_coupons (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  emoji TEXT DEFAULT '\u{1F381}',
+  given_by TEXT CHECK (given_by IN ('partner1', 'partner2')) NOT NULL,
+  is_redeemed BOOLEAN DEFAULT false,
+  redeemed_at TIMESTAMPTZ,
+  is_custom BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE love_coupons ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage love coupons in their space"
+  ON love_coupons
+  FOR ALL
+  USING (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()))
+  WITH CHECK (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()));
+
+ALTER PUBLICATION supabase_realtime ADD TABLE love_coupons;

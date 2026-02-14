@@ -20,6 +20,7 @@ import { useThinkingStore } from '@/stores/useThinkingStore';
 import { useSleepWakeStore } from '@/stores/useSleepWakeStore';
 import { useNextVisitStore } from '@/stores/useNextVisitStore';
 import { useWatchPartyStore } from '@/stores/useWatchPartyStore';
+import { useCouponStore } from '@/stores/useCouponStore';
 import { subscribeToTable, flushPendingOperations } from '@/lib/sync';
 import { flushPendingUploads } from '@/lib/photo-storage';
 import { supabase } from '@/lib/supabase';
@@ -199,6 +200,14 @@ export const useSync = () => {
       onDelete: (old) => useWatchPartyStore.getState().syncRemoteDelete(old.id),
     });
     if (watchPartyChannel) channels.push(watchPartyChannel);
+
+    // Love Coupons
+    const couponsChannel = subscribeToTable<RemoteRecord>('love_coupons', {
+      onInsert: (record) => useCouponStore.getState().syncRemoteInsert(record as never),
+      onUpdate: (record) => useCouponStore.getState().syncRemoteUpdate(record as never),
+      onDelete: (old) => useCouponStore.getState().syncRemoteDelete(old.id),
+    });
+    if (couponsChannel) channels.push(couponsChannel);
 
     channelsRef.current = channels;
 

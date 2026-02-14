@@ -18,6 +18,7 @@ import { SyncStatusIndicator } from '@/components/home/SyncStatusIndicator';
 import { ThisDayInHistory } from '@/components/home/ThisDayInHistory';
 import { ValentinesDayCard } from '@/components/home/ValentinesDayCard';
 import { MilestoneAlert } from '@/components/home/MilestoneAlert';
+import { StreakCounter } from '@/components/home/StreakCounter';
 import { getGreeting } from '@/lib/utils';
 
 export default function HomeScreen() {
@@ -196,6 +197,9 @@ export default function HomeScreen() {
         </Text>
         <QuickActions />
       </View>
+
+      {/* Relationship streak counter */}
+      <StreakCounter />
 
       {/* Sleep/Wake toggle */}
       <SleepWakeToggle />

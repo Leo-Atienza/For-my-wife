@@ -25,6 +25,7 @@ import {
   FileDown,
   ListMusic,
   PenTool,
+  Ticket,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -217,6 +218,13 @@ export default function MoreScreen() {
           subtitle: 'Generate romantic letters',
           route: '/letter-generator',
           emoji: '\u{1F48C}',
+        },
+        {
+          icon: <Ticket size={22} color={theme.primary} />,
+          label: 'Love Coupons',
+          subtitle: 'Give & redeem romantic coupons',
+          route: '/coupons',
+          emoji: '\u{1F3AB}',
         },
       ],
     },

@@ -18,6 +18,7 @@ import { useThinkingStore } from '@/stores/useThinkingStore';
 import { useSleepWakeStore } from '@/stores/useSleepWakeStore';
 import { useNextVisitStore } from '@/stores/useNextVisitStore';
 import { useWatchPartyStore } from '@/stores/useWatchPartyStore';
+import { useCouponStore } from '@/stores/useCouponStore';
 import type {
   LoveNote,
   Memory,
@@ -35,6 +36,7 @@ import type {
   SongDedicationEntry,
   NextVisit,
   WatchPartySession,
+  LoveCoupon,
   PartnerRole,
 } from '@/lib/types';
 
@@ -64,6 +66,7 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       sleepWakeEntries,
       nextVisits,
       watchPartySessions,
+      loveCoupons,
     ] = await Promise.all([
       pullFromSupabase<LoveNote>('love_notes'),
       pullFromSupabase<Memory>('memories'),
@@ -84,6 +87,7 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       pullFromSupabase<{ id: string; partner: PartnerRole; status: 'sleeping' | 'awake'; createdAt: string }>('sleep_wake_status'),
       pullFromSupabase<NextVisit>('next_visits'),
       pullFromSupabase<WatchPartySession>('watch_party_sessions'),
+      pullFromSupabase<LoveCoupon>('love_coupons'),
     ]);
 
     // Merge remote data with local data (preserving offline-created records)
@@ -148,6 +152,9 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
     );
     useWatchPartyStore.getState().loadFromRemote(
       mergeById(useWatchPartyStore.getState().sessions, watchPartySessions)
+    );
+    useCouponStore.getState().loadFromRemote(
+      mergeById(useCouponStore.getState().coupons, loveCoupons)
     );
 
     console.log('Initial data load from Supabase complete');

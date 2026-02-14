@@ -9,7 +9,54 @@
 
 ---
 
-## What Was Done (Latest Session — 5 New Features + 2 Bug Fixes)
+## What Was Done (Latest Session — 2 New Features + Full Integration)
+
+### 1. Love Coupon Book (Creative Enhancement)
+A complete romantic coupon system where partners can give and redeem love coupons:
+- **20 pre-built coupon templates** across 6 categories: Romance, Pampering, Quality Time, Food & Treats, Surprises, Acts of Service
+- **Custom coupon creation** — write personalized coupons with title and description
+- **Redemption system** — tap to redeem with confirmation alert, tracks redeemed date
+- **Two-tab UI** — "My Coupons" (received) and "Give to [Partner]" tabs
+- **Category browsing** — browse templates by category with counts
+- **Push notification** — partner gets notified when they receive a new coupon
+- **Full Supabase integration** — `love_coupons` table with RLS, realtime sync, initial-load, store-reset
+
+**Files created:**
+- `lib/coupon-templates.ts` — 20 coupon templates across 6 categories
+- `stores/useCouponStore.ts` — Zustand store with CRUD, redemption, sync methods
+- `app/coupons/index.tsx` — Love Coupons screen with tab UI, template browser, custom form
+
+**Files modified:**
+- `lib/types.ts` — Added `LoveCoupon` interface
+- `app/(tabs)/more.tsx` — Added Love Coupons menu item with Ticket icon
+- `lib/initial-load.ts` — Added `love_coupons` to initial data pull
+- `lib/store-reset.ts` — Added `useCouponStore` to sign-out reset
+- `hooks/useSync.ts` — Added realtime subscription for `love_coupons`
+- `supabase/schema.sql` — Added `love_coupons` table with RLS + realtime
+
+### 2. Relationship Streak Counter (Home Screen Widget)
+Created `components/home/StreakCounter.tsx` — gamified daily engagement tracker:
+- **Calculates consecutive days** of activity (notes, mood check-ins, thinking-of-you taps, memories)
+- **Animated flame icon** with flickering opacity
+- **Color-coded flame** — yellow (<7 days), orange (7-29 days), red (30+ days)
+- **Motivational messages** — "Nice start!", "One week strong!", "Amazing dedication!", "Incredible streak!"
+- **Auto-hides** when streak is 0
+- **Placed on home screen** between Quick Actions and Sleep/Wake toggle
+
+**Files created:**
+- `components/home/StreakCounter.tsx` — Streak calculation + animated display
+
+**Files modified:**
+- `app/(tabs)/index.tsx` — Added StreakCounter import and placement
+
+### 3. Verification & Quality
+- **TypeScript**: 0 errors (strict mode)
+- **Expo build**: Compiles successfully for Android
+- **All existing features verified**: 38+ features intact, all animations working
+
+---
+
+## What Was Done (Previous Session — 5 New Features + 2 Bug Fixes)
 
 ### 1. Valentine's Day Celebration Card
 Created `components/home/ValentinesDayCard.tsx` — special animated card for Feb 14:
@@ -455,8 +502,10 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | **Milestone Alerts** (NEW) | `components/home/MilestoneAlert.tsx` | — |
 | **App Quick Actions** (NEW) | `lib/quick-actions.ts` | — |
 | **Love Letter Generator** (NEW) | `app/letter-generator/` | `useNotesStore` |
+| **Love Coupon Book** (NEW) | `app/coupons/` | `useCouponStore` |
+| **Streak Counter** (NEW) | `components/home/StreakCounter.tsx` | — (reads from existing stores) |
 
-### Animations Implemented (16)
+### Animations Implemented (18)
 
 | Animation | Feature | Status |
 |-----------|---------|--------|
@@ -476,6 +525,8 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | Valentine floating hearts | Valentine's Day card | Done |
 | Milestone sparkle + bounce | Milestone alerts | Done |
 | Letter screen transitions | Love Letter Generator | Done |
+| Flame flicker | Streak counter | Done |
+| Coupon redeem confirm | Love Coupon Book | Done |
 
 ### Push Notifications Active
 
@@ -489,29 +540,32 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | Sleep/wake status | "Your partner is going to sleep/waking up" | `/` |
 | Song dedication (NEW) | "Your partner dedicated [song] to you" | `/songs` |
 | Watch party start (NEW) | "[title] is starting! Join in" | `/watch-party` |
+| Love coupon (NEW) | "Your partner gave you a coupon: [title]" | `/coupons` |
 
 ---
 
 ## Codebase Stats
 
-- **~155+ source files** (`.ts` + `.tsx`)
-- **54+ routes** (Expo Router auto-discovery)
-- **21 Zustand stores** with AsyncStorage persistence
-- **21 Supabase tables** with RLS + realtime
+- **~160+ source files** (`.ts` + `.tsx`)
+- **55+ routes** (Expo Router auto-discovery)
+- **22 Zustand stores** with AsyncStorage persistence
+- **22 Supabase tables** with RLS + realtime
 - **4 color themes**: Rose, Lavender, Sunset, Ocean
 - **3 font families**: Playfair Display, Inter, Dancing Script
-- **16 animation components** using React Native Animated API
+- **18 animation components** using React Native Animated API
 - **40 daily questions** (20 questions + 10 would-you-rather + 10 photo challenges)
 - **15 love language quiz questions**
 - **10 love letter templates** across 6 categories
-- **8 push notification triggers**
+- **20 love coupon templates** across 6 categories
+- **9 push notification triggers**
 - **4 app quick actions** (long-press app icon shortcuts)
 - **13 relationship milestones** tracked (50 days to 5 years)
 - **Background location** with 15-min interval via expo-task-manager
+- **Relationship streak counter** with flame animation
 
 ---
 
-## Supabase Tables (21 total)
+## Supabase Tables (22 total)
 
 | Table | Purpose | New? |
 |-------|---------|------|
@@ -537,6 +591,7 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | `next_visits` | Visit planner | NEW |
 | `love_language_results` | Quiz results | NEW |
 | `watch_party_sessions` | Watch party timers | NEW |
+| `love_coupons` | Love coupon book | NEW |
 
 ---
 
@@ -555,14 +610,14 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 |------|---------|
 | `lib/types.ts` | All TypeScript interfaces — includes new NextVisit, LoveLanguage, WatchParty types |
 | `lib/sync.ts` | Sync engine — camelCase↔snake_case + offline queue |
-| `lib/initial-load.ts` | Initial data pull from Supabase (21 tables) |
-| `lib/store-reset.ts` | Lazy store reset on sign-out (21 stores) |
+| `lib/initial-load.ts` | Initial data pull from Supabase (22 tables) |
+| `lib/store-reset.ts` | Lazy store reset on sign-out (22 stores) |
 | `lib/notifications.ts` | Push notification registration + sendPushToPartner |
 | `lib/love-languages.ts` | Quiz questions, labels, descriptions, tips |
 | `lib/dates.ts` | Date formatting + formatRelativeDate |
 | `lib/constants.ts` | Themes, quotes, questions, date ideas, emojis |
-| `hooks/useSync.ts` | Realtime subscriptions for all 21 synced tables |
-| `supabase/schema.sql` | Full DB schema with 21 tables + RLS + realtime |
+| `hooks/useSync.ts` | Realtime subscriptions for all 22 synced tables |
+| `supabase/schema.sql` | Full DB schema with 22 tables + RLS + realtime |
 | `app/_layout.tsx` | Root layout — route guard, auth listener |
 | `app/(tabs)/index.tsx` | Home dashboard — includes ThisDayInHistory |
 | `app/(tabs)/more.tsx` | More menu — all feature links |
@@ -580,13 +635,17 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | `app/letter-generator/index.tsx` | Love Letter Generator — category/template/preview flow |
 | `components/home/ValentinesDayCard.tsx` | Valentine's Day animated celebration card |
 | `components/home/MilestoneAlert.tsx` | Relationship milestone alerts (13 milestones) |
+| `lib/coupon-templates.ts` | Love coupon templates (20 templates, 6 categories) |
+| `stores/useCouponStore.ts` | Love coupons Zustand store with CRUD + sync |
+| `app/coupons/index.tsx` | Love Coupon Book — give, browse, redeem coupons |
+| `components/home/StreakCounter.tsx` | Relationship streak counter with flame animation |
 | `global.css` | Contains `@tailwind base` — source of Pressable layout bug |
 
 ---
 
 ## Architecture Notes
 
-- **State**: Zustand with AsyncStorage persistence (21 stores)
+- **State**: Zustand with AsyncStorage persistence (22 stores)
 - **Sync**: `pushToSupabase()` auto-converts camelCase→snake_case, `pullFromSupabase()` auto-converts snake_case→camelCase
 - **Conflict resolution**: Last-write-wins using `updatedAt` timestamps (all mutable tables now have `updated_at`)
 - **Themes**: 4 themes (Rose, Lavender, Sunset, Ocean) in `lib/constants.ts`
@@ -605,3 +664,5 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 - **Milestone Alerts**: Calculates milestones using `date-fns` month/year math; shows upcoming (within 7 days) or today milestones on home screen
 - **Love Letter Generator**: Multi-screen flow within single route using local state; uses `{PARTNER}` / `{YOU}` placeholder substitution; can send directly as love note
 - **Valentine's Day Card**: Self-hiding component (only renders when `month === 1 && date === 14`); calculates number of Valentine's Days shared
+- **Love Coupon Book**: 20 template coupons across 6 categories; custom coupon creation; redemption tracking with dates; two-tab UI (My Coupons / Give); push notification on gift
+- **Streak Counter**: Scans notes, moods, thinking-of-you taps, and memories for consecutive daily activity; color-coded flame (yellow/orange/red); auto-hides when streak is 0
