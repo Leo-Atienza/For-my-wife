@@ -41,7 +41,8 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow Us to track your distance from your partner."
         }
-      ]
+      ],
+      "expo-quick-actions"
     ]
   }
 }

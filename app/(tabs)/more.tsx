@@ -24,6 +24,7 @@ import {
   Film,
   FileDown,
   ListMusic,
+  PenTool,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -209,6 +210,13 @@ export default function MoreScreen() {
           subtitle: 'Discover how you feel loved',
           route: '/love-language',
           emoji: '\u{1F49D}',
+        },
+        {
+          icon: <PenTool size={22} color={theme.primary} />,
+          label: 'Love Letters',
+          subtitle: 'Generate romantic letters',
+          route: '/letter-generator',
+          emoji: '\u{1F48C}',
         },
       ],
     },

@@ -6,16 +6,86 @@
 
 - **Branch**: `main`
 - **Status**: Modified files with new features, not yet committed.
-- **Last 5 commits**:
-  - `780120d` — Add Export Yearbook, history notification, and CheckmarkDraw component
-  - `ec8ef8d` — update
-  - `e1f4d14` — Merge pull request #9 (context update)
-  - `500e308` — Update CONTEXT.md with new features, remaining tasks, and architecture notes
-  - `6f85ac4` — Merge pull request #8 (new features)
 
 ---
 
-## What Was Done (Latest Session — 4 New Features + 1 Enhancement)
+## What Was Done (Latest Session — 5 New Features + 2 Bug Fixes)
+
+### 1. Valentine's Day Celebration Card
+Created `components/home/ValentinesDayCard.tsx` — special animated card for Feb 14:
+- **Only visible on February 14th** — auto-hides on all other days
+- **Animated floating hearts** with staggered timing (3 hearts at different positions)
+- **Pulsing main heart** icon with gentle scale animation
+- **Sparkle shimmer** effect in the corner
+- **Valentine count** — calculates how many Valentine's Days the couple has shared
+- **Couple names** displayed in Dancing Script font
+- Shows "Your first Valentine's together!" for year 1
+- Integrated into home screen above Thinking of You button
+
+### 2. App Quick Actions / Shortcuts (Phase 4.6)
+Created `lib/quick-actions.ts` + installed `expo-quick-actions`:
+- **Long-press app icon** to see 4 shortcuts on both iOS and Android
+- **Write Love Note** — opens `/notes/new` directly
+- **Thinking of You** — jumps to home screen
+- **Add Memory** — opens `/memories/new` directly
+- **Mood Check-In** — opens `/mood` directly
+- iOS uses SF Symbols for icons (`symbol:heart.fill`, etc.)
+- Handles both cold-start (initial action) and warm-start (listener) scenarios
+- Set up after initial data load in `_layout.tsx`
+- Added `expo-quick-actions` config plugin to `app.json`
+
+### 3. Relationship Milestone Alerts
+Created `components/home/MilestoneAlert.tsx` — smart milestone notifications:
+- **13 milestone definitions**: 50, 100, 200, 365, 500, 1000 days; 1, 3, 6 months; 1, 2, 3, 5 year anniversaries
+- **Upcoming milestones** — shows card when a milestone is within 7 days
+- **Today milestones** — special celebration with sparkle animation and bounce
+- **Month/year milestones** use proper date math (via `date-fns addMonths/addYears`)
+- Auto-hides when no milestone is near
+- Integrated into home screen below Valentine's Day card
+
+### 4. Love Letter Generator (Creative Enhancement)
+Created `app/letter-generator/index.tsx` + `lib/letter-templates.ts`:
+- **6 categories**: Romantic, Appreciation, Missing You, Our Future, I'm Sorry, Anniversary
+- **10 pre-written letter templates** with beautiful romantic content
+- **Auto-fills partner names** — replaces `{PARTNER}` and `{YOU}` with real names/nicknames
+- **3-screen flow** with animated transitions: Categories → Templates → Preview
+- **Customizable** — edit any letter in-place before sending
+- **Copy to clipboard** — share via any messaging app
+- **Send as Love Note** — saves directly to the love notes inbox for partner to read
+- **Parchment-style preview** — warm cream background with subtle shadow
+- Added to More menu as "Love Letters" with PenTool icon
+
+### 5. PageHeader Enhancement
+Updated `components/layout/PageHeader.tsx`:
+- Added optional `onBack` prop for custom back navigation
+- Falls back to `router.back()` when `onBack` is not provided
+- Exported `PageHeaderProps` interface for type-safe usage
+- Enables multi-screen flows within a single route (like Love Letter Generator)
+
+### 6. Bug Fixes
+- **Fixed NativeWind Pressable bug in playlist** — song list items used callback-style Pressable with layout properties (`flexDirection`, `alignItems`, `gap`), which would be overridden by `@tailwind base`. Moved layout to plain View wrapper.
+- **All TypeScript strict mode checks pass** (0 errors after fixes)
+- **Installed `expo-quick-actions`** — config plugin auto-added to `app.json`
+
+**Files created:**
+- `components/home/ValentinesDayCard.tsx` — Valentine's Day celebration card
+- `components/home/MilestoneAlert.tsx` — Relationship milestone alerts
+- `lib/quick-actions.ts` — App icon quick action shortcuts
+- `lib/letter-templates.ts` — Love letter template constants (10 templates, 6 categories)
+- `app/letter-generator/index.tsx` — Love Letter Generator screen
+
+**Files modified:**
+- `app/(tabs)/index.tsx` — Added ValentinesDayCard + MilestoneAlert imports and placement
+- `app/(tabs)/more.tsx` — Added Love Letters menu item with PenTool icon
+- `app/_layout.tsx` — Quick actions setup + listener integration
+- `app/playlist/index.tsx` — Fixed NativeWind Pressable bug in song list items
+- `components/layout/PageHeader.tsx` — Added `onBack` prop + exported interface
+- `app.json` — Added expo-quick-actions plugin
+- `package.json` — Added expo-quick-actions dependency
+
+---
+
+## What Was Done (Previous Session — 4 New Features + 1 Enhancement)
 
 ### 1. Photo Gallery Improvements (Pinch-to-Zoom + Swipe Navigation)
 Created `components/memories/PhotoViewer.tsx` — full-screen modal photo viewer:
@@ -326,7 +396,7 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 - [x] Export / PDF Yearbook (Phase 4.5) — Generate printable PDF of memories, notes, timeline
 - [x] Spotify Shared Playlist (Phase 4.7) — "Our Soundtrack" view with Spotify deep links, copy playlist, stats
 - [x] Background Location Mode (Phase 4.1) — Expo Location background task, 15-min updates, toggle in settings
-- [ ] PWA / Home Screen Widget (Phase 4.6) — Countdown or status widget on phone home screen
+- [x] App Quick Actions (Phase 4.6) — Long-press app icon shortcuts (Write Note, Thinking of You, Add Memory, Mood Check-In)
 
 ### Priority 4: Nice-to-Have Enhancements
 - [x] Next Visit auto-prompt — after visit end date passes, prompt to add photos
@@ -335,12 +405,15 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 - [x] Map view for Distance screen — visual map with both partner locations
 - [x] Mood trend chart — visual chart showing mood over time
 - [x] Photo gallery improvements — pinch-to-zoom, swipe navigation in full-screen mode
+- [x] Valentine's Day celebration card — animated card with floating hearts, shown only on Feb 14
+- [x] Relationship milestone alerts — smart notifications for upcoming/today milestones (50 days, 100 days, anniversaries, etc.)
+- [x] Love Letter Generator — 10 template letters across 6 categories with auto-fill, editing, and send-as-note
 
 ---
 
 ## App Feature Status Overview
 
-### Fully Built & Working (34 features)
+### Fully Built & Working (38 features)
 
 | Feature | Screen | Store |
 |---------|--------|-------|
@@ -378,8 +451,12 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | **Photo Viewer** (NEW) | `components/memories/PhotoViewer.tsx` | — |
 | **Our Soundtrack / Playlist** (NEW) | `app/playlist/` | `useSongStore` |
 | **Background Location** (NEW) | `lib/background-location.ts` | `useLocationStore` |
+| **Valentine's Day Card** (NEW) | `components/home/ValentinesDayCard.tsx` | — |
+| **Milestone Alerts** (NEW) | `components/home/MilestoneAlert.tsx` | — |
+| **App Quick Actions** (NEW) | `lib/quick-actions.ts` | — |
+| **Love Letter Generator** (NEW) | `app/letter-generator/` | `useNotesStore` |
 
-### Animations Implemented (13)
+### Animations Implemented (16)
 
 | Animation | Feature | Status |
 |-----------|---------|--------|
@@ -396,6 +473,9 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | Checkmark draw | Bucket list completion | Done |
 | Nickname card-flip | Nickname reveal modal | Done |
 | Spinning vinyl | Our Soundtrack playlist | Done |
+| Valentine floating hearts | Valentine's Day card | Done |
+| Milestone sparkle + bounce | Milestone alerts | Done |
+| Letter screen transitions | Love Letter Generator | Done |
 
 ### Push Notifications Active
 
@@ -414,16 +494,19 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 
 ## Codebase Stats
 
-- **~145+ source files** (`.ts` + `.tsx`)
-- **52+ routes** (Expo Router auto-discovery)
+- **~155+ source files** (`.ts` + `.tsx`)
+- **54+ routes** (Expo Router auto-discovery)
 - **21 Zustand stores** with AsyncStorage persistence
 - **21 Supabase tables** with RLS + realtime
 - **4 color themes**: Rose, Lavender, Sunset, Ocean
 - **3 font families**: Playfair Display, Inter, Dancing Script
-- **13 animation components** using React Native Animated API
+- **16 animation components** using React Native Animated API
 - **40 daily questions** (20 questions + 10 would-you-rather + 10 photo challenges)
 - **15 love language quiz questions**
+- **10 love letter templates** across 6 categories
 - **8 push notification triggers**
+- **4 app quick actions** (long-press app icon shortcuts)
+- **13 relationship milestones** tracked (50 days to 5 years)
 - **Background location** with 15-min interval via expo-task-manager
 
 ---
@@ -492,6 +575,11 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 | `lib/background-location.ts` | Background location task (expo-task-manager) |
 | `lib/photo-storage.ts` | Photo upload, compression, migration, pending queue |
 | `app/playlist/index.tsx` | Our Soundtrack — shared playlist view |
+| `lib/quick-actions.ts` | App icon quick action shortcuts (long-press) |
+| `lib/letter-templates.ts` | Love letter templates (10 templates, 6 categories) |
+| `app/letter-generator/index.tsx` | Love Letter Generator — category/template/preview flow |
+| `components/home/ValentinesDayCard.tsx` | Valentine's Day animated celebration card |
+| `components/home/MilestoneAlert.tsx` | Relationship milestone alerts (13 milestones) |
 | `global.css` | Contains `@tailwind base` — source of Pressable layout bug |
 
 ---
@@ -513,3 +601,7 @@ Animated.timing(anim, { toValue: 1, duration: 300, useNativeDriver: true }).star
 - **Love Language Quiz**: 15 forced-choice questions, scores tallied per language type, primary = highest scorer
 - **Watch Party**: Supports both stopwatch (no timer) and countdown (set duration) modes
 - **Next Visit**: Activities and packing items stored as JSONB arrays in Supabase
+- **Quick Actions**: `expo-quick-actions` sets up app icon shortcuts after initial data load; handles both cold-start and warm-start scenarios
+- **Milestone Alerts**: Calculates milestones using `date-fns` month/year math; shows upcoming (within 7 days) or today milestones on home screen
+- **Love Letter Generator**: Multi-screen flow within single route using local state; uses `{PARTNER}` / `{YOU}` placeholder substitution; can send directly as love note
+- **Valentine's Day Card**: Self-hiding component (only renders when `month === 1 && date === 14`); calculates number of Valentine's Days shared

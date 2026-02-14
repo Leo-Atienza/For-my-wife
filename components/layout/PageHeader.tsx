@@ -4,16 +4,18 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 
-interface PageHeaderProps {
+export interface PageHeaderProps {
   title: string;
   showBack?: boolean;
   rightElement?: React.ReactNode;
+  onBack?: () => void;
 }
 
 export const PageHeader = ({
   title,
   showBack = false,
   rightElement,
+  onBack,
 }: PageHeaderProps) => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -34,7 +36,7 @@ export const PageHeader = ({
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
         {showBack && (
           <Pressable
-            onPress={() => router.back()}
+            onPress={onBack ?? (() => router.back())}
             hitSlop={12}
             accessibilityRole="button"
             accessibilityLabel="Go back"

@@ -16,6 +16,8 @@ import { PartnerSleepStatus } from '@/components/home/PartnerSleepStatus';
 import { WeeklyRecapCard } from '@/components/home/WeeklyRecapCard';
 import { SyncStatusIndicator } from '@/components/home/SyncStatusIndicator';
 import { ThisDayInHistory } from '@/components/home/ThisDayInHistory';
+import { ValentinesDayCard } from '@/components/home/ValentinesDayCard';
+import { MilestoneAlert } from '@/components/home/MilestoneAlert';
 import { getGreeting } from '@/lib/utils';
 
 export default function HomeScreen() {
@@ -158,6 +160,12 @@ export default function HomeScreen() {
           {myName} & {partnerDisplayName}
         </Text>
       </View>
+
+      {/* Valentine's Day celebration (only shows on Feb 14) */}
+      <ValentinesDayCard />
+
+      {/* Relationship milestone alert (upcoming/today milestones) */}
+      <MilestoneAlert />
 
       {/* Thinking of You */}
       <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16 }}>

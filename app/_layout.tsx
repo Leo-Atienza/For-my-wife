@@ -31,6 +31,8 @@ import { checkThisDayInHistory } from '@/lib/history-notification';
 import { migratePhotosToCloud, flushPendingUploads } from '@/lib/photo-storage';
 import { useMemoriesStore } from '@/stores/useMemoriesStore';
 import { isBackgroundLocationEnabled, startBackgroundLocation } from '@/lib/background-location';
+import { setupQuickActions, handleQuickAction } from '@/lib/quick-actions';
+import * as QuickActions from 'expo-quick-actions';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ToastProvider, useToast } from '@/components/ui/Toast';
 import { syncEvents } from '@/lib/sync-events';
@@ -121,6 +123,18 @@ function AppContent() {
       showToast(message, 'error');
     });
   }, [showToast]);
+
+  // Listen for quick action triggers (app icon long-press shortcuts)
+  useEffect(() => {
+    const sub = QuickActions.addListener((action) => {
+      handleQuickAction(action);
+    });
+    // Handle the initial action that may have launched the app
+    if (QuickActions.initial) {
+      handleQuickAction(QuickActions.initial);
+    }
+    return () => sub.remove();
+  }, []);
 
   // Protected route navigation
   const isRouteReady = useProtectedRoute();
@@ -215,6 +229,8 @@ function AppContent() {
           isBackgroundLocationEnabled().then((enabled) => {
             if (enabled) startBackgroundLocation();
           });
+          // Set up app icon quick actions (long-press shortcuts)
+          setupQuickActions();
         })
         .catch((err) => {
           console.error('Initial load failed, skipping migration to prevent data loss:', err);
