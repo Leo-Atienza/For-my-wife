@@ -72,7 +72,6 @@ const MenuItem = ({
       accessibilityLabel={item.label}
       style={({ pressed }) => ({
         opacity: pressed ? 0.7 : 1,
-        backgroundColor: pressed ? theme.primarySoft : 'transparent',
       })}
     >
       {/* Row container — plain View ensures flexDirection: 'row' is never overridden */}

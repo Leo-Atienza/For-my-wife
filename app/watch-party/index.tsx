@@ -279,7 +279,7 @@ export default function WatchPartyScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
-      <PageHeader title="Watch Party" />
+      <PageHeader title="Watch Party" showBack />
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 16,

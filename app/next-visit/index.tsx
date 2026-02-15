@@ -507,7 +507,7 @@ export default function NextVisitScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
-      <PageHeader title="Next Visit" />
+      <PageHeader title="Next Visit" showBack />
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 16,

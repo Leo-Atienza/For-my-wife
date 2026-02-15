@@ -225,7 +225,7 @@ export default function LoveLanguageScreen() {
 
     return (
       <View style={{ flex: 1, backgroundColor: theme.background }}>
-        <PageHeader title="Love Language Quiz" />
+        <PageHeader title="Love Language Quiz" showBack />
         <View style={{ flex: 1, paddingHorizontal: 24, justifyContent: 'center', gap: 32 }}>
           {/* Progress */}
           <View style={{ gap: 8 }}>
@@ -324,7 +324,7 @@ export default function LoveLanguageScreen() {
   // Results / Start view
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
-      <PageHeader title="Love Languages" />
+      <PageHeader title="Love Languages" showBack />
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 16,

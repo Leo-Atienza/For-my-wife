@@ -21,6 +21,11 @@ import { MilestoneAlert } from '@/components/home/MilestoneAlert';
 import { StreakCounter } from '@/components/home/StreakCounter';
 import { DailyCompliment } from '@/components/home/DailyCompliment';
 import { RelationshipHealth } from '@/components/home/RelationshipHealth';
+import { LoveFortune } from '@/components/home/LoveFortune';
+import { RelationshipTrivia } from '@/components/home/RelationshipTrivia';
+import { QuickGreeting } from '@/components/home/QuickGreeting';
+import { LoveLanguageTip } from '@/components/home/LoveLanguageTip';
+import { CountdownCelebration } from '@/components/home/CountdownCelebration';
 import { getGreeting } from '@/lib/utils';
 
 export default function HomeScreen() {
@@ -164,11 +169,17 @@ export default function HomeScreen() {
         </Text>
       </View>
 
+      {/* Countdown celebration (shows when a countdown reaches today) */}
+      <CountdownCelebration />
+
       {/* Valentine's Day celebration (only shows on Feb 14) */}
       <ValentinesDayCard />
 
       {/* Relationship milestone alert (upcoming/today milestones) */}
       <MilestoneAlert />
+
+      {/* Quick morning/night greeting */}
+      <QuickGreeting />
 
       {/* Thinking of You */}
       <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
@@ -212,11 +223,20 @@ export default function HomeScreen() {
       {/* This Day in Our History */}
       <ThisDayInHistory />
 
+      {/* Relationship trivia */}
+      <RelationshipTrivia />
+
+      {/* Love language tip for partner */}
+      <LoveLanguageTip />
+
       {/* Daily compliment for partner */}
       <DailyCompliment />
 
       {/* Daily quote */}
       <DailyQuote />
+
+      {/* Love fortune cookie */}
+      <LoveFortune />
 
       {/* Weekly Recap */}
       <WeeklyRecapCard />

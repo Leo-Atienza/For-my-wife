@@ -41,7 +41,7 @@ Custom React hook?                 → hooks/use[Name].ts
 Pure function, type, or constant?  → lib/[module].ts
 ```
 
-## All Stores (23)
+## All Stores (26)
 
 | Store | Table | Purpose |
 |-------|-------|---------|
@@ -68,6 +68,9 @@ Pure function, type, or constant?  → lib/[module].ts
 | `useWatchPartyStore` | `watch_party_sessions` | Shared timers |
 | `useCouponStore` | `love_coupons` | Love coupons |
 | `useDreamStore` | `dreams` | Dream board / goals |
+| `useLoveMapStore` | `love_map_pins` | Special places map |
+| `usePromiseStore` | `couple_promises` | Couple promises |
+| `useWishListStore` | `wish_items` | Gift wish lists |
 
 ## Navigation
 

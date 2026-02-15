@@ -6,18 +6,19 @@
 
 ## Quick Stats
 
-- **Source files**: ~170+ (`.ts` + `.tsx`)
-- **Zustand stores**: 23 (all with AsyncStorage persistence + Supabase sync)
-- **Supabase tables**: 24 (all with RLS + realtime)
-- **Route files**: 60 screens
-- **Components**: 39 reusable components
-- **Lib modules**: 25 utility files
-- **Animations**: 20+ using React Native Animated API
-- **Push notification triggers**: 11
+- **Zustand stores**: 26 (all with AsyncStorage persistence + Supabase sync)
+- **Supabase tables**: 29 (all with RLS + realtime)
+- **Route files**: 64 screens
+- **Components**: 45 reusable components
+- **Lib modules**: 26 utility files
+- **Hooks**: 7 custom hooks
+- **Animations**: 25+ using React Native Animated API
+- **Push notification triggers**: 17
+- **Home screen widgets**: 19
 
 ---
 
-## Stores → Tables Mapping (23 stores, 24 tables)
+## Stores → Tables Mapping (26 stores, 29 tables)
 
 | Store | Supabase Table | Key Field |
 |-------|---------------|-----------|
@@ -44,6 +45,9 @@
 | `useWatchPartyStore` | `watch_party_sessions` | `sessions` |
 | `useCouponStore` | `love_coupons` | `coupons` |
 | `useDreamStore` | `dreams` | `dreams` |
+| `useLoveMapStore` | `love_map_pins` | `pins` |
+| `usePromiseStore` | `couple_promises` | `promises` |
+| `useWishListStore` | `wish_items` | `wishes` |
 
 ---
 
@@ -55,33 +59,40 @@
 ### Auth (7)
 `sign-in`, `sign-up`, `forgot-password`, `reset-password`, `confirm`, `create-space`, `join-space`
 
-### Feature Screens (26)
-`bucket-list`, `card-maker`, `coupons`, `dates`, `distance`, `dreams`, `export`, `greetings`, `invite-partner`, `journal`, `letter-generator`, `love-language`, `mood`, `next-visit`, `partner-notes`, `playlist`, `questions`, `quiz`, `recap`, `settings`, `songs`, `stats`, `status`, `timeline`, `touch`, `watch-party`
+### Feature Screens (38)
+`bucket-list`, `card-maker`, `coupons`, `dates`, `distance`, `dreams`, `export`, `greetings`, `invite-partner`, `journal`, `letter-generator`, `love-language`, `love-map`, `mood`, `next-visit`, `partner-notes`, `playlist`, `promises`, `questions`, `quiz`, `recap`, `settings`, `songs`, `stats`, `status`, `timeline`, `touch`, `watch-party`, `wish-list`, `would-you-rather`
 
 ### Detail/Create Screens
 `notes/[id]`, `notes/new`, `memories/[id]`, `memories/new`, `countdowns/new`, `partner-notes/[id]`, `partner-notes/new`, `profile/couple`, `profile/[partner]`, `profile/nicknames`, `setup/index`
 
 ---
 
-## Home Screen Widgets (in order)
+## Home Screen Widgets (19, in order)
+
 1. `SyncStatusIndicator` — online/offline indicator
 2. Header (couple photo, greeting, names)
-3. `ValentinesDayCard` — Feb 14 only
-4. `MilestoneAlert` — upcoming/today milestones
-5. `ThinkingOfYouButton` — tap to send
-6. `PartnerSleepStatus` — inline sleep status
-7. `DurationCounter` + `FloatingHearts` — days together
-8. `QuickActions` — horizontal scroll (8 shortcuts)
-9. `StreakCounter` — consecutive activity days
-10. `SleepWakeToggle` — sleep/awake toggle
-11. `ThisDayInHistory` — same-date memories from past years
-12. `DailyCompliment` — rotating partner compliment
-13. `DailyQuote` — rotating love quote
-14. `WeeklyRecapCard` — weekly activity summary
+3. `CountdownCelebration` — celebration when a countdown reaches today
+4. `ValentinesDayCard` — Feb 14 only
+5. `MilestoneAlert` — upcoming/today milestones
+6. `QuickGreeting` — one-tap good morning/good night to partner
+7. `ThinkingOfYouButton` — tap to send
+8. `PartnerSleepStatus` — inline sleep status
+9. `DurationCounter` + `FloatingHearts` — days together
+10. `QuickActions` — horizontal scroll (8 shortcuts)
+11. `StreakCounter` — consecutive activity days
+12. `RelationshipHealth` — weekly activity score
+13. `SleepWakeToggle` — sleep/awake toggle
+14. `ThisDayInHistory` — same-date memories from past years
+15. `RelationshipTrivia` — fun facts from your data
+16. `LoveLanguageTip` — actionable tips based on partner's love language
+17. `DailyCompliment` — rotating partner compliment
+18. `DailyQuote` — rotating love quote
+19. `LoveFortune` — interactive fortune cookie
+20. `WeeklyRecapCard` — weekly activity summary
 
 ---
 
-## Push Notifications (11 triggers)
+## Push Notifications (17 triggers)
 
 | Event | Store/File |
 |-------|-----------|
@@ -94,7 +105,14 @@
 | Song dedication | `useSongStore` |
 | Watch party start | `useWatchPartyStore` |
 | Love coupon given | `useCouponStore` |
-| Dream added/achieved | `useDreamStore` |
+| Dream added | `useDreamStore` |
+| Dream achieved | `useDreamStore` |
+| New map pin | `useLoveMapStore` |
+| New promise made | `usePromiseStore` |
+| Promise kept | `usePromiseStore` |
+| Wish added for partner | `useWishListStore` |
+| Wish fulfilled | `useWishListStore` |
+| Good morning/night | `QuickGreeting` component |
 | This Day in History | `lib/history-notification.ts` |
 
 ---

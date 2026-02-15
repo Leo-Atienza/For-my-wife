@@ -30,15 +30,19 @@ export const WeeklyRecapCard = () => {
     <Pressable
       onPress={() => router.push('/recap')}
       style={({ pressed }) => ({
-        backgroundColor: theme.surface,
-        borderRadius: 20,
-        padding: 20,
-        borderWidth: 1,
-        borderColor: theme.accent,
-        gap: 16,
         opacity: pressed ? 0.9 : 1,
       })}
     >
+      <View
+        style={{
+          backgroundColor: theme.surface,
+          borderRadius: 20,
+          padding: 20,
+          borderWidth: 1,
+          borderColor: theme.accent,
+          gap: 16,
+        }}
+      >
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <Sparkles size={20} color={theme.primary} />
@@ -106,6 +110,7 @@ export const WeeklyRecapCard = () => {
           Most common mood: {recap.moodSummary}
         </Text>
       )}
+      </View>
     </Pressable>
   );
 };
