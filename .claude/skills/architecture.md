@@ -13,7 +13,7 @@ For-my-wife/
 │
 ├── app/                         # SCREENS ONLY — Expo Router pages
 ├── components/                  # REUSABLE UI — organized by feature
-├── stores/                      # STATE — Zustand stores (23 stores)
+├── stores/                      # STATE — Zustand stores (26 stores)
 ├── lib/                         # UTILITIES — pure functions, types, constants
 ├── hooks/                       # CUSTOM HOOKS — shared React hooks
 ├── supabase/                    # DATABASE — schema.sql
