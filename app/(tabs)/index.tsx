@@ -20,6 +20,7 @@ import { ValentinesDayCard } from '@/components/home/ValentinesDayCard';
 import { MilestoneAlert } from '@/components/home/MilestoneAlert';
 import { StreakCounter } from '@/components/home/StreakCounter';
 import { DailyCompliment } from '@/components/home/DailyCompliment';
+import { RelationshipHealth } from '@/components/home/RelationshipHealth';
 import { getGreeting } from '@/lib/utils';
 
 export default function HomeScreen() {
@@ -201,6 +202,9 @@ export default function HomeScreen() {
 
       {/* Relationship streak counter */}
       <StreakCounter />
+
+      {/* Weekly relationship health pulse */}
+      <RelationshipHealth />
 
       {/* Sleep/Wake toggle */}
       <SleepWakeToggle />

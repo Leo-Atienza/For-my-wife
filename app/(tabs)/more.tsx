@@ -31,6 +31,10 @@ import {
   Gift,
   Lightbulb,
   Brain,
+  CircleDot,
+  Handshake,
+  ShoppingBag,
+  Map,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -259,6 +263,13 @@ export default function MoreScreen() {
           route: '/quiz',
           emoji: '\u{1F9E0}',
         },
+        {
+          icon: <CircleDot size={22} color={theme.primary} />,
+          label: 'Would You Rather',
+          subtitle: 'Fun dilemmas for couples',
+          route: '/would-you-rather',
+          emoji: '\u{1F937}',
+        },
       ],
     },
     {
@@ -327,6 +338,27 @@ export default function MoreScreen() {
           subtitle: 'Plan your next time together',
           route: '/next-visit',
           emoji: '\u2708\ufe0f',
+        },
+        {
+          icon: <Handshake size={22} color={theme.primary} />,
+          label: 'Our Promises',
+          subtitle: 'Commitments to each other',
+          route: '/promises',
+          emoji: '\u{1F91D}',
+        },
+        {
+          icon: <ShoppingBag size={22} color={theme.primary} />,
+          label: 'Wish List',
+          subtitle: 'Gift ideas for each other',
+          route: '/wish-list',
+          emoji: '\u{1F381}',
+        },
+        {
+          icon: <Map size={22} color={theme.primary} />,
+          label: 'Love Map',
+          subtitle: 'Places special to your story',
+          route: '/love-map',
+          emoji: '\u{1F5FA}\ufe0f',
         },
       ],
     },

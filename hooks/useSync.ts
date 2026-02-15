@@ -22,6 +22,9 @@ import { useNextVisitStore } from '@/stores/useNextVisitStore';
 import { useWatchPartyStore } from '@/stores/useWatchPartyStore';
 import { useCouponStore } from '@/stores/useCouponStore';
 import { useDreamStore } from '@/stores/useDreamStore';
+import { usePromiseStore } from '@/stores/usePromiseStore';
+import { useWishListStore } from '@/stores/useWishListStore';
+import { useLoveMapStore } from '@/stores/useLoveMapStore';
 import { subscribeToTable, flushPendingOperations } from '@/lib/sync';
 import { flushPendingUploads } from '@/lib/photo-storage';
 import { supabase } from '@/lib/supabase';
@@ -216,6 +219,30 @@ export const useSync = () => {
       onDelete: (old) => useDreamStore.getState().syncRemoteDelete(old.id),
     });
     if (dreamsChannel) channels.push(dreamsChannel);
+
+    // Couple Promises
+    const promisesChannel = subscribeToTable<RemoteRecord>('couple_promises', {
+      onInsert: (record) => usePromiseStore.getState().syncRemoteInsert(record as never),
+      onUpdate: (record) => usePromiseStore.getState().syncRemoteUpdate(record as never),
+      onDelete: (old) => usePromiseStore.getState().syncRemoteDelete(old.id),
+    });
+    if (promisesChannel) channels.push(promisesChannel);
+
+    // Wish List
+    const wishListChannel = subscribeToTable<RemoteRecord>('wish_items', {
+      onInsert: (record) => useWishListStore.getState().syncRemoteInsert(record as never),
+      onUpdate: (record) => useWishListStore.getState().syncRemoteUpdate(record as never),
+      onDelete: (old) => useWishListStore.getState().syncRemoteDelete(old.id),
+    });
+    if (wishListChannel) channels.push(wishListChannel);
+
+    // Love Map Pins
+    const loveMapChannel = subscribeToTable<RemoteRecord>('love_map_pins', {
+      onInsert: (record) => useLoveMapStore.getState().syncRemoteInsert(record as never),
+      onUpdate: (record) => useLoveMapStore.getState().syncRemoteUpdate(record as never),
+      onDelete: (old) => useLoveMapStore.getState().syncRemoteDelete(old.id),
+    });
+    if (loveMapChannel) channels.push(loveMapChannel);
 
     channelsRef.current = channels;
 

@@ -544,3 +544,86 @@ CREATE POLICY "Users can manage dreams in their space"
   WITH CHECK (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()));
 
 ALTER PUBLICATION supabase_realtime ADD TABLE dreams;
+
+-- ============================================
+-- Couple Promises
+-- ============================================
+
+CREATE TABLE couple_promises (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT DEFAULT '',
+  emoji TEXT DEFAULT '🤝',
+  made_by TEXT CHECK (made_by IN ('partner1', 'partner2')) NOT NULL,
+  is_kept BOOLEAN DEFAULT false,
+  kept_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE couple_promises ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage couple_promises in their space"
+  ON couple_promises
+  FOR ALL
+  USING (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()))
+  WITH CHECK (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()));
+
+ALTER PUBLICATION supabase_realtime ADD TABLE couple_promises;
+
+-- ============================================
+-- Wish List (Gift Ideas)
+-- ============================================
+
+CREATE TABLE wish_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT DEFAULT '',
+  emoji TEXT DEFAULT '🎁',
+  category TEXT CHECK (category IN ('experience', 'gift', 'surprise', 'homemade', 'other')) NOT NULL,
+  for_partner TEXT CHECK (for_partner IN ('partner1', 'partner2')) NOT NULL,
+  added_by TEXT CHECK (added_by IN ('partner1', 'partner2')) NOT NULL,
+  is_fulfilled BOOLEAN DEFAULT false,
+  fulfilled_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE wish_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage wish_items in their space"
+  ON wish_items
+  FOR ALL
+  USING (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()))
+  WITH CHECK (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()));
+
+ALTER PUBLICATION supabase_realtime ADD TABLE wish_items;
+
+-- ============================================
+-- Love Map (Places We've Been)
+-- ============================================
+
+CREATE TABLE love_map_pins (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
+  place_name TEXT NOT NULL,
+  description TEXT,
+  category TEXT CHECK (category IN ('first-date', 'vacation', 'restaurant', 'adventure', 'home', 'special', 'other')) NOT NULL,
+  emoji TEXT DEFAULT '📍',
+  date TEXT,
+  added_by TEXT CHECK (added_by IN ('partner1', 'partner2')) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE love_map_pins ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage love_map_pins in their space"
+  ON love_map_pins
+  FOR ALL
+  USING (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()))
+  WITH CHECK (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()));
+
+ALTER PUBLICATION supabase_realtime ADD TABLE love_map_pins;

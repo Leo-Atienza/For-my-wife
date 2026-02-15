@@ -407,6 +407,72 @@ export interface Dream {
 }
 
 // ============================================
+// Love Map (Places We've Been)
+// ============================================
+
+export type LoveMapCategory =
+  | 'first-date'
+  | 'vacation'
+  | 'restaurant'
+  | 'adventure'
+  | 'home'
+  | 'special'
+  | 'other';
+
+export interface LoveMapPin {
+  id: string;
+  placeName: string;
+  description?: string;
+  category: LoveMapCategory;
+  emoji: string;
+  date?: string;
+  addedBy: PartnerRole;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// ============================================
+// Couple Promises
+// ============================================
+
+export interface CouplePromise {
+  id: string;
+  title: string;
+  description: string;
+  emoji: string;
+  madeBy: PartnerRole;
+  isKept: boolean;
+  keptAt?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// ============================================
+// Wish List (Gift Ideas)
+// ============================================
+
+export type WishCategory =
+  | 'experience'
+  | 'gift'
+  | 'surprise'
+  | 'homemade'
+  | 'other';
+
+export interface WishItem {
+  id: string;
+  title: string;
+  description: string;
+  emoji: string;
+  category: WishCategory;
+  forPartner: PartnerRole;
+  addedBy: PartnerRole;
+  isFulfilled: boolean;
+  fulfilledAt?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// ============================================
 // Onboarding Types
 // ============================================
 

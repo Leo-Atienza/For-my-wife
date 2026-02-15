@@ -20,6 +20,9 @@ import { useNextVisitStore } from '@/stores/useNextVisitStore';
 import { useWatchPartyStore } from '@/stores/useWatchPartyStore';
 import { useCouponStore } from '@/stores/useCouponStore';
 import { useDreamStore } from '@/stores/useDreamStore';
+import { usePromiseStore } from '@/stores/usePromiseStore';
+import { useWishListStore } from '@/stores/useWishListStore';
+import { useLoveMapStore } from '@/stores/useLoveMapStore';
 import type {
   LoveNote,
   Memory,
@@ -39,6 +42,9 @@ import type {
   WatchPartySession,
   LoveCoupon,
   Dream,
+  CouplePromise,
+  WishItem,
+  LoveMapPin,
   PartnerRole,
 } from '@/lib/types';
 
@@ -70,6 +76,9 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       watchPartySessions,
       loveCoupons,
       dreams,
+      couplePromises,
+      wishItems,
+      loveMapPins,
     ] = await Promise.all([
       pullFromSupabase<LoveNote>('love_notes'),
       pullFromSupabase<Memory>('memories'),
@@ -92,6 +101,9 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       pullFromSupabase<WatchPartySession>('watch_party_sessions'),
       pullFromSupabase<LoveCoupon>('love_coupons'),
       pullFromSupabase<Dream>('dreams'),
+      pullFromSupabase<CouplePromise>('couple_promises'),
+      pullFromSupabase<WishItem>('wish_items'),
+      pullFromSupabase<LoveMapPin>('love_map_pins'),
     ]);
 
     // Merge remote data with local data (preserving offline-created records)
@@ -162,6 +174,15 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
     );
     useDreamStore.getState().loadFromRemote(
       mergeById(useDreamStore.getState().dreams, dreams)
+    );
+    usePromiseStore.getState().loadFromRemote(
+      mergeById(usePromiseStore.getState().promises, couplePromises)
+    );
+    useWishListStore.getState().loadFromRemote(
+      mergeById(useWishListStore.getState().wishes, wishItems)
+    );
+    useLoveMapStore.getState().loadFromRemote(
+      mergeById(useLoveMapStore.getState().pins, loveMapPins)
     );
 
     console.log('Initial data load from Supabase complete');
