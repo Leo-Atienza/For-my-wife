@@ -21,6 +21,7 @@ import { useSleepWakeStore } from '@/stores/useSleepWakeStore';
 import { useNextVisitStore } from '@/stores/useNextVisitStore';
 import { useWatchPartyStore } from '@/stores/useWatchPartyStore';
 import { useCouponStore } from '@/stores/useCouponStore';
+import { useDreamStore } from '@/stores/useDreamStore';
 import { subscribeToTable, flushPendingOperations } from '@/lib/sync';
 import { flushPendingUploads } from '@/lib/photo-storage';
 import { supabase } from '@/lib/supabase';
@@ -208,6 +209,13 @@ export const useSync = () => {
       onDelete: (old) => useCouponStore.getState().syncRemoteDelete(old.id),
     });
     if (couponsChannel) channels.push(couponsChannel);
+
+    const dreamsChannel = subscribeToTable<RemoteRecord>('dreams', {
+      onInsert: (record) => useDreamStore.getState().syncRemoteInsert(record as never),
+      onUpdate: (record) => useDreamStore.getState().syncRemoteUpdate(record as never),
+      onDelete: (old) => useDreamStore.getState().syncRemoteDelete(old.id),
+    });
+    if (dreamsChannel) channels.push(dreamsChannel);
 
     channelsRef.current = channels;
 

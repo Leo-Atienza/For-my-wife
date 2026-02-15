@@ -19,6 +19,7 @@ import { useSleepWakeStore } from '@/stores/useSleepWakeStore';
 import { useNextVisitStore } from '@/stores/useNextVisitStore';
 import { useWatchPartyStore } from '@/stores/useWatchPartyStore';
 import { useCouponStore } from '@/stores/useCouponStore';
+import { useDreamStore } from '@/stores/useDreamStore';
 import type {
   LoveNote,
   Memory,
@@ -37,6 +38,7 @@ import type {
   NextVisit,
   WatchPartySession,
   LoveCoupon,
+  Dream,
   PartnerRole,
 } from '@/lib/types';
 
@@ -67,6 +69,7 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       nextVisits,
       watchPartySessions,
       loveCoupons,
+      dreams,
     ] = await Promise.all([
       pullFromSupabase<LoveNote>('love_notes'),
       pullFromSupabase<Memory>('memories'),
@@ -88,6 +91,7 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       pullFromSupabase<NextVisit>('next_visits'),
       pullFromSupabase<WatchPartySession>('watch_party_sessions'),
       pullFromSupabase<LoveCoupon>('love_coupons'),
+      pullFromSupabase<Dream>('dreams'),
     ]);
 
     // Merge remote data with local data (preserving offline-created records)
@@ -155,6 +159,9 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
     );
     useCouponStore.getState().loadFromRemote(
       mergeById(useCouponStore.getState().coupons, loveCoupons)
+    );
+    useDreamStore.getState().loadFromRemote(
+      mergeById(useDreamStore.getState().dreams, dreams)
     );
 
     console.log('Initial data load from Supabase complete');

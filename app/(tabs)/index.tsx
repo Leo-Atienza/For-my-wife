@@ -19,6 +19,7 @@ import { ThisDayInHistory } from '@/components/home/ThisDayInHistory';
 import { ValentinesDayCard } from '@/components/home/ValentinesDayCard';
 import { MilestoneAlert } from '@/components/home/MilestoneAlert';
 import { StreakCounter } from '@/components/home/StreakCounter';
+import { DailyCompliment } from '@/components/home/DailyCompliment';
 import { getGreeting } from '@/lib/utils';
 
 export default function HomeScreen() {
@@ -206,6 +207,9 @@ export default function HomeScreen() {
 
       {/* This Day in Our History */}
       <ThisDayInHistory />
+
+      {/* Daily compliment for partner */}
+      <DailyCompliment />
 
       {/* Daily quote */}
       <DailyQuote />

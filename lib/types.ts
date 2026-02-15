@@ -381,6 +381,32 @@ export interface LoveCoupon {
 }
 
 // ============================================
+// Dream Board
+// ============================================
+
+export type DreamCategory =
+  | 'travel'
+  | 'home'
+  | 'adventure'
+  | 'career'
+  | 'family'
+  | 'lifestyle';
+
+export interface Dream {
+  id: string;
+  title: string;
+  description?: string;
+  category: DreamCategory;
+  emoji: string;
+  addedBy: PartnerRole;
+  isAchieved: boolean;
+  achievedAt?: string;
+  targetYear?: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// ============================================
 // Onboarding Types
 // ============================================
 

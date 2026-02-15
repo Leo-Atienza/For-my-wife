@@ -518,3 +518,29 @@ CREATE POLICY "Users can manage love coupons in their space"
   WITH CHECK (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()));
 
 ALTER PUBLICATION supabase_realtime ADD TABLE love_coupons;
+
+-- Dreams / Vision Board
+CREATE TABLE dreams (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  space_id UUID REFERENCES spaces(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  category TEXT CHECK (category IN ('travel', 'home', 'adventure', 'career', 'family', 'lifestyle')) NOT NULL,
+  emoji TEXT DEFAULT '\u{2728}',
+  added_by TEXT CHECK (added_by IN ('partner1', 'partner2')) NOT NULL,
+  is_achieved BOOLEAN DEFAULT false,
+  achieved_at TIMESTAMPTZ,
+  target_year INTEGER,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE dreams ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage dreams in their space"
+  ON dreams
+  FOR ALL
+  USING (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()))
+  WITH CHECK (space_id IN (SELECT space_id FROM space_members WHERE user_id = auth.uid()));
+
+ALTER PUBLICATION supabase_realtime ADD TABLE dreams;

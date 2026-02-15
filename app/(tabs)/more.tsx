@@ -29,6 +29,8 @@ import {
   BarChart3,
   Sun,
   Gift,
+  Lightbulb,
+  Brain,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -242,6 +244,20 @@ export default function MoreScreen() {
           subtitle: 'Create & send greeting cards',
           route: '/card-maker',
           emoji: '\u{1F48C}',
+        },
+        {
+          icon: <Lightbulb size={22} color={theme.primary} />,
+          label: 'Dream Board',
+          subtitle: 'Shared dreams & goals',
+          route: '/dreams',
+          emoji: '\u{1F320}',
+        },
+        {
+          icon: <Brain size={22} color={theme.primary} />,
+          label: 'Know Me Quiz',
+          subtitle: 'How well do you know each other?',
+          route: '/quiz',
+          emoji: '\u{1F9E0}',
         },
       ],
     },
