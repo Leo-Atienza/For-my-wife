@@ -1,5 +1,6 @@
 import { View, FlatList, Pressable } from 'react-native';
 import { useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useTimelineStore } from '@/stores/useTimelineStore';
@@ -10,6 +11,7 @@ import { TimelineItem } from '@/components/timeline/TimelineItem';
 import { AddMilestoneModal } from '@/components/timeline/AddMilestoneModal';
 
 export default function TimelineScreen() {
+  const insets = useSafeAreaInsets();
   const theme = useTheme();
   const milestones = useTimelineStore((state) => state.milestones);
   const addMilestone = useTimelineStore((state) => state.addMilestone);
@@ -69,7 +71,7 @@ export default function TimelineScreen() {
               isLast={index === allMilestones.length - 1}
             />
           )}
-          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40, paddingTop: 8 }}
+          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: insets.bottom + 40, paddingTop: 8 }}
           showsVerticalScrollIndicator={false}
         />
       )}

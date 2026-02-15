@@ -289,8 +289,8 @@ export default function SettingsScreen() {
               value={bgLocationOn}
               onValueChange={toggleBackgroundLocation}
               disabled={bgLocationLoading}
-              trackColor={{ false: '#ccc', true: theme.accent }}
-              thumbColor={bgLocationOn ? theme.primary : '#f4f3f4'}
+              trackColor={{ false: theme.textMuted + '40', true: theme.accent }}
+              thumbColor={bgLocationOn ? theme.primary : theme.surface}
             />
           </View>
         </View>
@@ -360,11 +360,11 @@ export default function SettingsScreen() {
           <Pressable
             onPress={handleReset}
             style={{
-              backgroundColor: '#FEF2F2',
+              backgroundColor: theme.danger + '10',
               borderRadius: 12,
               padding: 16,
               borderWidth: 1,
-              borderColor: '#FECACA',
+              borderColor: theme.danger + '30',
             }}
           >
             <Text style={{ fontSize: 14, fontFamily: 'Inter_600SemiBold', color: theme.danger }}>

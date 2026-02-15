@@ -157,7 +157,7 @@ export default function QuestionsScreen() {
           <View style={{ alignItems: 'center', gap: 8 }}>
             <View
               style={{
-                backgroundColor: isPhotoChallenge ? '#FEF3C7' : theme.primarySoft,
+                backgroundColor: isPhotoChallenge ? theme.accent + '30' : theme.primarySoft,
                 paddingHorizontal: 10,
                 paddingVertical: 4,
                 borderRadius: 8,
@@ -171,7 +171,7 @@ export default function QuestionsScreen() {
                 style={{
                   fontSize: 11,
                   fontFamily: 'Inter_600SemiBold',
-                  color: isPhotoChallenge ? '#D97706' : theme.primary,
+                  color: isPhotoChallenge ? theme.primary : theme.primary,
                   textTransform: 'uppercase',
                 }}
               >
@@ -343,13 +343,13 @@ export default function QuestionsScreen() {
                     {entry.category === 'photo-challenge' && (
                       <View
                         style={{
-                          backgroundColor: '#FEF3C7',
+                          backgroundColor: theme.accent + '30',
                           paddingHorizontal: 6,
                           paddingVertical: 1,
                           borderRadius: 4,
                         }}
                       >
-                        <Text style={{ fontSize: 9, fontFamily: 'Inter_600SemiBold', color: '#D97706' }}>
+                        <Text style={{ fontSize: 9, fontFamily: 'Inter_600SemiBold', color: theme.primary }}>
                           PHOTO
                         </Text>
                       </View>

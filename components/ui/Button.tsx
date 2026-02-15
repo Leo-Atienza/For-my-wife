@@ -24,10 +24,10 @@ export const Button = ({
   let fg = '#FFFFFF';
 
   if (variant === 'primary') {
-    bg = isDisabled ? '#F9A8B8' : theme.primary;
+    bg = isDisabled ? theme.accent : theme.primary;
     fg = '#FFFFFF';
   } else if (variant === 'secondary') {
-    bg = '#FFFFFF';
+    bg = theme.surface;
     fg = isDisabled ? theme.textMuted : theme.primary;
   } else {
     bg = 'transparent';

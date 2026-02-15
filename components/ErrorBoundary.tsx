@@ -1,5 +1,12 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
+import { THEMES } from '@/lib/constants';
+import { useCoupleStore } from '@/stores/useCoupleStore';
+
+function getThemeColors() {
+  const themeName = useCoupleStore.getState().profile?.theme ?? 'rose';
+  return THEMES[themeName];
+}
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -29,11 +36,12 @@ export class ErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
+      const colors = getThemeColors();
       return (
         <View
           style={{
             flex: 1,
-            backgroundColor: '#FFFBFB',
+            backgroundColor: colors.background,
             justifyContent: 'center',
             alignItems: 'center',
             paddingHorizontal: 32,
@@ -45,7 +53,7 @@ export class ErrorBoundary extends React.Component<
             style={{
               fontSize: 24,
               fontWeight: '700',
-              color: '#1C1917',
+              color: colors.textPrimary,
               textAlign: 'center',
             }}
           >
@@ -54,7 +62,7 @@ export class ErrorBoundary extends React.Component<
           <Text
             style={{
               fontSize: 15,
-              color: '#78716C',
+              color: colors.textMuted,
               textAlign: 'center',
               lineHeight: 22,
             }}
@@ -65,7 +73,7 @@ export class ErrorBoundary extends React.Component<
             <Text
               style={{
                 fontSize: 12,
-                color: '#DC2626',
+                color: colors.danger,
                 textAlign: 'center',
                 marginTop: 8,
               }}
@@ -76,7 +84,7 @@ export class ErrorBoundary extends React.Component<
           <Pressable
             onPress={this.handleReload}
             style={{
-              backgroundColor: '#E11D48',
+              backgroundColor: colors.primary,
               borderRadius: 9999,
               paddingHorizontal: 32,
               paddingVertical: 14,
@@ -128,11 +136,12 @@ export class ScreenErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
+      const colors = getThemeColors();
       return (
         <View
           style={{
             flex: 1,
-            backgroundColor: '#FFFBFB',
+            backgroundColor: colors.background,
             justifyContent: 'center',
             alignItems: 'center',
             paddingHorizontal: 32,
@@ -144,7 +153,7 @@ export class ScreenErrorBoundary extends React.Component<
             style={{
               fontSize: 18,
               fontWeight: '600',
-              color: '#1C1917',
+              color: colors.textPrimary,
               textAlign: 'center',
             }}
           >
@@ -153,7 +162,7 @@ export class ScreenErrorBoundary extends React.Component<
           <Text
             style={{
               fontSize: 14,
-              color: '#78716C',
+              color: colors.textMuted,
               textAlign: 'center',
               lineHeight: 20,
             }}
@@ -164,7 +173,7 @@ export class ScreenErrorBoundary extends React.Component<
             <Text
               style={{
                 fontSize: 11,
-                color: '#DC2626',
+                color: colors.danger,
                 textAlign: 'center',
                 marginTop: 4,
               }}
@@ -175,7 +184,7 @@ export class ScreenErrorBoundary extends React.Component<
           <Pressable
             onPress={this.handleRetry}
             style={{
-              backgroundColor: '#E11D48',
+              backgroundColor: colors.primary,
               borderRadius: 9999,
               paddingHorizontal: 24,
               paddingVertical: 12,

@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { Animated, View } from 'react-native';
+import { useTheme } from '@/hooks/useTheme';
 
 const PARTICLE_COUNT = 12;
-const COLORS = ['#E11D48', '#F59E0B', '#7C3AED', '#10B981', '#3B82F6', '#EC4899'];
 
 interface Particle {
   translateX: Animated.Value;
@@ -20,6 +20,8 @@ interface ConfettiBurstProps {
 }
 
 export const ConfettiBurst = ({ active, onComplete }: ConfettiBurstProps) => {
+  const theme = useTheme();
+  const confettiColors = [theme.primary, theme.accent, theme.success, '#F59E0B', '#3B82F6', '#EC4899'];
   const particles = useRef<Particle[]>(
     Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
       translateX: new Animated.Value(0),
@@ -27,7 +29,7 @@ export const ConfettiBurst = ({ active, onComplete }: ConfettiBurstProps) => {
       opacity: new Animated.Value(0),
       scale: new Animated.Value(0),
       rotate: new Animated.Value(0),
-      color: COLORS[i % COLORS.length],
+      color: confettiColors[i % confettiColors.length],
       angle: (i / PARTICLE_COUNT) * Math.PI * 2,
     }))
   ).current;
