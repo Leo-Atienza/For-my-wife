@@ -31,7 +31,7 @@ export const migrateLocalDataToCloud = async (): Promise<void> => {
   const alreadyMigrated = await AsyncStorage.getItem(MIGRATION_KEY);
   if (alreadyMigrated === 'true') return;
 
-  console.log('Starting one-time local-to-cloud migration...');
+  // Starting one-time local-to-cloud migration
 
   try {
     // Love notes
@@ -152,7 +152,7 @@ export const migrateLocalDataToCloud = async (): Promise<void> => {
 
     // Mark migration as complete
     await AsyncStorage.setItem(MIGRATION_KEY, 'true');
-    console.log('Local-to-cloud migration complete');
+    // Migration complete
   } catch (error) {
     console.error('Migration failed (will retry on next launch):', error);
   }

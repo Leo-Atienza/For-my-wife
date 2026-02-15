@@ -166,12 +166,12 @@ export default function QuestionsScreen() {
                 gap: 4,
               }}
             >
-              {isPhotoChallenge && <Camera size={12} color="#D97706" />}
+              {isPhotoChallenge && <Camera size={12} color={theme.primary} />}
               <Text
                 style={{
                   fontSize: 11,
                   fontFamily: 'Inter_600SemiBold',
-                  color: isPhotoChallenge ? theme.primary : theme.primary,
+                  color: theme.primary,
                   textTransform: 'uppercase',
                 }}
               >

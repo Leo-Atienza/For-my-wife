@@ -34,7 +34,7 @@ export const PartnerSleepStatus = () => {
       {isSleeping ? (
         <Moon size={16} color={theme.primary} />
       ) : (
-        <Sun size={16} color="#F59E0B" />
+        <Sun size={16} color={theme.accent} />
       )}
       <Text
         style={{

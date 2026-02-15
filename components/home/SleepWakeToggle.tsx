@@ -42,7 +42,7 @@ export const SleepWakeToggle = () => {
         {isSleeping ? (
           <Moon size={22} color={theme.primary} />
         ) : (
-          <Sun size={22} color="#F59E0B" />
+          <Sun size={22} color={theme.accent} />
         )}
         <View style={{ flex: 1 }}>
           <Text

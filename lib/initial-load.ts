@@ -185,7 +185,6 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       mergeById(useLoveMapStore.getState().pins, loveMapPins)
     );
 
-    console.log('Initial data load from Supabase complete');
   } catch (error) {
     console.error('Failed to load initial data from Supabase:', error);
   }
