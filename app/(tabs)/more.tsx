@@ -26,6 +26,9 @@ import {
   ListMusic,
   PenTool,
   Ticket,
+  BarChart3,
+  Sun,
+  Gift,
 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -226,6 +229,20 @@ export default function MoreScreen() {
           route: '/coupons',
           emoji: '\u{1F3AB}',
         },
+        {
+          icon: <Sun size={22} color={theme.primary} />,
+          label: 'Greetings',
+          subtitle: 'Send morning & night messages',
+          route: '/greetings',
+          emoji: '\u{1F31E}',
+        },
+        {
+          icon: <Gift size={22} color={theme.primary} />,
+          label: 'Card Maker',
+          subtitle: 'Create & send greeting cards',
+          route: '/card-maker',
+          emoji: '\u{1F48C}',
+        },
       ],
     },
     {
@@ -328,6 +345,13 @@ export default function MoreScreen() {
           subtitle: 'Your nickname history',
           route: '/profile/nicknames',
           emoji: '\u{1F31F}',
+        },
+        {
+          icon: <BarChart3 size={22} color={theme.primary} />,
+          label: 'Our Stats',
+          subtitle: 'Your relationship by the numbers',
+          route: '/stats',
+          emoji: '\u{1F4CA}',
         },
         {
           icon: <FileDown size={22} color={theme.primary} />,
