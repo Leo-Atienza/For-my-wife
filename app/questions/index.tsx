@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, Pressable, Image } from 'react-native';
-import { useState } from 'react';
+import { View, Text, ScrollView, Pressable, Image, ActivityIndicator } from 'react-native';
+import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { MessageCircle, Eye, EyeOff, Camera } from 'lucide-react-native';
@@ -15,6 +15,7 @@ import type { PartnerRole } from '@/lib/types';
 export default function QuestionsScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const getTodayEntry = useQuestionsStore((state) => state.getTodayEntry);
   const createTodayEntry = useQuestionsStore((state) => state.createTodayEntry);
   const answerQuestion = useQuestionsStore((state) => state.answerQuestion);
   const submitPhoto = useQuestionsStore((state) => state.submitPhoto);
@@ -26,7 +27,25 @@ export default function QuestionsScreen() {
   const [answer, setAnswer] = useState('');
   const [showAnswers, setShowAnswers] = useState(false);
 
-  const todayEntry = createTodayEntry();
+  // Create today's entry in an effect to avoid setState during render
+  useEffect(() => {
+    if (!getTodayEntry()) {
+      createTodayEntry();
+    }
+  }, [getTodayEntry, createTodayEntry]);
+
+  const todayEntry = getTodayEntry();
+
+  // Show loading while entry is being created
+  if (!todayEntry) {
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.background, justifyContent: 'center', alignItems: 'center' }}>
+        <PageHeader title="Daily Questions" showBack />
+        <ActivityIndicator size="large" color={theme.primary} />
+      </View>
+    );
+  }
+
   const isPhotoChallenge = todayEntry.category === 'photo-challenge';
 
   const myAnswer =
