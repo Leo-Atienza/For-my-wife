@@ -9,11 +9,11 @@ export const LOVE_LANGUAGE_LABELS: Record<LoveLanguageType, string> = {
 };
 
 export const LOVE_LANGUAGE_EMOJIS: Record<LoveLanguageType, string> = {
-  'words-of-affirmation': '\u{1F4AC}',
-  'quality-time': '\u{23F3}',
-  'receiving-gifts': '\u{1F381}',
-  'acts-of-service': '\u{1F91D}',
-  'physical-touch': '\u{1F917}',
+  'words-of-affirmation': '💬',
+  'quality-time': '⏳',
+  'receiving-gifts': '🎁',
+  'acts-of-service': '🤝',
+  'physical-touch': '🤗',
 };
 
 export const LOVE_LANGUAGE_DESCRIPTIONS: Record<LoveLanguageType, string> = {

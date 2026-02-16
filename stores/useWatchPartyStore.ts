@@ -57,7 +57,7 @@ export const useWatchPartyStore = create<WatchPartyState>()(
         const updated = get().sessions.find((s) => s.id === id);
         if (updated) {
           pushToSupabase('watch_party_sessions', updated);
-          sendPushToPartner('Watch Party Started', `"${updated.title}" is starting! Join in \u{1F3AC}`, '/watch-party');
+          sendPushToPartner('Watch Party Started', `"${updated.title}" is starting! Join in 🎬`, '/watch-party');
         }
       },
 

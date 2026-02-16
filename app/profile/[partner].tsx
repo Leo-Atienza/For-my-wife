@@ -140,7 +140,7 @@ export default function PartnerProfileScreen() {
           >
             <Card>
               <View style={{ alignItems: 'center', gap: 6 }}>
-                <Text style={{ fontSize: 28 }}>{'\u{1F49D}'}</Text>
+                <Text style={{ fontSize: 28 }}>{'💝'}</Text>
                 <Text
                   style={{
                     fontSize: 14,

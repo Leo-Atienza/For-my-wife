@@ -25,8 +25,8 @@ import { Input } from '@/components/ui/Input';
 import type { WatchPartySession } from '@/lib/types';
 
 const TYPE_CONFIG = {
-  movie: { icon: Film, label: 'Movie Night', emoji: '\u{1F3AC}' },
-  dinner: { icon: UtensilsCrossed, label: 'Dinner Date', emoji: '\u{1F37D}\ufe0f' },
+  movie: { icon: Film, label: 'Movie Night', emoji: '🎬' },
+  dinner: { icon: UtensilsCrossed, label: 'Dinner Date', emoji: '🍽\ufe0f' },
   activity: { icon: Sparkles, label: 'Activity', emoji: '\u2728' },
 };
 
@@ -259,7 +259,7 @@ export default function WatchPartyScreen() {
           : partner2?.name ?? 'Your partner';
       sendPushToPartner(
         'Watch Party',
-        `${myName} joined "${activeSession.title}"! \u{1F3AC}`,
+        `${myName} joined "${activeSession.title}"! 🎬`,
         '/watch-party'
       );
     }
@@ -414,7 +414,7 @@ export default function WatchPartyScreen() {
         {/* Empty state */}
         {sessions.length === 0 && !showForm && (
           <EmptyState
-            emoji={'\u{1F3AC}'}
+            emoji={'🎬'}
             title="No watch parties yet"
             subtitle="Start a shared timer for movie nights, dinner dates, or activities"
           />

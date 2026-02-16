@@ -63,8 +63,8 @@ export const useSleepWakeStore = create<SleepWakeState>()(
         });
         const message =
           status === 'sleeping'
-            ? '\u{1F31C} Your partner is going to sleep. Goodnight!'
-            : '\u{2600}\ufe0f Your partner just woke up. Good morning!';
+            ? '🌜 Your partner is going to sleep. Goodnight!'
+            : '☀\ufe0f Your partner just woke up. Good morning!';
         sendPushToPartner(
           status === 'sleeping' ? 'Goodnight' : 'Good Morning',
           message,

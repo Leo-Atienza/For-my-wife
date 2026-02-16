@@ -251,7 +251,7 @@ export const generateYearbookHtml = (): string => {
   <!-- Timeline -->
   ${sortedMilestones.length > 0 ? `
   <div class="section">
-    <h2 class="section-title">\u{1F4D6} Our Timeline</h2>
+    <h2 class="section-title">📖 Our Timeline</h2>
     ${sortedMilestones
       .map(
         (m) => `
@@ -267,7 +267,7 @@ export const generateYearbookHtml = (): string => {
   <!-- Love Notes -->
   ${sortedNotes.length > 0 ? `
   <div class="section">
-    <h2 class="section-title">\u{1F48C} Love Notes</h2>
+    <h2 class="section-title">💌 Love Notes</h2>
     ${sortedNotes
       .slice(0, 50) // Limit to 50 notes for PDF size
       .map(
@@ -285,7 +285,7 @@ export const generateYearbookHtml = (): string => {
   <!-- Memories -->
   ${sortedMemories.length > 0 ? `
   <div class="section">
-    <h2 class="section-title">\u{1F4F8} Memories</h2>
+    <h2 class="section-title">📸 Memories</h2>
     <div class="memory-grid">
       ${sortedMemories
         .slice(0, 30) // Limit for PDF size
@@ -294,7 +294,7 @@ export const generateYearbookHtml = (): string => {
         <div class="memory-card">
           <div class="entry-date">${formatDate(m.date)}</div>
           <div class="memory-caption">${escapeHtml(m.caption)}</div>
-          ${m.location ? `<div class="entry-date">\u{1F4CD} ${escapeHtml(m.location)}</div>` : ''}
+          ${m.location ? `<div class="entry-date">📍 ${escapeHtml(m.location)}</div>` : ''}
         </div>`
         )
         .join('')}
@@ -305,12 +305,12 @@ export const generateYearbookHtml = (): string => {
   <!-- Song Dedications -->
   ${sortedSongs.length > 0 ? `
   <div class="section">
-    <h2 class="section-title">\u{1F3B5} Our Soundtrack</h2>
+    <h2 class="section-title">🎵 Our Soundtrack</h2>
     ${sortedSongs
       .map(
         (s) => `
       <div class="song-row">
-        <span class="song-emoji">\u{1F3B5}</span>
+        <span class="song-emoji">🎵</span>
         <div class="song-info">
           <div class="song-title">${escapeHtml(s.title)}</div>
           <div class="song-artist">${escapeHtml(s.artist)}</div>

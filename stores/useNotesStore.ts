@@ -40,7 +40,7 @@ export const useNotesStore = create<NotesState>()(
           notes: [note, ...state.notes],
         }));
         pushToSupabase('love_notes', note);
-        sendPushToPartner('New Love Note', 'Your partner left you a love note \u{1F48C}', '/notes');
+        sendPushToPartner('New Love Note', 'Your partner left you a love note 💌', '/notes');
       },
 
       removeNote: (id) => {

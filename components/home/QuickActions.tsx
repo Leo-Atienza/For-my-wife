@@ -29,31 +29,31 @@ export const QuickActions = () => {
       icon: <PenLine size={22} color={theme.primary} />,
       label: 'Notes',
       route: '/(tabs)/notes',
-      emoji: '\u{1F48C}',
+      emoji: '💌',
     },
     {
       icon: <Camera size={22} color={theme.primary} />,
       label: 'Memories',
       route: '/(tabs)/memories',
-      emoji: '\u{1F4F8}',
+      emoji: '📸',
     },
     {
       icon: <Clock size={22} color={theme.primary} />,
       label: 'Countdowns',
       route: '/(tabs)/countdowns',
-      emoji: '\u{23F3}',
+      emoji: '⏳',
     },
     {
       icon: <BookOpen size={22} color={theme.primary} />,
       label: 'Timeline',
       route: '/timeline',
-      emoji: '\u{1F4D6}',
+      emoji: '📖',
     },
     {
       icon: <CalendarHeart size={22} color={theme.primary} />,
       label: 'Dates',
       route: '/dates',
-      emoji: '\u{1F495}',
+      emoji: '💕',
     },
     {
       icon: <CheckSquare size={22} color={theme.primary} />,
@@ -65,13 +65,13 @@ export const QuickActions = () => {
       icon: <Smile size={22} color={theme.primary} />,
       label: 'Mood',
       route: '/mood',
-      emoji: '\u{1F60A}',
+      emoji: '😊',
     },
     {
       icon: <Music size={22} color={theme.primary} />,
       label: 'Songs',
       route: '/songs',
-      emoji: '\u{1F3B5}',
+      emoji: '🎵',
     },
   ];
 

@@ -138,7 +138,7 @@ export default function SettingsScreen() {
                   color: theme.textPrimary,
                 }}
               >
-                {'\u{1F48D}'} Invite Partner
+                {'💍'} Invite Partner
               </Text>
               <Text
                 style={{

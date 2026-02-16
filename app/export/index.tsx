@@ -137,10 +137,10 @@ export default function ExportScreen() {
             What's included
           </Text>
           <View style={{ gap: 10 }}>
-            <StatRow emoji={'\u{1F4D6}'} label="Timeline milestones" count={milestonesCount} theme={theme} />
-            <StatRow emoji={'\u{1F48C}'} label="Love notes" count={notesCount} theme={theme} />
-            <StatRow emoji={'\u{1F4F8}'} label="Memories" count={memoriesCount} theme={theme} />
-            <StatRow emoji={'\u{1F3B5}'} label="Song dedications" count={songsCount} theme={theme} />
+            <StatRow emoji={'📖'} label="Timeline milestones" count={milestonesCount} theme={theme} />
+            <StatRow emoji={'💌'} label="Love notes" count={notesCount} theme={theme} />
+            <StatRow emoji={'📸'} label="Memories" count={memoriesCount} theme={theme} />
+            <StatRow emoji={'🎵'} label="Song dedications" count={songsCount} theme={theme} />
             <StatRow emoji={'\u2728'} label="Bucket list completed" count={bucketDone} theme={theme} />
           </View>
           <View

@@ -59,7 +59,7 @@ export default function InvitePartnerScreen() {
     if (!inviteCode) return;
     try {
       await Share.share({
-        message: `Join me on Us! \u{1F496}\n\nUse this invite code to connect with me:\n\n${inviteCode}\n\nDownload the app and enter this code to join our private space.`,
+        message: `Join me on Us! 💖\n\nUse this invite code to connect with me:\n\n${inviteCode}\n\nDownload the app and enter this code to join our private space.`,
       });
     } catch {
       // User cancelled sharing
@@ -120,7 +120,7 @@ export default function InvitePartnerScreen() {
                   textAlign: 'center',
                 }}
               >
-                {'\u{1F496}'} Connected!
+                {'💖'} Connected!
               </Text>
               <Text
                 style={{
@@ -170,7 +170,7 @@ export default function InvitePartnerScreen() {
                   alignItems: 'center',
                 }}
               >
-                <Text style={{ fontSize: 40 }}>{'\u{1F48C}'}</Text>
+                <Text style={{ fontSize: 40 }}>{'💌'}</Text>
               </View>
               <Text
                 style={{
@@ -260,7 +260,7 @@ export default function InvitePartnerScreen() {
                 textAlign: 'center',
               }}
             >
-              {'\u{1F511}'} Your Invite Code
+              {'🔑'} Your Invite Code
             </Text>
 
             {/* Code display */}
@@ -375,7 +375,7 @@ export default function InvitePartnerScreen() {
               borderColor: theme.accent,
             }}
           >
-            <Text style={{ fontSize: 32 }}>{'\u{1F914}'}</Text>
+            <Text style={{ fontSize: 32 }}>{'🤔'}</Text>
             <Text
               style={{
                 fontSize: 15,
@@ -418,7 +418,7 @@ export default function InvitePartnerScreen() {
               color: theme.textPrimary,
             }}
           >
-            {'\u{1F4A1}'} How it works
+            {'💡'} How it works
           </Text>
           {[
             { step: '1', text: 'Share the invite code with your partner' },

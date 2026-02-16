@@ -37,7 +37,7 @@ export const useSongStore = create<SongState>()(
           songs: [song, ...state.songs],
         }));
         pushToSupabase('song_dedications', song);
-        sendPushToPartner('Song Dedication', `Your partner dedicated "${title}" by ${artist} to you \u{1F3B5}`, '/songs');
+        sendPushToPartner('Song Dedication', `Your partner dedicated "${title}" by ${artist} to you 🎵`, '/songs');
       },
 
       removeSong: (id) => {
