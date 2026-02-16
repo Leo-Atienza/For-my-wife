@@ -13,12 +13,14 @@ const CAMEL_TO_SNAKE_ALIASES: Record<string, string> = {
   imageUri: 'image_url',
   couplePhoto: 'couple_photo_url',
   photoUrl: 'photo_url',
+  primary: 'primary_language',
 };
 
 const SNAKE_TO_CAMEL_ALIASES: Record<string, string> = {
   image_url: 'imageUri',
   couple_photo_url: 'couplePhoto',
   photo_url: 'photoUrl',
+  primary_language: 'primary',
 };
 
 const camelToSnakeKey = (key: string): string => {
