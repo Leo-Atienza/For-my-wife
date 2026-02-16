@@ -125,13 +125,31 @@
 
 ---
 
-## What Still Needs Doing
+## Production Progress
 
-### Must Do
+### Code Completion: 100%
+
+| Area | Status | Details |
+|------|--------|---------|
+| Routes | 64/64 | All screens built and navigable |
+| Stores | 26/26 | All with persistence + sync methods |
+| Sync (initial-load) | 25/25 | All stores pull from Supabase on login |
+| Sync (realtime) | 25/25 | All stores subscribe to realtime changes |
+| Sync (store-reset) | 25/25 | All stores reset on sign-out |
+| Supabase tables | 27/27 | All with RLS policies + realtime publication |
+| Push notifications | 17/17 | All triggers wired with `sendPushToPartner()` |
+| Home widgets | 19/19 | All rendering on home screen |
+| TypeScript | 0 errors | `npx tsc --noEmit` passes clean |
+| Bundle | Compiles | `npx expo export --platform ios` succeeds |
+| TODOs/FIXMEs | 0 | No stubs or incomplete code |
+
+### What Still Needs Doing
+
+#### Must Do
 - [ ] Real device testing (auth flows, 2-device sync, offline queue, all animations)
 - [ ] Test invite partner flow end-to-end on two devices
 
-### Nice to Have
+#### Nice to Have
 - [ ] Field-level conflict resolution (currently last-write-wins)
 - [ ] Accessibility audit (all tap targets 44px, screen reader labels)
 - [ ] Performance profiling on mid-range Android

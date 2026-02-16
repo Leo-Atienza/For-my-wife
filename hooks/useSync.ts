@@ -25,6 +25,7 @@ import { useDreamStore } from '@/stores/useDreamStore';
 import { usePromiseStore } from '@/stores/usePromiseStore';
 import { useWishListStore } from '@/stores/useWishListStore';
 import { useLoveMapStore } from '@/stores/useLoveMapStore';
+import { useLoveLanguageStore } from '@/stores/useLoveLanguageStore';
 import { subscribeToTable, flushPendingOperations } from '@/lib/sync';
 import { flushPendingUploads } from '@/lib/photo-storage';
 import { supabase } from '@/lib/supabase';
@@ -243,6 +244,14 @@ export const useSync = () => {
       onDelete: (old) => useLoveMapStore.getState().syncRemoteDelete(old.id),
     });
     if (loveMapChannel) channels.push(loveMapChannel);
+
+    // Love Language Results
+    const loveLanguageChannel = subscribeToTable<RemoteRecord>('love_language_results', {
+      onInsert: (record) => useLoveLanguageStore.getState().syncRemoteInsert(record as never),
+      onUpdate: (record) => useLoveLanguageStore.getState().syncRemoteUpdate(record as never),
+      onDelete: (old) => useLoveLanguageStore.getState().syncRemoteDelete(old.id as never),
+    });
+    if (loveLanguageChannel) channels.push(loveLanguageChannel);
 
     channelsRef.current = channels;
 

@@ -23,6 +23,7 @@ import { useDreamStore } from '@/stores/useDreamStore';
 import { usePromiseStore } from '@/stores/usePromiseStore';
 import { useWishListStore } from '@/stores/useWishListStore';
 import { useLoveMapStore } from '@/stores/useLoveMapStore';
+import { useLoveLanguageStore } from '@/stores/useLoveLanguageStore';
 import type {
   LoveNote,
   Memory,
@@ -45,6 +46,7 @@ import type {
   CouplePromise,
   WishItem,
   LoveMapPin,
+  LoveLanguageResult,
   PartnerRole,
 } from '@/lib/types';
 
@@ -79,6 +81,7 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       couplePromises,
       wishItems,
       loveMapPins,
+      loveLanguageResults,
     ] = await Promise.all([
       pullFromSupabase<LoveNote>('love_notes'),
       pullFromSupabase<Memory>('memories'),
@@ -104,6 +107,7 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
       pullFromSupabase<CouplePromise>('couple_promises'),
       pullFromSupabase<WishItem>('wish_items'),
       pullFromSupabase<LoveMapPin>('love_map_pins'),
+      pullFromSupabase<LoveLanguageResult>('love_language_results'),
     ]);
 
     // Merge remote data with local data (preserving offline-created records)
@@ -183,6 +187,21 @@ export const loadAllDataFromSupabase = async (): Promise<void> => {
     );
     useLoveMapStore.getState().loadFromRemote(
       mergeById(useLoveMapStore.getState().pins, loveMapPins)
+    );
+
+    // Love Language Results use `partner` as key, not `id`
+    const mergeByPartner = (local: LoveLanguageResult[], remote: LoveLanguageResult[]): LoveLanguageResult[] => {
+      const remoteMap = new Map(remote.map((r) => [r.partner, r]));
+      const merged = [...remote];
+      for (const localItem of local) {
+        if (!remoteMap.has(localItem.partner)) {
+          merged.push(localItem);
+        }
+      }
+      return merged;
+    };
+    useLoveLanguageStore.getState().loadFromRemote(
+      mergeByPartner(useLoveLanguageStore.getState().results, loveLanguageResults)
     );
 
   } catch (error) {
