@@ -21,18 +21,23 @@ const MemoryThumbnail = ({ memory, onPress, onLongPress }: { memory: Memory; onP
       onPress={onPress}
       onLongPress={onLongPress}
       style={({ pressed }) => ({
-        width: ITEM_SIZE,
-        height: ITEM_SIZE,
-        borderRadius: 8,
-        overflow: 'hidden',
         opacity: pressed ? 0.8 : 1,
       })}
     >
-      <Image
-        source={{ uri: memory.imageUri }}
-        style={{ width: '100%', height: '100%' }}
-        resizeMode="cover"
-      />
+      <View
+        style={{
+          width: ITEM_SIZE,
+          height: ITEM_SIZE,
+          borderRadius: 8,
+          overflow: 'hidden',
+        }}
+      >
+        <Image
+          source={{ uri: memory.imageUri }}
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="cover"
+        />
+      </View>
     </Pressable>
   );
 };

@@ -324,10 +324,10 @@ export default function WatchPartyScreen() {
                 const config = TYPE_CONFIG[type];
                 const isSelected = type === selectedType;
                 return (
+                  <View key={type} style={{ flex: 1 }}>
                   <Pressable
-                    key={type}
                     onPress={() => setSelectedType(type)}
-                    style={({ pressed }) => ({ flex: 1, opacity: pressed ? 0.8 : 1 })}
+                    style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
                   >
                     <View
                       style={{
@@ -350,6 +350,7 @@ export default function WatchPartyScreen() {
                       </Text>
                     </View>
                   </Pressable>
+                  </View>
                 );
               })}
             </View>

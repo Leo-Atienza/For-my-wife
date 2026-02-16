@@ -290,10 +290,10 @@ export default function InvitePartnerScreen() {
 
             {/* Action buttons */}
             <View style={{ flexDirection: 'row', gap: 12 }}>
+              <View style={{ flex: 1 }}>
               <Pressable
                 onPress={handleCopyCode}
                 style={({ pressed }) => ({
-                  flex: 1,
                   opacity: pressed ? 0.85 : 1,
                 })}
                 accessibilityRole="button"
@@ -328,11 +328,12 @@ export default function InvitePartnerScreen() {
                   </Text>
                 </View>
               </Pressable>
+              </View>
 
+              <View style={{ flex: 1 }}>
               <Pressable
                 onPress={handleShareCode}
                 style={({ pressed }) => ({
-                  flex: 1,
                   opacity: pressed ? 0.85 : 1,
                 })}
                 accessibilityRole="button"
@@ -361,6 +362,7 @@ export default function InvitePartnerScreen() {
                   </Text>
                 </View>
               </Pressable>
+              </View>
             </View>
           </View>
         ) : (
