@@ -31,12 +31,12 @@ interface PartnerNotesState {
 const mapRemoteToLocal = (record: Record<string, unknown>): PartnerNote => ({
   id: record.id as string,
   author: record.author as PartnerRole,
-  aboutPartner: record.about_partner as PartnerRole,
+  aboutPartner: (record.aboutPartner ?? record.about_partner) as PartnerRole,
   content: record.content as string,
   category: record.category as PartnerNoteCategory,
-  isDiscovered: record.is_discovered as boolean,
-  discoveredAt: record.discovered_at as string | undefined,
-  createdAt: record.created_at as string,
+  isDiscovered: (record.isDiscovered ?? record.is_discovered ?? false) as boolean,
+  discoveredAt: (record.discoveredAt ?? record.discovered_at) as string | undefined,
+  createdAt: (record.createdAt ?? record.created_at ?? new Date().toISOString()) as string,
 });
 
 const mapLocalToRemote = (note: PartnerNote): Record<string, unknown> => ({

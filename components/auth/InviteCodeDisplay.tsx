@@ -58,32 +58,36 @@ export const InviteCodeDisplay = ({ code }: InviteCodeDisplayProps) => {
 
       <Pressable
         onPress={handleCopy}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 6,
-          paddingHorizontal: 16,
-          paddingVertical: 8,
-          borderRadius: 9999,
-          backgroundColor: copied ? theme.success + '20' : theme.surface,
-          borderWidth: 1,
-          borderColor: copied ? theme.success : theme.accent,
-        }}
+        style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
       >
-        {copied ? (
-          <Check size={16} color={theme.success} />
-        ) : (
-          <Copy size={16} color={theme.primary} />
-        )}
-        <Text
+        <View
           style={{
-            fontSize: 14,
-            fontFamily: 'Inter_500Medium',
-            color: copied ? theme.success : theme.primary,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            paddingHorizontal: 16,
+            paddingVertical: 8,
+            borderRadius: 9999,
+            backgroundColor: copied ? theme.success + '20' : theme.surface,
+            borderWidth: 1,
+            borderColor: copied ? theme.success : theme.accent,
           }}
         >
-          {copied ? 'Copied!' : 'Copy Code'}
-        </Text>
+          {copied ? (
+            <Check size={16} color={theme.success} />
+          ) : (
+            <Copy size={16} color={theme.primary} />
+          )}
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: 'Inter_500Medium',
+              color: copied ? theme.success : theme.primary,
+            }}
+          >
+            {copied ? 'Copied!' : 'Copy Code'}
+          </Text>
+        </View>
       </Pressable>
     </View>
   );

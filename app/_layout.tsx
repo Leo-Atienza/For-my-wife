@@ -215,6 +215,8 @@ function AppContent() {
       initialLoadDone.current = true;
       loadAllDataFromSupabase()
         .then(() => {
+          // Signal to the home screen that initial data is ready
+          useAuthStore.getState().setInitialLoadComplete(true);
           migrateLocalDataToCloud();
           // Check for "This Day in History" entries after data is loaded
           checkThisDayInHistory();
@@ -235,6 +237,8 @@ function AppContent() {
         .catch((err) => {
           console.error('Initial load failed, skipping migration to prevent data loss:', err);
           initialLoadDone.current = false;
+          // Still mark as complete to avoid infinite loading state
+          useAuthStore.getState().setInitialLoadComplete(true);
         });
     }
     if (!session) {

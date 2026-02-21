@@ -76,18 +76,22 @@ export default function MemoriesScreen() {
         rightElement={
           <Pressable
             onPress={() => router.push('/memories/new')}
-            style={{
-              backgroundColor: theme.primary,
-              borderRadius: 20,
-              width: 40,
-              height: 40,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
             accessibilityRole="button"
             accessibilityLabel="Add a new memory"
+            style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
           >
-            <Plus size={20} color="#FFFFFF" />
+            <View
+              style={{
+                backgroundColor: theme.primary,
+                borderRadius: 20,
+                width: 40,
+                height: 40,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Plus size={20} color="#FFFFFF" />
+            </View>
           </Pressable>
         }
       />

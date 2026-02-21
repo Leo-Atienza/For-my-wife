@@ -8,7 +8,13 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useTheme } from '@/hooks/useTheme';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { CATEGORY_LABELS, CATEGORY_ICONS } from '@/components/partner-notes/CategoryPicker';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
+
+const safeFormatDate = (dateStr: string | undefined, pattern: string): string => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return isValid(date) ? format(date, pattern) : '';
+};
 
 export default function PartnerNoteDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -75,8 +81,10 @@ export default function PartnerNoteDetailScreen() {
         showBack
         rightElement={
           isMyNote ? (
-            <Pressable onPress={handleDelete} style={{ padding: 8 }}>
-              <Trash2 size={20} color={theme.danger} />
+            <Pressable onPress={handleDelete} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+              <View style={{ padding: 8 }}>
+                <Trash2 size={20} color={theme.danger} />
+              </View>
             </Pressable>
           ) : undefined
         }
@@ -156,9 +164,9 @@ export default function PartnerNoteDetailScreen() {
             color: theme.textMuted,
           }}
         >
-          Written on {format(new Date(note.createdAt), 'MMMM d, yyyy')}
+          Written on {safeFormatDate(note.createdAt, 'MMMM d, yyyy')}
           {note.discoveredAt &&
-            ` \u2022 Discovered on ${format(new Date(note.discoveredAt), 'MMMM d, yyyy')}`}
+            ` \u2022 Discovered on ${safeFormatDate(note.discoveredAt, 'MMMM d, yyyy')}`}
         </Text>
       </ScrollView>
     </View>

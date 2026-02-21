@@ -4,7 +4,13 @@ import { useTheme } from '@/hooks/useTheme';
 import { truncateText } from '@/lib/utils';
 import { CATEGORY_LABELS, CATEGORY_ICONS } from './CategoryPicker';
 import type { PartnerNote } from '@/lib/types';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
+
+const safeFormatDate = (dateStr: string | undefined, pattern: string): string => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return isValid(date) ? format(date, pattern) : '';
+};
 
 interface PartnerNoteCardProps {
   note: PartnerNote;
@@ -102,7 +108,7 @@ export const PartnerNoteCard = ({ note, isAboutMe, onPress }: PartnerNoteCardPro
             color: theme.textMuted,
           }}
         >
-          {format(new Date(note.createdAt), 'MMM d, yyyy')}
+          {safeFormatDate(note.createdAt, 'MMM d, yyyy')}
         </Text>
       </View>
     </Pressable>

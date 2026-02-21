@@ -9,7 +9,7 @@ import type { Memory } from '@/lib/types';
 
 interface MemoriesState {
   memories: Memory[];
-  addMemory: (imageUri: string, caption: string, date: string, location?: string) => void;
+  addMemory: (imageUri: string, caption: string, date: string, location?: string, id?: string) => string;
   removeMemory: (id: string) => void;
   updateMemory: (id: string, updates: Partial<Memory>) => void;
   getMemoryById: (id: string) => Memory | undefined;
@@ -25,10 +25,11 @@ export const useMemoriesStore = create<MemoriesState>()(
     (set, get) => ({
       memories: [],
 
-      addMemory: (imageUri, caption, date, location) => {
+      addMemory: (imageUri, caption, date, location, id) => {
         const now = new Date().toISOString();
+        const memoryId = id ?? generateId();
         const memory: Memory = {
-          id: generateId(),
+          id: memoryId,
           imageUri,
           caption,
           date,
@@ -40,7 +41,8 @@ export const useMemoriesStore = create<MemoriesState>()(
           memories: [memory, ...state.memories],
         }));
         pushToSupabase('memories', memory);
-        sendPushToPartner('New Memory', 'Your partner added a new memory 📸', '/memories');
+        sendPushToPartner('New Memory', 'Your partner added a new memory \ud83d\udcf8', '/memories');
+        return memoryId;
       },
 
       removeMemory: (id) => {

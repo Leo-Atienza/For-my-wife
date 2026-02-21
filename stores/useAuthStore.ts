@@ -13,11 +13,13 @@ interface AuthState {
   myRole: PartnerRole | null;
   inviteCode: string | null;
   isLoading: boolean;
+  initialLoadComplete: boolean;
   error: string | null;
 
   setSession: (session: Session | null) => void;
   setSpaceInfo: (spaceId: string, role: PartnerRole, inviteCode: string | null) => void;
   setLoading: (loading: boolean) => void;
+  setInitialLoadComplete: (value: boolean) => void;
   setError: (error: string | null) => void;
 
   signUp: (email: string, password: string) => Promise<'session' | 'confirmation' | false>;
@@ -49,6 +51,7 @@ export const useAuthStore = create<AuthState>()(
       myRole: null,
       inviteCode: null,
       isLoading: false,
+      initialLoadComplete: false,
       error: null,
 
       setSession: (session) =>
@@ -56,12 +59,16 @@ export const useAuthStore = create<AuthState>()(
           session,
           user: session?.user ?? null,
           error: null,
+          // Reset initial load flag when session changes (new login or logout)
+          initialLoadComplete: session ? get().initialLoadComplete : false,
         }),
 
       setSpaceInfo: (spaceId, role, inviteCode) =>
         set({ spaceId, myRole: role, inviteCode }),
 
       setLoading: (loading) => set({ isLoading: loading }),
+
+      setInitialLoadComplete: (value) => set({ initialLoadComplete: value }),
 
       setError: (error) => set({ error }),
 
@@ -171,6 +178,7 @@ export const useAuthStore = create<AuthState>()(
           spaceId: null,
           myRole: null,
           inviteCode: null,
+          initialLoadComplete: false,
           error: null,
         });
       },
@@ -319,6 +327,7 @@ export const useAuthStore = create<AuthState>()(
           myRole: null,
           inviteCode: null,
           isLoading: false,
+          initialLoadComplete: false,
           error: null,
         }),
     }),

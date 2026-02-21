@@ -95,30 +95,36 @@ export const AddBucketItemModal = ({ visible, onClose, onAdd }: AddBucketItemMod
                     <Pressable
                       key={cat.key}
                       onPress={() => setCategory(cat.key)}
-                      style={{
+                      style={({ pressed }) => ({
                         flex: 1,
-                        alignItems: 'center',
-                        gap: 4,
-                        paddingVertical: 12,
-                        borderRadius: 12,
-                        backgroundColor:
-                          category === cat.key ? theme.primarySoft : theme.surface,
-                        borderWidth: 2,
-                        borderColor:
-                          category === cat.key ? theme.primary : theme.accent,
-                      }}
+                        opacity: pressed ? 0.7 : 1,
+                      })}
                       accessibilityLabel={cat.label}
                     >
-                      <Text style={{ fontSize: 18 }}>{cat.emoji}</Text>
-                      <Text
+                      <View
                         style={{
-                          fontSize: 12,
-                          fontFamily: 'Inter_500Medium',
-                          color: category === cat.key ? theme.primary : theme.textPrimary,
+                          alignItems: 'center',
+                          gap: 4,
+                          paddingVertical: 12,
+                          borderRadius: 12,
+                          backgroundColor:
+                            category === cat.key ? theme.primarySoft : theme.surface,
+                          borderWidth: 2,
+                          borderColor:
+                            category === cat.key ? theme.primary : theme.accent,
                         }}
                       >
-                        {cat.label}
-                      </Text>
+                        <Text style={{ fontSize: 18 }}>{cat.emoji}</Text>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontFamily: 'Inter_500Medium',
+                            color: category === cat.key ? theme.primary : theme.textPrimary,
+                          }}
+                        >
+                          {cat.label}
+                        </Text>
+                      </View>
                     </Pressable>
                   ))}
                 </View>

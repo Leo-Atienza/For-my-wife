@@ -34,6 +34,7 @@ export default function HomeScreen() {
 
   const session = useAuthStore((state) => state.session);
   const spaceId = useAuthStore((state) => state.spaceId);
+  const initialLoadComplete = useAuthStore((state) => state.initialLoadComplete);
   const isOnboarded = useCoupleStore((state) => state.isOnboarded);
   const profile = useCoupleStore((state) => state.profile);
   const partner1 = useProfileStore((state) => state.partner1);
@@ -57,8 +58,9 @@ export default function HomeScreen() {
     );
   }
 
-  // Handle missing profile data gracefully (empty state)
-  if (!profile || !partner1) {
+  // Wait for initial Supabase load to complete before rendering widgets
+  // This prevents empty/missing widgets on first render after login
+  if (!initialLoadComplete || !profile || !partner1) {
     return (
       <View
         style={{

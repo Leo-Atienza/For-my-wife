@@ -113,31 +113,35 @@ export const AddDateIdeaModal = ({ visible, onClose, onAdd }: AddDateIdeaModalPr
                       <Pressable
                         key={cat.key}
                         onPress={() => setCategory(cat.key)}
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          gap: 6,
-                          paddingHorizontal: 14,
-                          paddingVertical: 10,
-                          borderRadius: 12,
-                          backgroundColor:
-                            category === cat.key ? theme.primarySoft : theme.surface,
-                          borderWidth: 2,
-                          borderColor:
-                            category === cat.key ? theme.primary : theme.accent,
-                        }}
+                        style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
                         accessibilityLabel={cat.label}
                       >
-                        <Text style={{ fontSize: 16 }}>{cat.emoji}</Text>
-                        <Text
+                        <View
                           style={{
-                            fontSize: 14,
-                            fontFamily: 'Inter_500Medium',
-                            color: category === cat.key ? theme.primary : theme.textPrimary,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 6,
+                            paddingHorizontal: 14,
+                            paddingVertical: 10,
+                            borderRadius: 12,
+                            backgroundColor:
+                              category === cat.key ? theme.primarySoft : theme.surface,
+                            borderWidth: 2,
+                            borderColor:
+                              category === cat.key ? theme.primary : theme.accent,
                           }}
                         >
-                          {cat.label}
-                        </Text>
+                          <Text style={{ fontSize: 16 }}>{cat.emoji}</Text>
+                          <Text
+                            style={{
+                              fontSize: 14,
+                              fontFamily: 'Inter_500Medium',
+                              color: category === cat.key ? theme.primary : theme.textPrimary,
+                            }}
+                          >
+                            {cat.label}
+                          </Text>
+                        </View>
                       </Pressable>
                     ))}
                   </View>

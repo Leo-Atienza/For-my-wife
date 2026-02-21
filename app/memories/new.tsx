@@ -47,7 +47,8 @@ export default function NewMemoryScreen() {
       const memoryDate = date.trim() || new Date().toISOString().split('T')[0];
       const memoryId = generateId();
 
-      addMemory(finalUri, caption.trim(), memoryDate, location.trim() || undefined);
+      // Pass the pre-generated ID so pending upload queue references the correct memory
+      addMemory(finalUri, caption.trim(), memoryDate, location.trim() || undefined, memoryId);
 
       // If upload failed, queue for retry so partner eventually gets the cloud URL
       if (!cloudUrl) {
@@ -91,23 +92,27 @@ export default function NewMemoryScreen() {
         ) : (
           <Pressable
             onPress={pickImage}
-            style={{
-              width: '100%',
-              height: 200,
-              borderRadius: 16,
-              backgroundColor: theme.primarySoft,
-              borderWidth: 2,
-              borderColor: theme.accent,
-              borderStyle: 'dashed',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 8,
-            }}
+            style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
           >
-            <Camera size={36} color={theme.primary} />
-            <Text style={{ fontSize: 14, fontFamily: 'Inter_500Medium', color: theme.primary }}>
-              Choose a Photo
-            </Text>
+            <View
+              style={{
+                width: '100%',
+                height: 200,
+                borderRadius: 16,
+                backgroundColor: theme.primarySoft,
+                borderWidth: 2,
+                borderColor: theme.accent,
+                borderStyle: 'dashed',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <Camera size={36} color={theme.primary} />
+              <Text style={{ fontSize: 14, fontFamily: 'Inter_500Medium', color: theme.primary }}>
+                Choose a Photo
+              </Text>
+            </View>
           </Pressable>
         )}
 
